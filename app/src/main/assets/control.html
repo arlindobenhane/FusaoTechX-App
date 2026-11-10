@@ -1,195 +1,357 @@
 <!doctype html>
 <html lang="pt"><head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>FusãoTechX</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FusãoTechX Studio</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-:root{--bg:#070a12;--p:rgba(255,255,255,.04);--p2:rgba(255,255,255,.07);--l:rgba(255,255,255,.1);--tx:#eef2ff;--mu:#94a3c4;--ac:#22d3ee;--ac2:#818cf8;--ok:#34d399;--er:#fb7185;--grad:linear-gradient(135deg,#22d3ee,#818cf8 60%,#c084fc)}
+:root{--bg:#070a12;--bg2:#0b1020;--p:rgba(255,255,255,.035);--p2:rgba(255,255,255,.06);--l:rgba(255,255,255,.08);--l2:rgba(255,255,255,.14);
+--tx:#eef2ff;--mu:#94a3c4;--mu2:#5b678a;--ac:#22d3ee;--ac2:#818cf8;--ac3:#c084fc;--ok:#34d399;--wa:#fbbf24;--er:#fb7185;
+--grad:linear-gradient(135deg,#22d3ee 0%,#818cf8 55%,#c084fc 100%);--r:18px;--sh:0 10px 40px rgba(0,0,0,.4)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:radial-gradient(900px 500px at 90% -10%,rgba(129,140,248,.14),transparent),var(--bg);color:var(--tx);font:14.5px/1.45 system-ui,Segoe UI,Roboto,sans-serif;overflow:hidden;height:100vh}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);font:14.5px/1.45 "Segoe UI",Inter,system-ui,sans-serif;overflow:hidden}
+body{background:radial-gradient(1100px 580px at 88% -12%,rgba(129,140,248,.14),transparent 60%),radial-gradient(800px 500px at -8% 112%,rgba(34,211,238,.10),transparent 60%),var(--bg)}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
-input,textarea{font:inherit;color:var(--tx);background:rgba(0,0,0,.3);border:1px solid var(--l);border-radius:12px;padding:11px 13px;outline:none;width:100%}
-svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-#login{position:fixed;inset:0;background:var(--bg);display:grid;place-items:center;z-index:50;padding:24px}
-#login .b{width:100%;max-width:340px;text-align:center}
-#login h1{color:var(--ac);margin:0 0 4px;font-size:30px}#login p{color:var(--mu);margin:0 0 22px}
-#login input{text-align:center;font-size:30px;letter-spacing:.3em;margin-bottom:16px}
-.pbtn{background:var(--grad);color:#06121f;font-weight:700;border-radius:12px;padding:13px;width:100%}
-.app{display:none;grid-template-rows:auto 1fr auto;height:100vh}
-.app.on{display:grid}
-header{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--l)}
-header .m{width:34px;height:34px;border-radius:10px;background:var(--grad);display:grid;place-items:center;font-weight:900;color:#06121f}
-header b{font-size:15px}header .s{font-size:12px;color:var(--mu)}
-.stat{margin-left:auto;display:flex;gap:14px;font-size:12px;color:var(--mu);text-align:right}
-.stat b{display:block;color:var(--tx);font-size:14px}
-main{overflow:auto;padding:16px}
-.view{display:none}.view.on{display:block;animation:f .2s}@keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
-nav{display:flex;gap:4px;padding:8px;border-top:1px solid var(--l);background:rgba(7,10,18,.8);overflow-x:auto}
-nav button{flex:1;min-width:64px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:12px;color:var(--mu);font-size:11px;font-weight:600}
-nav button.on{color:var(--ac);background:var(--p2)}
-.live{display:flex;flex-direction:column;align-items:center;gap:14px}
-.phone{position:relative;border-radius:26px;padding:8px;background:linear-gradient(160deg,#1f2937,#0b1020);box-shadow:0 20px 60px rgba(0,0,0,.5);max-width:min(100%,420px)}
-.phone img{display:block;width:100%;border-radius:20px;background:#000;touch-action:none;-webkit-user-drag:none}
-.ctl{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%;max-width:460px}
-.ctl button{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 4px;border-radius:12px;background:var(--p2);border:1px solid var(--l);font-size:11px;color:var(--mu);font-weight:600}
-.ctl button:active{transform:scale(.94)}
-.card{background:var(--p);border:1px solid var(--l);border-radius:16px;padding:16px;margin-bottom:14px}
-.card h3{margin:0 0 12px;font-size:14px;display:flex;align-items:center;gap:9px;color:var(--ac)}
-.row{display:flex;gap:10px;align-items:center}.row>*{flex:1}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;background:var(--p2);border:1px solid var(--l);font-weight:600}
-.btn.p{background:var(--grad);color:#06121f;border:0}.btn.ok{background:rgba(52,211,153,.15);color:#a7f3d0;border-color:rgba(52,211,153,.3)}.btn.er{background:rgba(251,113,133,.14);color:#fecdd3;border-color:rgba(251,113,133,.3)}
-.btn.sm{padding:8px 11px;font-size:13px}
-.it{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:12px;background:var(--p);border:1px solid var(--l);margin-bottom:8px}
-.it .av{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-weight:800;color:#06121f;flex:none}
-.it .tx{flex:1;min-width:0;text-align:left}.it .tx b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.it .tx span{font-size:12px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
-.dial{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
-.dial button{padding:16px;border-radius:14px;background:var(--p2);border:1px solid var(--l);font-size:20px;font-weight:600}
-.msg{padding:10px 12px;border-radius:12px;margin-bottom:8px;max-width:85%}
-.msg.in{background:var(--p2)}.msg.out{background:rgba(34,211,238,.14);margin-left:auto}
-.chip{display:inline-flex;gap:6px;align-items:center;padding:6px 12px;border-radius:99px;background:var(--p2);border:1px solid var(--l);font-size:12px;font-weight:600;color:var(--mu)}
+input,textarea,select{font:inherit;color:var(--tx);background:rgba(0,0,0,.28);border:1px solid var(--l);border-radius:12px;padding:11px 13px;outline:none;transition:border .15s;width:100%}
+input:focus,textarea:focus{border-color:var(--ac2)}
+svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.app{display:grid;grid-template-columns:238px 1fr;height:100vh}
+/* sidebar */
+.side{border-right:1px solid var(--l);background:rgba(7,10,18,.72);backdrop-filter:blur(20px);display:flex;flex-direction:column;padding:20px 14px}
+.brand{display:flex;align-items:center;gap:12px;padding:4px 8px 22px}
+.brand img{width:44px;height:44px;border-radius:12px;object-fit:cover;box-shadow:0 6px 22px rgba(34,211,238,.35)}
+.brand b{display:block;font-size:15px;letter-spacing:.2px}.brand small{color:var(--mu);font-size:11.5px}
+.nav{display:flex;flex-direction:column;gap:3px}
+.nav button{display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:12px;color:var(--mu);font-weight:600;text-align:left;position:relative;transition:.14s}
+.nav button:hover{background:var(--p);color:var(--tx)}.nav button.on{background:var(--p2);color:var(--tx)}
+.nav button.on::before{content:"";position:absolute;left:-14px;top:9px;bottom:9px;width:3px;border-radius:3px;background:var(--grad)}
+.nav .b{margin-left:auto;font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px;background:rgba(52,211,153,.18);color:var(--ok);display:none}
+.side .foot{margin-top:auto;padding:12px;border-radius:14px;background:var(--p);border:1px solid var(--l);font-size:11.5px;color:var(--mu)}
+.side .foot b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+/* main */
+.main{display:flex;flex-direction:column;min-width:0}
+.top{display:flex;align-items:center;gap:14px;padding:16px 26px;border-bottom:1px solid var(--l)}
+.top h1{margin:0;font-size:21px;letter-spacing:-.3px}.top p{margin:2px 0 0;color:var(--mu);font-size:12.5px}
+.top .sp{flex:1}
+.pill{display:flex;align-items:center;gap:9px;padding:7px 14px;border-radius:99px;background:var(--p);border:1px solid var(--l);font-size:13px;font-weight:600}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--er)}.dot.on{background:var(--ok);box-shadow:0 0 0 4px rgba(52,211,153,.14)}
+.content{flex:1;overflow:auto;padding:22px 26px 40px}
+.view{display:none;animation:f .22s}.view.on{display:block}@keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+/* cards */
+.card{background:var(--p);border:1px solid var(--l);border-radius:var(--r);padding:18px 20px}
+.card h3{margin:0 0 14px;font-size:14px;display:flex;align-items:center;gap:10px}.card h3 .i{color:var(--ac)}
+.grid{display:grid;gap:16px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:11px 15px;border-radius:12px;background:var(--p2);border:1px solid var(--l);font-weight:600;transition:.14s;white-space:nowrap}
+.btn:hover{border-color:var(--l2);background:rgba(255,255,255,.09)}.btn:active{transform:scale(.97)}
+.btn.p{background:var(--grad);color:#06121f;border:0;box-shadow:0 8px 26px rgba(129,140,248,.32)}
+.btn.ok{background:rgba(52,211,153,.14);border-color:rgba(52,211,153,.32);color:#a7f3d0}
+.btn.er{background:rgba(251,113,133,.12);border-color:rgba(251,113,133,.32);color:#fecdd3}
+.btn.sm{padding:8px 11px;font-size:13px;border-radius:10px}
+.muted{color:var(--mu)}.tiny{font-size:12px}.sep{height:1px;background:var(--l);margin:14px 0}
+.kpi .v{font-size:25px;font-weight:800;letter-spacing:-.5px}.kpi .l{color:var(--mu);font-size:12.5px}
+.bar{height:8px;border-radius:9px;background:rgba(255,255,255,.08);overflow:hidden}.bar i{display:block;height:100%;border-radius:9px;background:var(--grad);transition:width .5s}
+.ring{--p:0;width:92px;height:92px;border-radius:50%;background:conic-gradient(var(--ok) calc(var(--p)*1%),rgba(255,255,255,.08) 0);display:grid;place-items:center;flex:none}
+.ring>div{width:72px;height:72px;border-radius:50%;background:var(--bg2);display:grid;place-items:center;font-weight:800;font-size:18px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;background:var(--p2);border:1px solid var(--l);font-size:12.5px;font-weight:600;color:var(--mu)}
 .chip.on{color:var(--ac);border-color:var(--ac)}
-#toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(20px);background:#0e7490;color:#fff;padding:11px 18px;border-radius:99px;font-weight:600;opacity:0;transition:.25s;z-index:60;pointer-events:none}
+/* sim */
+.sim{display:flex;gap:14px;align-items:center;padding:16px;border-radius:16px;background:linear-gradient(135deg,rgba(34,211,238,.1),rgba(129,140,248,.08));border:1px solid var(--l)}
+.sim .n{width:46px;height:46px;border-radius:12px;background:var(--grad);display:grid;place-items:center;font-weight:900;color:#06121f;flex:none}
+.sim .tx b{display:block;font-size:15px}.sim .tx span{font-size:12.5px;color:var(--mu)}
+/* phone mirror */
+.live{display:grid;grid-template-columns:1fr 340px;gap:22px;align-items:start}
+.phone{position:relative;border-radius:28px;padding:9px;background:linear-gradient(160deg,#1f2937,#0b1020);box-shadow:var(--sh);display:inline-block;max-width:100%}
+.phone .scr{border-radius:22px;overflow:hidden;background:#000;position:relative;display:grid;place-items:center}
+.phone img{display:block;width:100%;height:auto;touch-action:none;-webkit-user-drag:none}
+.phone .fps{position:absolute;top:12px;right:14px;font-size:11px;padding:3px 8px;border-radius:99px;background:rgba(0,0,0,.55);color:#a7f3d0;font-weight:700;pointer-events:none}
+.ctl{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ctl button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;border-radius:12px;background:var(--p2);border:1px solid var(--l);font-size:11.5px;color:var(--mu);font-weight:600}
+.ctl button:hover{color:var(--tx);border-color:var(--l2)}.ctl button:active{transform:scale(.95)}
+/* lists */
+.it{display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:13px;background:var(--p);border:1px solid var(--l);margin-bottom:8px}
+.it .av{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-weight:800;color:#06121f;flex:none}
+.it .tx{flex:1;min-width:0;text-align:left}.it .tx b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it .tx span{font-size:12px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.msg{padding:10px 13px;border-radius:13px;margin-bottom:8px;max-width:78%;font-size:13.5px}
+.msg.in{background:var(--p2)}.msg.out{background:rgba(34,211,238,.13);margin-left:auto}
+.msg .w{font-size:11px;color:var(--mu);margin-bottom:3px}
+.dial{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:12px 0}
+.dial button{padding:15px;border-radius:14px;background:var(--p2);border:1px solid var(--l);font-size:20px;font-weight:600}
+.dial button:active{transform:scale(.95)}
+.crumbs{display:flex;align-items:center;gap:3px;flex-wrap:wrap;font-weight:600;font-size:13px}
+.crumbs button{padding:5px 8px;border-radius:8px;color:var(--mu)}.crumbs button:hover{background:var(--p2);color:var(--tx)}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:11px}
+.fi{border-radius:14px;padding:10px;background:var(--p);border:1px solid var(--l);cursor:pointer;transition:.12s}
+.fi:hover{border-color:var(--l2);background:var(--p2)}
+.fi .th{height:88px;border-radius:10px;display:grid;place-items:center;background:rgba(0,0,0,.25);margin-bottom:8px;overflow:hidden}
+.fi .th img{width:100%;height:100%;object-fit:cover}.fi .th .e{font-weight:800;font-size:13px;padding:5px 9px;border-radius:8px}
+.fi .nm{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fi .mt{font-size:11px;color:var(--mu2)}
+.qrbox{background:#fff;padding:12px;border-radius:14px;display:inline-block}
+.empty{text-align:center;color:var(--mu);padding:46px 10px}
+/* login */
+#login{position:fixed;inset:0;background:var(--bg);display:grid;place-items:center;z-index:50;padding:24px}
+#login .bx{width:100%;max-width:360px;text-align:center}
+#login img{width:92px;height:92px;border-radius:22px;margin-bottom:10px;box-shadow:0 10px 36px rgba(34,211,238,.4)}
+#login h1{color:var(--ac);margin:4px 0 2px;font-size:26px}#login p{color:var(--mu);margin:0 0 20px}
+#login input{text-align:center;font-size:28px;letter-spacing:.3em;margin-bottom:14px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#0e7490;color:#fff;padding:11px 18px;border-radius:99px;font-weight:600;opacity:0;transition:.25s;z-index:60;pointer-events:none;max-width:90%}
 #toast.on{opacity:1;transform:translateX(-50%)}
-.empty{text-align:center;color:var(--mu);padding:40px 10px}
-footer{text-align:center;font-size:11px;color:var(--mu);padding:6px}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:10px;border:2px solid transparent;background-clip:padding-box}
+@media (max-width:1150px){.live{grid-template-columns:1fr}.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:1fr}.app{grid-template-columns:200px 1fr}}
 </style></head>
 <body>
-<div id="login"><div class="b"><h1>FusãoTechX</h1><p>Controlo do telefone</p>
-<input id="pin" type="tel" inputmode="numeric" maxlength="12" placeholder="código"><button class="pbtn" onclick="entrar()">Entrar</button>
-<p style="margin-top:28px;font-size:12px">FusãoTechX Mz · fusaotech.com</p></div></div>
+<div id="login"><div class="bx"><img src="/logo" alt=""><h1>FusãoTechX Studio</h1><p>Controlo do telefone</p>
+<input id="pin" type="tel" inputmode="numeric" maxlength="12" placeholder="código"><button class="btn p" style="width:100%" onclick="entrar()">Entrar</button>
+<p style="margin-top:26px;font-size:12px">FusãoTechX Mz · fusaotech.com</p></div></div>
 
-<div class="app" id="app">
-<header>
-  <div class="m">FX</div><div><b id="hNome">Telefone</b><div class="s" id="hSub">Android</div></div>
-  <div class="stat"><div><b id="sBat">—</b>bateria</div><div><b id="sArm">—</b>livre</div></div>
-</header>
-<main>
-  <section class="view on" id="v-ecra"><div class="live">
-    <div class="phone"><img id="scr" alt=""></div>
-    <div class="row" style="max-width:460px"><span class="chip" data-q="40">Rápido</span><span class="chip on" data-q="60">Normal</span><span class="chip" data-q="80">Nítido</span></div>
-    <div class="ctl">
-      <button data-g="back"><svg><path d="M15 6l-6 6 6 6"/></svg>Voltar</button>
-      <button data-g="home"><svg><circle cx="12" cy="12" r="7"/></svg>Início</button>
-      <button data-g="recents"><svg><rect x="6" y="6" width="12" height="12" rx="2"/></svg>Recentes</button>
-      <button data-g="notifications"><svg><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/></svg>Barra</button>
-      <button data-k="voldown"><svg><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 12h3"/></svg>Vol −</button>
-      <button data-k="volup"><svg><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 12h3M18.5 10.5v3"/></svg>Vol +</button>
-      <button data-g="power"><svg><path d="M12 3v9M6 7a8 8 0 1 0 12 0"/></svg>Energia</button>
-      <button data-g="lock"><svg><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Bloquear</button>
-    </div>
-    <div class="card" style="width:100%;max-width:460px"><h3>Escrever no telefone</h3>
-      <textarea id="kb" rows="2" placeholder="Toque num campo no telefone e escreva aqui…"></textarea>
-      <div class="row" style="margin-top:8px"><button class="btn p sm" onclick="escrever()">Enviar</button><button class="btn sm" onclick="post('/backspace')">Apagar</button><button class="btn sm" onclick="post('/global',{a:'back'})">OK/Enter fecha</button></div>
-    </div>
-  </div></section>
+<div class="app" id="app" style="display:none">
+  <aside class="side">
+    <div class="brand"><img src="/logo" alt=""><div><b>FusãoTechX</b><small>Studio</small></div></div>
+    <nav class="nav" id="nav">
+      <button data-v="painel" class="on"><svg class="i" data-i="grid"></svg>Painel</button>
+      <button data-v="ecra"><svg class="i" data-i="phone"></svg>Ecrã ao vivo<span class="b" id="bLive">LIVE</span></button>
+      <button data-v="sms"><svg class="i" data-i="msg"></svg>Mensagens</button>
+      <button data-v="call"><svg class="i" data-i="call"></svg>Chamadas</button>
+      <button data-v="notif"><svg class="i" data-i="bell"></svg>Notificações</button>
+      <button data-v="apps"><svg class="i" data-i="apps"></svg>Aplicações</button>
+      <button data-v="files"><svg class="i" data-i="folder"></svg>Ficheiros</button>
+      <button data-v="def"><svg class="i" data-i="cog"></svg>Definições</button>
+    </nav>
+    <div class="foot">Desenvolvido por <b>FusãoTechX Mz</b><br>+258 83 333 7906<br>fusaotech.com</div>
+  </aside>
 
-  <section class="view" id="v-sms">
-    <div class="card"><h3>Enviar mensagem</h3>
+  <div class="main">
+    <header class="top">
+      <div><h1 id="tTit">Painel</h1><p id="tSub">Visão geral do telefone</p></div>
+      <div class="sp"></div>
+      <div class="pill"><span class="dot" id="dot"></span><span id="pNome">Telefone</span></div>
+    </header>
+    <div class="content">
+
+<!-- PAINEL -->
+<section class="view on" id="v-painel">
+  <div class="grid g4" style="margin-bottom:16px">
+    <div class="card" style="display:flex;gap:14px;align-items:center"><div class="ring" id="batR"><div id="batV">—</div></div><div><div class="kpi"><div class="l">Bateria</div></div><div class="tiny muted" id="batS">—</div></div></div>
+    <div class="card kpi"><div class="l">Armazenamento livre</div><div class="v" id="armV">—</div><div class="bar" style="margin-top:8px"><i id="armB" style="width:0"></i></div></div>
+    <div class="card kpi"><div class="l">Memória RAM livre</div><div class="v" id="ramV">—</div><div class="bar" style="margin-top:8px"><i id="ramB" style="width:0"></i></div></div>
+    <div class="card kpi"><div class="l">Android</div><div class="v" id="andV">—</div><div class="tiny muted" id="modV">—</div></div>
+  </div>
+  <div class="grid g2" style="margin-bottom:16px" id="simWrap"></div>
+  <div class="card"><h3><svg class="i" data-i="bolt"></svg>Ações rápidas</h3>
+    <div class="row">
+      <button class="btn" data-go="ecra"><svg class="i" data-i="phone"></svg>Abrir ecrã ao vivo</button>
+      <button class="btn" data-go="sms"><svg class="i" data-i="msg"></svg>Enviar SMS</button>
+      <button class="btn" data-go="call"><svg class="i" data-i="call"></svg>Ligar</button>
+      <button class="btn" data-go="files"><svg class="i" data-i="folder"></svg>Ficheiros</button>
+      <button class="btn ok" id="qFotos"><svg class="i" data-i="cam"></svg>Ver fotos (Câmara)</button>
+    </div>
+  </div>
+</section>
+
+<!-- ECRA -->
+<section class="view" id="v-ecra">
+  <div class="live">
+    <div style="display:flex;justify-content:center"><div class="phone" style="width:min(400px,100%)"><div class="scr"><img id="scr" tabindex="0" alt=""></div><span class="fps" id="fps">—</span></div></div>
+    <div class="grid">
+      <div class="card"><h3><svg class="i" data-i="mouse"></svg>Controlo</h3>
+        <div class="tiny muted" style="margin-bottom:10px">Clique = tocar · Arrastar = deslizar · Roda = rolar · Clique direito = voltar · Escreva com o teclado.</div>
+        <div class="ctl">
+          <button data-g="back"><svg class="i" data-i="back"></svg>Voltar</button>
+          <button data-g="home"><svg class="i" data-i="circle"></svg>Início</button>
+          <button data-g="recents"><svg class="i" data-i="square"></svg>Recentes</button>
+          <button data-g="notifications"><svg class="i" data-i="bell"></svg>Barra</button>
+          <button data-g="quicksettings"><svg class="i" data-i="cog"></svg>Atalhos</button>
+          <button data-g="power"><svg class="i" data-i="power"></svg>Energia</button>
+          <button id="bCap"><svg class="i" data-i="shot"></svg>Captura</button>
+          <button data-g="lock"><svg class="i" data-i="lock"></svg>Bloquear</button>
+          <button id="bCam"><svg class="i" data-i="cam"></svg>Câmara</button>
+        </div>
+        <div class="sep"></div>
+        <div class="row"><span class="tiny muted">Qualidade</span><span class="chip" data-q="40">Rápido</span><span class="chip on" data-q="60">Normal</span><span class="chip" data-q="80">Nítido</span></div>
+      </div>
+      <div class="card"><h3><svg class="i" data-i="type"></svg>Escrever</h3>
+        <textarea id="kb" rows="2" placeholder="Toque num campo no telefone e escreva…"></textarea>
+        <div class="row" style="margin-top:8px"><button class="btn p sm" onclick="escrever()">Enviar texto</button><button class="btn sm" onclick="post('/backspace')">Apagar</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SMS -->
+<section class="view" id="v-sms">
+  <div class="grid g2" style="align-items:start">
+    <div class="card"><h3><svg class="i" data-i="msg"></svg>Nova mensagem</h3>
       <input id="smsNum" placeholder="Número (+258…)" inputmode="tel">
-      <textarea id="smsTxt" rows="3" placeholder="Mensagem…" style="margin-top:8px"></textarea>
-      <div class="row" style="margin-top:8px"><button class="btn p" onclick="enviarSms()">Enviar SMS</button><button class="btn ok" onclick="enviarWa()">WhatsApp</button></div>
+      <textarea id="smsTxt" rows="4" placeholder="Mensagem…" style="margin-top:9px"></textarea>
+      <div class="row" style="margin-top:9px"><button class="btn p" onclick="enviarSms()">Enviar SMS</button><button class="btn ok" onclick="enviarWa()">WhatsApp</button></div>
     </div>
-    <div class="card"><h3>Recebidas <button class="btn sm" style="margin-left:auto" onclick="carregarSms()">↻</button></h3><div id="smsList" class="empty">Toque em ↻</div></div>
-  </section>
+    <div class="card"><h3><svg class="i" data-i="msg"></svg>Recebidas<button class="btn sm" style="margin-left:auto" onclick="carregarSms()"><svg class="i" data-i="refresh"></svg></button></h3><div id="smsList" class="empty">Toque em atualizar</div></div>
+  </div>
+</section>
 
-  <section class="view" id="v-call">
-    <div class="card"><input id="num" style="font-size:24px;text-align:center" placeholder="+258 …" inputmode="tel">
+<!-- CALL -->
+<section class="view" id="v-call">
+  <div class="grid g2" style="align-items:start">
+    <div class="card"><h3><svg class="i" data-i="call"></svg>Marcador</h3>
+      <input id="num" style="font-size:24px;text-align:center" placeholder="+258 …" inputmode="tel">
       <div class="dial" id="dial"></div>
-      <div class="row"><button class="btn ok" onclick="ligar()">Ligar</button><button class="btn er" onclick="post('/endcall')">Terminar</button></div>
+      <div class="row"><button class="btn ok" style="flex:1" onclick="ligar()"><svg class="i" data-i="call"></svg>Ligar</button><button class="btn er" style="flex:1" onclick="post('/endcall')">Terminar</button></div>
+      <button class="btn" style="width:100%;margin-top:9px" onclick="post('/global',{a:'back'})">Atender (abrir ecrã)</button>
     </div>
-    <div class="card"><h3>Contactos <button class="btn sm" style="margin-left:auto" onclick="carregarContactos()">↻</button></h3><div id="contList" class="empty">Toque em ↻</div></div>
-  </section>
+    <div class="card"><h3><svg class="i" data-i="users"></svg>Contactos<button class="btn sm" style="margin-left:auto" onclick="carregarContactos()"><svg class="i" data-i="refresh"></svg></button></h3>
+      <input id="cBusca" placeholder="Procurar…" oninput="pintarContactos()" style="margin-bottom:10px"><div id="contList" style="max-height:440px;overflow:auto" class="empty">Toque em atualizar</div></div>
+  </div>
+</section>
 
-  <section class="view" id="v-notif">
-    <div class="row" style="margin-bottom:12px"><button class="btn sm" onclick="carregarNotifs()">↻ Atualizar</button><button class="btn sm er" onclick="post('/notifdismiss',{key:''}).then(carregarNotifs)">Limpar todas</button></div>
-    <div id="notifList" class="empty">Toque em ↻</div>
-  </section>
+<!-- NOTIF -->
+<section class="view" id="v-notif">
+  <div class="row" style="margin-bottom:14px"><button class="btn sm" onclick="carregarNotifs()"><svg class="i" data-i="refresh"></svg>Atualizar</button><button class="btn sm er" onclick="post('/notifdismiss',{key:''}).then(carregarNotifs)">Limpar todas</button></div>
+  <div id="notifList" class="empty">Toque em atualizar</div>
+</section>
 
-  <section class="view" id="v-apps">
-    <input id="aBusca" placeholder="Procurar app…" oninput="pintarApps()" style="margin-bottom:12px">
-    <div id="appList" class="empty">A carregar…</div>
-  </section>
+<!-- APPS -->
+<section class="view" id="v-apps">
+  <div class="row" style="margin-bottom:14px"><input id="aBusca" placeholder="Procurar app…" oninput="pintarApps()" style="max-width:320px"><span class="muted tiny" id="aTot"></span><button class="btn sm" style="margin-left:auto" onclick="carregarApps(1)"><svg class="i" data-i="refresh"></svg>Atualizar</button></div>
+  <div id="appList" class="empty">A carregar…</div>
+</section>
 
-  <section class="view" id="v-files">
-    <div class="row" style="margin-bottom:12px"><button class="btn sm" onclick="subir()">⬆</button><div id="crumb" style="flex:3;font-size:13px;color:var(--mu);align-self:center;overflow:hidden">Armazenamento</div><label class="btn sm">Enviar<input type="file" id="up" hidden multiple></label></div>
-    <div id="fileList" class="empty">A carregar…</div>
-  </section>
-</main>
-<nav id="nav">
-  <button data-v="ecra" class="on"><svg><rect x="6" y="2" width="12" height="20" rx="3"/></svg>Ecrã</button>
-  <button data-v="sms"><svg><path d="M4 5h16v11H8l-4 4z"/></svg>SMS</button>
-  <button data-v="call"><svg><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Chamar</button>
-  <button data-v="notif"><svg><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/></svg>Notif.</button>
-  <button data-v="apps"><svg><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Apps</button>
-  <button data-v="files"><svg><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Ficheiros</button>
-</nav>
+<!-- FILES -->
+<section class="view" id="v-files">
+  <div class="row" style="margin-bottom:14px"><button class="btn sm" onclick="subir()"><svg class="i" data-i="back"></svg></button><div class="crumbs" id="crumb"></div><div class="sp" style="flex:1"></div><label class="btn sm"><svg class="i" data-i="up"></svg>Enviar<input type="file" id="up" hidden multiple></label><button class="btn sm" onclick="abrir(DIR)"><svg class="i" data-i="refresh"></svg></button></div>
+  <div id="fileList" class="empty">A carregar…</div>
+</section>
+
+<!-- DEF -->
+<section class="view" id="v-def">
+  <div class="grid g2" style="align-items:start">
+    <div class="card"><h3><svg class="i" data-i="cog"></svg>Ligação</h3>
+      <div class="tiny muted">Nome do telefone</div><input id="dNome" style="margin:6px 0 12px">
+      <div class="tiny muted">Código de acesso</div><input id="dCode" inputmode="numeric" style="margin:6px 0 12px">
+      <button class="btn p" onclick="guardar()">Guardar</button>
+      <div class="sep"></div>
+      <div class="tiny muted">Endereços (mesma rede / hotspot):</div><div id="ips" class="tiny" style="margin-top:6px"></div>
+    </div>
+    <div class="card" style="text-align:center"><h3 style="justify-content:center"><svg class="i" data-i="down"></svg>Instalar noutro telefone</h3>
+      <div class="qrbox"><div id="qrDl"></div></div>
+      <div class="tiny muted" style="margin-top:12px">Lê este QR com outro telefone para descarregar a app.</div>
+      <a class="btn sm" style="margin-top:10px" href="https://github.com/arlindobenhane/FusaoTechX-App/releases/download/apk/FusaoTechX.apk">Link de descarga</a>
+    </div>
+  </div>
+</section>
+    </div>
+  </div>
 </div>
 <div id="toast"></div>
 
 <script>
+const ICON={grid:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
+phone:'<rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/>',msg:'<path d="M4 5h16v11H8l-4 4z"/>',call:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
+bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>',apps:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/>',
+folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',cog:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',
+bolt:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',down:'<path d="M12 3v12M7 10l5 5 5-5M4 21h16"/>',up:'<path d="M12 15V3M7 8l5-5 5 5M4 21h16"/>',mouse:'<rect x="6" y="3" width="12" height="18" rx="6"/><path d="M12 7v4"/>',
+back:'<path d="M15 6l-6 6 6 6"/>',circle:'<circle cx="12" cy="12" r="7"/>',square:'<rect x="6" y="6" width="12" height="12" rx="2"/>',power:'<path d="M12 3v9"/><path d="M6.3 7a8 8 0 1 0 11.4 0"/>',
+shot:'<path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><circle cx="12" cy="12" r="3"/>',lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+cam:'<path d="M4 8h3l2-3h6l2 3h3v12H4z"/><circle cx="12" cy="13" r="4"/>',type:'<path d="M4 7V5h16v2M12 5v14M9 19h6"/>',refresh:'<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/>',users:'<circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 4a3.5 3.5 0 0 1 0 7"/>',
+sim:'<path d="M6 3h8l4 4v14H6z"/><rect x="9" y="12" width="6" height="6" rx="1"/>',file:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>'};
+function ico(n,c=''){return `<svg class="i ${c}" viewBox="0 0 24 24">${ICON[n]||ICON.file}</svg>`}
+document.querySelectorAll('svg[data-i]').forEach(s=>{s.setAttribute('viewBox','0 0 24 24');s.innerHTML=ICON[s.dataset.i]||''});
 const $=s=>document.querySelector(s);let CODE=localStorage.getItem('ftxcode')||'';let W=1080,H=2340;
-const CORES=['#22d3ee','#818cf8','#c084fc','#f472b6','#34d399','#fbbf24'];
+const CO=['#22d3ee','#818cf8','#c084fc','#f472b6','#34d399','#fbbf24','#60a5fa'];
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._);t._=setTimeout(()=>t.classList.remove('on'),2200)}
 function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function fmtB(b){if(!b)return '—';if(b>=1073741824)return (b/1073741824).toFixed(1)+' GB';if(b>=1048576)return (b/1048576).toFixed(0)+' MB';if(b>=1024)return (b/1024).toFixed(0)+' KB';return b+' B'}
 async function get(u){const r=await fetch(u+(u.includes('?')?'&':'?')+'k='+CODE);if(r.status===401){sair();throw 0}return r.json()}
 async function post(u,b){const r=await fetch(u+'?k='+CODE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b||{})});if(r.status===401){sair();throw 0}return r.json().catch(()=>({}))}
-function sair(){localStorage.removeItem('ftxcode');$('#app').classList.remove('on');$('#login').style.display='grid'}
-
+function sair(){localStorage.removeItem('ftxcode');location.reload()}
 async function entrar(){const c=$('#pin').value.trim();const r=await fetch('/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:c})}).then(x=>x.json()).catch(()=>({}));
  if(r.ok){CODE=c;localStorage.setItem('ftxcode',c);arrancar()}else toast('Código errado')}
 $('#pin').addEventListener('keyup',e=>{if(e.key==='Enter')entrar()});
 
-function arrancar(){$('#login').style.display='none';$('#app').classList.add('on');$('#scr').src='/stream?k='+CODE+'&t='+Date.now();estado();setInterval(estado,5000);montarDial();ligarEcra()}
-async function estado(){try{const s=await get('/state');W=s.w||W;H=s.h||H;$('#hNome').textContent=s.nome||'Telefone';$('#hSub').textContent=(s.marca||'')+' · Android '+(s.android||'');$('#sBat').textContent=(s.bateria||0)+'%'+(s.carregar?' ⚡':'');$('#sArm').textContent=fmtB(s.livre)}catch(e){}}
+const TIT={painel:['Painel','Visão geral do telefone'],ecra:['Ecrã ao vivo','Controle com o rato e o teclado'],sms:['Mensagens','SMS e WhatsApp a partir do PC'],call:['Chamadas','Marcador e contactos'],notif:['Notificações','Em tempo real'],apps:['Aplicações','Abrir e gerir'],files:['Ficheiros','Navegar e transferir'],def:['Definições','Ligação e instalação']};
+function arrancar(){$('#login').style.display='none';$('#app').style.display='grid';montarDial();estado();setInterval(estado,4000);$('#scr').src='/stream?k='+CODE+'&t='+Date.now();
+ $('#scr').onerror=()=>setTimeout(()=>{$('#scr').src='/stream?k='+CODE+'&t='+Date.now()},1500);
+ try{new QRCode($('#qrDl'),{text:'https://github.com/arlindobenhane/FusaoTechX-App/releases/download/apk/FusaoTechX.apk',width:150,height:150})}catch(e){}}
+$('#nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;ir(b.dataset.v)};
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)ir(g.dataset.go)});
+function ir(v){document.querySelectorAll('nav button,.view').forEach(x=>x.classList.remove('on'));$('#nav [data-v="'+v+'"]').classList.add('on');$('#v-'+v).classList.add('on');$('#tTit').textContent=TIT[v][0];$('#tSub').textContent=TIT[v][1];
+ if(v==='apps')carregarApps();if(v==='notif')carregarNotifs();if(v==='files'&&!DIR)abrir('');if(v==='sms')carregarSms();if(v==='call')carregarContactos();if(v==='ecra')setTimeout(()=>$('#scr').focus(),150)}
 
-// navegação
-$('#nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;document.querySelectorAll('nav button,.view').forEach(x=>x.classList.remove('on'));b.classList.add('on');$('#v-'+b.dataset.v).classList.add('on');
- if(b.dataset.v==='apps')carregarApps();if(b.dataset.v==='notif')carregarNotifs();if(b.dataset.v==='files')abrir('');if(b.dataset.v==='sms')carregarSms();if(b.dataset.v==='call')carregarContactos()};
+let S={};
+async function estado(){try{S=await get('/state');W=S.w||W;H=S.h||H;
+ $('#dot').classList.add('on');$('#pNome').textContent=S.nome||'Telefone';
+ $('#batR').style.setProperty('--p',S.bateria||0);$('#batV').textContent=(S.bateria||0)+'%';$('#batS').textContent=S.carregar?'A carregar ⚡':'Em uso';
+ const au=S.total?(1-S.livre/S.total)*100:0;$('#armV').textContent=fmtB(S.livre);$('#armB').style.width=au+'%';
+ const ru=S.ramTotal?(1-S.ramLivre/S.ramTotal)*100:0;$('#ramV').textContent=fmtB(S.ramLivre);$('#ramB').style.width=ru+'%';
+ $('#andV').textContent=S.android||'—';$('#modV').textContent=(S.marca||'')+' '+(S.modelo||'');
+ pintarSims(S.sims||[]);
+ if($('#v-def').classList.contains('on')||!$('#dNome').value){$('#dNome').value=S.nome||'';$('#dCode').value=CODE;$('#ips').innerHTML=(S.ips||[]).map(ip=>'http://'+ip+':9999').join('<br>')||'(sem rede)'}
+ }catch(e){$('#dot').classList.remove('on')}}
+function pintarSims(sims){
+ if(!sims.length){$('#simWrap').innerHTML='<div class="card"><h3>'+ico('sim')+'SIM</h3><div class="muted tiny">Sem SIM detetado ou permissão de telefone por dar.</div></div>';return}
+ $('#simWrap').innerHTML=sims.map(s=>`<div class="sim"><div class="n">SIM${s.slot}</div><div class="tx"><b>${esc(s.operadora||s.nome||('SIM '+s.slot))}</b><span>${esc(s.numero||'número não disponível')}${s.roaming?' · roaming':''}${s.pais?' · '+esc(s.pais):''}</span></div></div>`).join('')}
+$('#qFotos').onclick=()=>{ir('files');abrir('/sdcard/DCIM/Camera')};
 
-// ecrã ao vivo
-const scr=$('#scr');let pd=null;
+// ecrã
+const scr=$('#scr');let pd=null,ultRoda=0,frames=0,tf=performance.now();
+scr.addEventListener('load',()=>{});
 function pt(e){const r=scr.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height,t:performance.now()}}
-scr.addEventListener('pointerdown',e=>{pd=pt(e);scr.setPointerCapture(e.pointerId)});
+scr.addEventListener('pointerdown',e=>{if(e.button!==0)return;pd=pt(e);scr.setPointerCapture(e.pointerId);scr.focus()});
 scr.addEventListener('pointerup',e=>{if(!pd)return;const p=pt(e),dt=p.t-pd.t,d=Math.hypot(p.x-pd.x,p.y-pd.y);
- if(d<.02){dt>480?post('/longpress',{x:pd.x,y:pd.y}):post('/tap',{x:pd.x,y:pd.y})}else post('/swipe',{x1:pd.x,y1:pd.y,x2:p.x,y2:p.y,ms:Math.max(80,Math.min(900,dt))});pd=null});
-function ligarEcra(){$('#scr').onerror=()=>{setTimeout(()=>{$('#scr').src='/stream?k='+CODE+'&t='+Date.now()},1500)}}
-document.querySelectorAll('[data-q]').forEach(c=>c.onclick=()=>{document.querySelectorAll('[data-q]').forEach(x=>x.classList.remove('on'));c.classList.add('on');post('/quality',{q:+c.dataset.q})});
-$('#nav').addEventListener('click',()=>{},true);
+ if(d<.02){dt>480?post('/longpress',{x:pd.x,y:pd.y}):post('/tap',{x:pd.x,y:pd.y})}else post('/swipe',{x1:pd.x,y1:pd.y,x2:p.x,y2:p.y,ms:Math.max(60,Math.min(800,dt))});pd=null});
+scr.addEventListener('wheel',e=>{e.preventDefault();const n=performance.now();if(n-ultRoda<240)return;ultRoda=n;const c=pt(e),dir=e.deltaY>0?-1:1;
+ post('/swipe',{x1:c.x,y1:c.y,x2:c.x,y2:Math.max(.02,Math.min(.98,c.y+dir*.28)),ms:150})},{passive:false});
+scr.addEventListener('contextmenu',e=>{e.preventDefault();post('/global',{a:'back'})});
+let buf='',bt=null;
+scr.addEventListener('keydown',e=>{if(e.ctrlKey||e.altKey)return;const m={Enter:'KEYCODE_ENTER',Escape:'KEYCODE_BACK',Tab:'KEYCODE_TAB'};
+ if(e.key==='Backspace'){e.preventDefault();post('/backspace');return}
+ if(e.key.length===1){e.preventDefault();buf+=e.key;clearTimeout(bt);bt=setTimeout(()=>{const t=buf;buf='';post('/text',{t})},150);return}
+ if(m[e.key]){e.preventDefault();post('/global',{a:'back'})}});
+setInterval(()=>{frames++;},0);
+scr.addEventListener('load',()=>{frames++;const n=performance.now();if(n-tf>1000){$('#fps').textContent=(frames*1000/(n-tf)).toFixed(0)+' fps';frames=0;tf=n}});
 document.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>post('/global',{a:b.dataset.g}));
-document.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>toast(b.dataset.k==='volup'?'Volume +':'Volume −')||post('/global',{a:b.dataset.k==='volup'?'quicksettings':'quicksettings'}));
-function escrever(){const t=$('#kb').value;if(!t)return;post('/text',{t}).then(r=>{if(!r.ok)toast('Toque primeiro num campo no telefone');else $('#kb').value=''})}
+document.querySelectorAll('[data-q]').forEach(c=>c.onclick=()=>{document.querySelectorAll('[data-q]').forEach(x=>x.classList.remove('on'));c.classList.add('on');post('/quality',{q:+c.dataset.q})});
+$('#bCap').onclick=()=>{post('/captura').then(r=>toast(r&&r.ok?'Captura guardada no telefone (Imagens)':'Falhou'))};
+$('#bCam').onclick=()=>{post('/camara');toast('Câmara aberta no telefone')};
+function escrever(){const t=$('#kb').value;if(!t)return;post('/text',{t}).then(r=>{if(r&&r.ok===false)toast('Toque primeiro num campo no telefone');else $('#kb').value=''})}
 
 // SMS
-async function carregarSms(){$('#smsList').innerHTML='A carregar…';try{const r=await get('/sms');const l=r.lista||[];$('#smsList').innerHTML=l.length?l.map(m=>`<div class="msg ${m.enviada?'out':'in'}"><div style="font-size:12px;color:var(--mu)">${esc(m.de)}</div>${esc(m.texto)}</div>`).join(''):'<div class="empty">Sem mensagens</div>'}catch(e){}}
-function enviarSms(){const num=$('#smsNum').value,t=$('#smsTxt').value;if(!num||!t)return toast('Número e texto');post('/sendsms',{num,texto:t}).then(r=>{toast(r.ok?'SMS enviado ✓':'Falhou (permissão SMS?)');if(r.ok)$('#smsTxt').value=''})}
-function enviarWa(){const num=$('#smsNum').value,t=$('#smsTxt').value;if(!num)return toast('Número');post('/whatsapp',{num,texto:t});toast('WhatsApp aberto')}
+async function carregarSms(){$('#smsList').innerHTML='A carregar…';try{const r=await get('/sms');const l=r.lista||[];$('#smsList').innerHTML=l.length?l.map(m=>`<div class="msg ${m.enviada?'out':'in'}"><div class="w">${esc(m.de)}</div>${esc(m.texto)}</div>`).join(''):'<div class="empty">Sem mensagens</div>'}catch(e){}}
+function enviarSms(){const num=$('#smsNum').value,t=$('#smsTxt').value;if(!num||!t)return toast('Número e texto');post('/sendsms',{num,texto:t}).then(r=>{toast(r&&r.ok?'SMS enviado':'Falhou (permissão SMS?)');if(r&&r.ok)$('#smsTxt').value=''})}
+function enviarWa(){const num=$('#smsNum').value;if(!num)return toast('Número');post('/whatsapp',{num,texto:$('#smsTxt').value});toast('WhatsApp aberto no telefone')}
 
-// chamadas
+// Chamadas
 function montarDial(){$('#dial').innerHTML=['1','2','3','4','5','6','7','8','9','+','0','⌫'].map(k=>`<button>${k}</button>`).join('');
  $('#dial').onclick=e=>{const b=e.target.closest('button');if(!b)return;const n=$('#num');n.value=b.textContent==='⌫'?n.value.slice(0,-1):n.value+b.textContent}}
 function ligar(){const num=$('#num').value;if(!num)return toast('Número');post('/call',{num});toast('A ligar…')}
-async function carregarContactos(){$('#contList').innerHTML='A carregar…';try{const r=await get('/contactos');const l=r.lista||[];$('#contList').innerHTML=l.length?l.slice(0,300).map(c=>`<div class="it" onclick="$('#num').value='${esc(c.num)}';toast('Número escolhido')"><div class="av" style="background:${CORES[c.nome.length%6]}">${esc((c.nome[0]||'?').toUpperCase())}</div><div class="tx"><b>${esc(c.nome)}</b><span>${esc(c.num)}</span></div></div>`).join(''):'<div class="empty">Sem contactos (deu permissão?)</div>'}catch(e){}}
+let CONT=[];async function carregarContactos(){$('#contList').innerHTML='A carregar…';try{const r=await get('/contactos');CONT=r.lista||[];pintarContactos()}catch(e){}}
+function pintarContactos(){const f=($('#cBusca').value||'').toLowerCase();$('#contList').innerHTML=CONT.filter(c=>!f||(c.nome+c.num).toLowerCase().includes(f)).slice(0,400).map(c=>`<div class="it" onclick="$('#num').value='${esc(c.num)}';ir('call');toast('Número: ${esc(c.num)}')"><div class="av" style="background:${CO[c.nome.length%7]}">${esc((c.nome[0]||'?').toUpperCase())}</div><div class="tx"><b>${esc(c.nome)}</b><span>${esc(c.num)}</span></div></div>`).join('')||'<div class="empty">Sem contactos</div>'}
 
-// notificações
-async function carregarNotifs(){$('#notifList').innerHTML='A carregar…';try{const r=await get('/notifs');const l=r.lista||[];if(!r.ativo){$('#notifList').innerHTML='<div class="empty">Ative "ler notificações" na app do telefone.</div>';return}
- $('#notifList').innerHTML=l.length?l.map(n=>`<div class="it"><div class="av" style="background:${CORES[(n.app||'').length%6]}">${esc((n.app[0]||'?').toUpperCase())}</div><div class="tx"><b>${esc(n.titulo||n.app)}</b><span>${esc(n.texto)}</span></div><button class="btn sm er" onclick="post('/notifdismiss',{key:'${esc(n.key)}'}).then(carregarNotifs)">✕</button></div>`).join(''):'<div class="empty">Sem notificações</div>'}catch(e){}}
+// Notif
+async function carregarNotifs(){$('#notifList').innerHTML='A carregar…';try{const r=await get('/notifs');if(!r.ativo){$('#notifList').innerHTML='<div class="empty">Ative "ler notificações" na app do telefone (Definições).</div>';return}const l=r.lista||[];
+ $('#notifList').innerHTML=l.length?l.map(n=>`<div class="it"><div class="av" style="background:${CO[(n.app||' ').length%7]}">${esc((n.app[0]||'?').toUpperCase())}</div><div class="tx"><b>${esc(n.titulo||n.app)}</b><span>${esc(n.texto)}</span></div><button class="btn sm er" onclick="post('/notifdismiss',{key:'${esc(n.key)}'}).then(carregarNotifs)">✕</button></div>`).join(''):'<div class="empty">Sem notificações</div>'}catch(e){}}
 
-// apps
-let APPS=[];async function carregarApps(){if(APPS.length){pintarApps();return}$('#appList').innerHTML='A carregar…';try{const r=await get('/apps');APPS=(r.lista||[]).sort((a,b)=>a.nome.localeCompare(b.nome));pintarApps()}catch(e){}}
-function pintarApps(){const f=($('#aBusca').value||'').toLowerCase();const l=APPS.filter(a=>!f||a.nome.toLowerCase().includes(f)||a.pkg.includes(f));
- $('#appList').innerHTML=l.map(a=>`<div class="it"><div class="av" style="background:${CORES[a.pkg.length%6]}">${esc((a.nome[0]||'?').toUpperCase())}</div><div class="tx"><b>${esc(a.nome)}</b><span>${esc(a.pkg)}</span></div><button class="btn sm p" onclick="post('/applaunch',{pkg:'${esc(a.pkg)}'})">Abrir</button></div>`).join('')||'<div class="empty">Nada</div>'}
+// Apps
+let APPS=[];async function carregarApps(f){if(APPS.length&&!f){pintarApps();return}$('#appList').innerHTML='A carregar…';try{const r=await get('/apps');APPS=(r.lista||[]).sort((a,b)=>a.nome.localeCompare(b.nome));pintarApps()}catch(e){}}
+function pintarApps(){const f=($('#aBusca').value||'').toLowerCase();const l=APPS.filter(a=>!f||a.nome.toLowerCase().includes(f)||a.pkg.includes(f));$('#aTot').textContent=APPS.length+' apps';
+ $('#appList').innerHTML='<div class="fgrid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">'+l.map(a=>`<div class="it" style="margin:0"><div class="av" style="background:${CO[a.pkg.length%7]}">${esc((a.nome[0]||'?').toUpperCase())}</div><div class="tx"><b>${esc(a.nome)}</b><span>${esc(a.pkg)}</span></div><button class="btn sm p" onclick="post('/applaunch',{pkg:'${esc(a.pkg)}'});toast('A abrir')">Abrir</button></div>`).join('')+'</div>'||'<div class="empty">Nada</div>'}
 
-// ficheiros
-let DIR='';async function abrir(p){DIR=p;$('#fileList').innerHTML='A abrir…';try{const r=await get('/files?p='+encodeURIComponent(p||''));DIR=r.dir;$('#crumb').textContent=r.dir.replace('/storage/emulated/0','Armazenamento').replace('/sdcard','Armazenamento');
- const it=r.itens||[];$('#fileList').innerHTML=it.map(i=>i.d?`<div class="it" onclick="abrir('${esc(i.p)}')"><div class="av" style="background:#22d3ee22;color:#22d3ee"><svg><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div><div class="tx"><b>${esc(i.n)}</b><span>Pasta</span></div></div>`:`<div class="it"><div class="av" style="background:#818cf822;color:#818cf8">${esc((i.e||'?').toUpperCase().slice(0,3))}</div><div class="tx"><b>${esc(i.n)}</b><span>${fmtB(i.s)}</span></div><a class="btn sm" href="/file?baixar=1&k=${CODE}&p=${encodeURIComponent(i.p)}">⬇</a></div>`).join('')||'<div class="empty">Pasta vazia</div>'}catch(e){}}
-function subir(){if(DIR&&DIR!=='/storage/emulated/0'&&DIR!=='/sdcard')abrir(DIR.substring(0,DIR.lastIndexOf('/'))||'')}
-$('#up').onchange=async e=>{for(const f of e.target.files){await fetch('/upload?k='+CODE+'&nome='+encodeURIComponent(f.name),{method:'POST',body:f});toast('Enviado: '+f.name)}e.target.value='';abrir(DIR)};
+// Ficheiros
+let DIR='';const EXT={img:['jpg','jpeg','png','gif','webp','bmp','heic'],vid:['mp4','mkv','avi','mov','3gp','webm'],aud:['mp3','m4a','wav','ogg','opus','aac'],doc:['pdf','doc','docx','txt','xls','xlsx','ppt','pptx']};
+function kind(e){for(const k in EXT)if(EXT[k].includes(e))return k;return 'f'}
+const KC={img:'#22d3ee',vid:'#c084fc',aud:'#f472b6',doc:'#818cf8',f:'#94a3c4'};
+async function abrir(p){DIR=p;$('#fileList').innerHTML='A abrir…';try{const r=await get('/files?p='+encodeURIComponent(p||''));DIR=r.dir;
+ const parts=r.dir.replace(/^\/storage\/emulated\/0\/?|^\/sdcard\/?/,'').split('/').filter(Boolean);let acc='/sdcard';
+ $('#crumb').innerHTML='<button onclick="abrir(\'/sdcard\')">Armazenamento</button>'+parts.map(x=>{acc+='/'+x;return '<span class="muted">›</span><button onclick="abrir(\''+acc+'\')">'+esc(x)+'</button>'}).join('');
+ const it=r.itens||[];$('#fileList').innerHTML='<div class="fgrid">'+it.map(i=>{if(i.d)return `<div class="fi" ondblclick="abrir('${esc(i.p)}')" onclick="abrir('${esc(i.p)}')"><div class="th"><span style="color:#22d3ee">${ico('folder')}</span></div><div class="nm">${esc(i.n)}</div><div class="mt">Pasta</div></div>`;
+  const k=kind(i.e);const th=k==='img'?`<img loading="lazy" src="/file?k=${CODE}&p=${encodeURIComponent(i.p)}">`:`<span class="e" style="background:${KC[k]}22;color:${KC[k]}">${esc((i.e||'?').toUpperCase().slice(0,4))}</span>`;
+  return `<div class="fi" onclick="window.open('/file?k=${CODE}&p=${encodeURIComponent(i.p)}')"><div class="th">${th}</div><div class="nm">${esc(i.n)}</div><div class="mt">${fmtB(i.s)}</div></div>`}).join('')+'</div>'||'<div class="empty">Pasta vazia</div>'}catch(e){}}
+function subir(){if(DIR&&!/\/(storage\/emulated\/0|sdcard)$/.test(DIR))abrir(DIR.substring(0,DIR.lastIndexOf('/'))||'')}
+$('#up').onchange=async e=>{for(const f of e.target.files){await fetch('/upload?k='+CODE+'&dir='+encodeURIComponent(DIR)+'&nome='+encodeURIComponent(f.name),{method:'POST',body:f});toast('Enviado: '+f.name)}e.target.value='';abrir(DIR)};
 
-// teclado físico (quando se usa no PC)
-document.addEventListener('keydown',e=>{if(!$('#app').classList.contains('on'))return;if(document.activeElement&&['INPUT','TEXTAREA'].includes(document.activeElement.tagName))return;
- if(e.key.length===1){post('/text',{t:e.key})}else if(e.key==='Backspace'){post('/backspace')}else if(e.key==='Enter'){post('/global',{a:'back'})}});
+// Definições
+function guardar(){const n=$('#dNome').value.trim(),c=$('#dCode').value.trim();if(n)post('/setname',{nome:n});if(c.length>=4){post('/setcode',{code:c}).then(()=>{CODE=c;localStorage.setItem('ftxcode',c)})}toast('Guardado')}
 
-if(CODE)arrancar();
+if(CODE)arrancar();else $('#login').style.display='grid';
 </script>
 </body></html>

@@ -38,6 +38,10 @@ class MainActivity : Activity() {
         val col = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(22), dp(28), dp(22), dp(40)) }
         root.addView(col)
 
+        col.addView(ImageView(this).apply {
+            try { setImageBitmap(android.graphics.BitmapFactory.decodeStream(assets.open("logo.png"))) } catch (_: Exception) {}
+            layoutParams = LinearLayout.LayoutParams(dp(130), dp(130)).apply { gravity = Gravity.CENTER_HORIZONTAL }
+        })
         col.addView(TextView(this).apply { text = "FusãoTechX"; setTextColor(cor.ac); textSize = 30f; setTypeface(typeface, android.graphics.Typeface.BOLD) })
         col.addView(TextView(this).apply { text = "O seu telefone no PC — app própria, sem conta"; setTextColor(cor.mu); textSize = 14f; setPadding(0, dp(2), 0, dp(18)) })
 
@@ -79,6 +83,15 @@ class MainActivity : Activity() {
 
         estado = TextView(this).apply { setTextColor(cor.mu); textSize = 13f; setPadding(0, dp(16), 0, 0) }
         col.addView(estado)
+
+        col.addView(espaco(18))
+        col.addView(TextView(this).apply { text = "Instalar noutro telefone"; setTextColor(cor.ac); textSize = 16f; setTypeface(typeface, android.graphics.Typeface.BOLD) })
+        col.addView(rotulo("Lê este QR com o outro telefone para descarregar a app:"))
+        col.addView(ImageView(this).apply {
+            try { setImageBitmap(qr("https://github.com/arlindobenhane/FusaoTechX-App/releases/download/apk/FusaoTechX.apk", 440)) } catch (_: Exception) {}
+            layoutParams = LinearLayout.LayoutParams(dp(190), dp(190)).apply { topMargin = dp(6) }
+            setBackgroundColor(Color.WHITE); setPadding(dp(8), dp(8), dp(8), dp(8))
+        })
         col.addView(TextView(this).apply { text = "FusãoTechX Mz · +258 83 333 7906 · fusaotech.com"; setTextColor(cor.ac); textSize = 12f; setPadding(0, dp(24), 0, 0); gravity = Gravity.CENTER })
 
         setContentView(root)
@@ -140,6 +153,13 @@ class MainActivity : Activity() {
     private fun bateria() {
         try { abrirUri(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, "package:$packageName") }
         catch (_: Exception) { toast("Abra Definições › Bateria › sem restrições") }
+    }
+
+    private fun qr(texto: String, tam: Int): android.graphics.Bitmap {
+        val m = com.google.zxing.qrcode.QRCodeWriter().encode(texto, com.google.zxing.BarcodeFormat.QR_CODE, tam, tam)
+        val bmp = android.graphics.Bitmap.createBitmap(tam, tam, android.graphics.Bitmap.Config.ARGB_8888)
+        for (x in 0 until tam) for (y in 0 until tam) bmp.setPixel(x, y, if (m.get(x, y)) Color.BLACK else Color.WHITE)
+        return bmp
     }
 
     // ---------- helpers de UI ----------

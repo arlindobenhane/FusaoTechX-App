@@ -78,13 +78,14 @@ class Httpd(ctxIn: Context, private val porta: Int) {
 
             // Autenticação
             val agora = System.currentTimeMillis()
-            if (caminho != "/login" && caminho != "/") {
+            if (caminho != "/login" && caminho != "/" && caminho != "/logo") {
                 if (agora < bloqueioAte) { enviar(out, 429, "application/json", "{\"erro\":\"bloqueado\"}".toByteArray()); return }
                 if (chave != code()) { enviar(out, 401, "application/json", "{\"erro\":\"codigo\"}".toByteArray()); return }
             }
 
             when {
                 caminho == "/" -> servirAsset(out, "control.html", "text/html; charset=utf-8")
+                caminho == "/logo" -> servirAsset(out, "logo.png", "image/png")
                 caminho == "/login" && metodo == "POST" -> {
                     val b = json(corpo)
                     if (b.optString("code") == code()) {
@@ -137,6 +138,13 @@ class Httpd(ctxIn: Context, private val porta: Int) {
             "/applaunch" -> Device.abrirApp(ctx, b.optString("pkg"))
             "/notifdismiss" -> if (b.optString("key").isEmpty()) NotifService.inst?.dispensarTodas() else NotifService.inst?.dispensar(b.optString("key"))
             "/quality" -> CaptureService.qualidade = b.optInt("q", 60).coerceIn(20, 90)
+            "/captura" -> {
+                val f = CaptureService.frame
+                r.put("ok", if (f != null) Device.guardarImagem(ctx, f, "Captura-" + System.currentTimeMillis() + ".jpg") else false)
+            }
+            "/camara" -> Device.abrirCamera(ctx)
+            "/setname" -> Prefs.setName(ctx, b.optString("nome"))
+            "/setcode" -> { val cc = b.optString("code"); if (cc.length in 4..12) Prefs.setCode(ctx, cc) }
             else -> r.put("ok", false)
         }
         return r
@@ -147,6 +155,7 @@ class Httpd(ctxIn: Context, private val porta: Int) {
         o.put("ecra", CaptureService.frame != null)
         o.put("w", CaptureService.realW); o.put("h", CaptureService.realH)
         o.put("ips", JSONArray(Util.localIps()))
+        o.put("sims", Device.sims(ctx))
         return o
     }
 
@@ -203,7 +212,7 @@ class Httpd(ctxIn: Context, private val porta: Int) {
                 semEcra = 0
                 out.write(("--ftx\r\nContent-Type: image/jpeg\r\nContent-Length: ${f.size}\r\n\r\n").toByteArray())
                 out.write(f); out.write("\r\n".toByteArray()); out.flush()
-                Thread.sleep(55)
+                Thread.sleep(33)
             }
         } catch (_: Exception) {}
     }

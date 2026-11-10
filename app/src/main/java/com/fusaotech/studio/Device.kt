@@ -44,6 +44,36 @@ object Device {
         return o
     }
 
+    @Suppress("MissingPermission", "DEPRECATION", "HardwareIds")
+    fun sims(c: Context): JSONArray {
+        val arr = JSONArray()
+        try {
+            val sm = c.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as android.telephony.SubscriptionManager
+            val lista = sm.activeSubscriptionInfoList
+            if (lista != null) {
+                for (s in lista) {
+                    val o = JSONObject()
+                    o.put("slot", s.simSlotIndex + 1)
+                    o.put("operadora", s.carrierName?.toString() ?: "")
+                    o.put("nome", s.displayName?.toString() ?: "")
+                    o.put("numero", try { s.number ?: "" } catch (_: Exception) { "" })
+                    o.put("pais", s.countryIso?.uppercase() ?: "")
+                    o.put("roaming", sm.isNetworkRoaming(s.subscriptionId))
+                    arr.put(o)
+                }
+            }
+        } catch (_: Exception) {}
+        // Dados adicionais (rede, sinal) do SIM principal
+        try {
+            val tm = c.getSystemService(Context.TELEPHONY_SERVICE) as android.telephony.TelephonyManager
+            if (arr.length() == 0 && tm.simState == android.telephony.TelephonyManager.SIM_STATE_READY) {
+                val o = JSONObject(); o.put("slot", 1); o.put("operadora", tm.networkOperatorName ?: ""); o.put("numero", "")
+                arr.put(o)
+            }
+        } catch (_: Exception) {}
+        return arr
+    }
+
     fun ligar(c: Context, numero: String) {
         try {
             val i = Intent(Intent.ACTION_CALL, Uri.parse("tel:" + numero))
@@ -145,6 +175,22 @@ object Device {
             if (!u.matches(Regex("^[a-z]+://.*"))) u = "https://$u"
             val i = Intent(Intent.ACTION_VIEW, Uri.parse(u)); i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); c.startActivity(i)
         } catch (_: Exception) {}
+    }
+
+    fun abrirCamera(c: Context) {
+        try {
+            val i = Intent("android.media.action.STILL_IMAGE_CAMERA"); i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); c.startActivity(i)
+        } catch (_: Exception) {}
+    }
+
+    fun guardarImagem(c: Context, bytes: ByteArray, nome: String): Boolean {
+        return try {
+            val dir = File(android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_PICTURES), "FusaoTechX")
+            dir.mkdirs()
+            val f = File(dir, nome); f.writeBytes(bytes)
+            c.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(f)))
+            true
+        } catch (_: Exception) { false }
     }
 
     fun whatsapp(c: Context, numero: String, texto: String) {

@@ -33,7 +33,8 @@ class CaptureService : Service() {
         @Volatile var realW = 0
         @Volatile var realH = 0
         @Volatile var ativo = false
-        @Volatile var qualidade = 60
+        @Volatile var qualidade = 55
+        @Volatile var maxLado = 820.0
         const val CH = "ftx_run"
         const val NID = 7788
     }
@@ -108,7 +109,6 @@ class CaptureService : Service() {
                 realW = dm.widthPixels; realH = dm.heightPixels
             }
             // Resolução de captura reduzida para fluidez
-            val maxLado = 1000.0
             val esc = minOf(1.0, maxLado / maxOf(realW, realH))
             val capW = (realW * esc).toInt().coerceAtLeast(2) and 1.inv()
             val capH = (realH * esc).toInt().coerceAtLeast(2) and 1.inv()
@@ -118,7 +118,7 @@ class CaptureService : Service() {
                 val img = try { r.acquireLatestImage() } catch (_: Exception) { null } ?: return@setOnImageAvailableListener
                 try {
                     val agora = System.currentTimeMillis()
-                    if (agora - ultima < 45) return@setOnImageAvailableListener
+                    if (agora - ultima < 28) return@setOnImageAvailableListener
                     ultima = agora
                     val plane = img.planes[0]
                     val buf = plane.buffer
