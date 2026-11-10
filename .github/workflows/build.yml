@@ -3,6 +3,9 @@ on:
   push:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   apk:
     runs-on: ubuntu-latest
@@ -16,9 +19,16 @@ jobs:
         run: gradle wrapper --gradle-version 8.2
       - name: Compilar APK (debug)
         run: ./gradlew assembleDebug --no-daemon --stacktrace
-      - name: Guardar APK
+      - name: Guardar APK (artefacto)
         uses: actions/upload-artifact@v4
         with:
           name: FusaoTechX-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+      - name: Publicar APK (link de descarga)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk FusaoTechX.apk
+          gh release delete apk -y --cleanup-tag 2>/dev/null || true
+          gh release create apk FusaoTechX.apk -t "FusãoTechX App (APK)" -n "APK pronta a instalar. Abra no telefone e instale. FusãoTechX Mz."
