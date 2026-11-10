@@ -1,0 +1,42 @@
+<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>App FusãoTechX • Instalar</title>
+<style>body{margin:0;background:#0b1020;color:#e8ecf8;font:16px/1.6 Segoe UI,system-ui,sans-serif}
+header{padding:40px 24px;background:linear-gradient(135deg,#0e7490,#1e1b4b);text-align:center}h1{margin:6px 0;font-size:30px}
+main{max-width:860px;margin:0 auto;padding:24px 16px}section{background:#121a33;border:1px solid #1f2a4d;border-radius:16px;padding:20px 24px;margin-bottom:18px}
+h2{color:#22d3ee;margin:0 0 10px}code{background:#0a0f1e;border:1px solid #1f2a4d;padding:1px 6px;border-radius:6px;color:#a5f3fc}
+ol,ul{padding-left:22px}li{margin:6px 0}.ok{border-left:4px solid #34d399;padding:8px 14px;background:#0d2a22;border-radius:8px}
+.wa{border-left:4px solid #fbbf24;padding:8px 14px;background:#2a2410;border-radius:8px}
+footer{text-align:center;color:#93a0c4;padding:30px;font-size:13px}b{color:#a5f3fc}</style></head><body>
+<header><div style="letter-spacing:.1em;color:#a5f3fc;font-weight:800">FUSÃOTECHX MZ</div><h1>App do Telefone</h1><p>A tua app — sem conta, sem email</p></header>
+<main>
+<section><h2>O que a app faz</h2>
+<ul><li>Mostra o ecrã do telefone no PC e deixa controlar com o rato e o teclado (rápido, por ser nativa).</li>
+<li><b>SMS</b> e <b>chamadas</b> feitas direto do PC, <b>contactos</b>, <b>notificações</b> em tempo real, <b>apps</b> e <b>ficheiros</b>.</li>
+<li>Abre o painel dentro do próprio telefone. No PC abres <code>http://IP-DO-TELEFONE:9999</code>.</li>
+<li>Sem conta: a app cria um <b>código de 4 dígitos</b>. Instalas em 2 telefones e no PC escolhes qual.</li></ul></section>
+
+<section><h2>Em que redes funciona</h2>
+<ul><li><b>Mesma rede Wi-Fi</b> (casa, escritório): funciona, rápido.</li>
+<li><b>Hotspot do telefone</b>: liga o hotspot no telefone e o PC a esse hotspot → funciona em qualquer lugar, sem cabo e sem router.</li>
+<li><b>Redes diferentes</b> (telefone nos dados móveis, PC noutra rede): precisa do <b>servidor de ligação</b> (relay) a correr num host público (o teu fusaotech.com), porque a operadora bloqueia ligações a entrar no telefone.</li></ul></section>
+
+<section><h2>Instalar a APK</h2>
+<ol><li>Copia o <code>app-debug.apk</code> para o telefone (cabo, WhatsApp para ti próprio, ou abre o link no telefone).</li>
+<li>Toca no ficheiro → o Android pede para <b>permitir instalar de fontes desconhecidas</b> → aceita.</li>
+<li>Abre a app <b>FusãoTechX</b> e toca nos botões de permissões (uma vez): Acessibilidade (controlo), Notificações, SMS/chamadas/contactos/câmara, ficheiros, bateria.</li>
+<li>Toca em <b>LIGAR</b> e aceita a partilha de ecrã.</li>
+<li>No PC, abre o endereço que a app mostra (ex.: <code>http://192.168.x.x:9999</code>) e mete o código.</li></ol>
+<div class="ok">A APK é assinada em modo de teste (debug) — instala-se normalmente ao lado das outras apps. É a tua app, não passa por lojas.</div></section>
+
+<section><h2>Permissões — porquê</h2>
+<ul><li><b>Acessibilidade:</b> é a forma oficial de uma app tocar e escrever no ecrã sem fazer root.</li>
+<li><b>Captura de ecrã:</b> para veres o telefone no PC.</li>
+<li><b>SMS / Telefone:</b> enviar mensagens e ligar direto do PC.</li>
+<li><b>Notificações:</b> ler e dispensar no PC.</li>
+<li>Em apps de banco/M-Pesa o ecrã fica <b>preto</b> (proteção do Android); mesmo assim escreves lá com o teclado do PC.</li></ul></section>
+
+<section><h2>Ecrã preto em apps de banco</h2>
+<p>M-Pesa, e-Mola, bancos e gestores de senhas ativam uma proteção do Android que impede qualquer app de capturar esse ecrã — é o que protege o teu dinheiro de vírus. Nenhuma ferramenta sem root mostra esse ecrã. Podes continuar a tocar e escrever nesses ecrãs a partir do PC.</p></section>
+</main>
+<footer>FusãoTechX Mz · +258 83 333 7906 · fusaotech.com</footer>
+</body></html>
