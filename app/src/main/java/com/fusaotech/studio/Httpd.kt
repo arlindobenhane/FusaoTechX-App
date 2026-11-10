@@ -180,7 +180,7 @@ class Httpd(ctxIn: Context, private val porta: Int) {
 
     private fun upload(nome: String?, corpo: ByteArray): JSONObject {
         return try {
-            val dir = java.io.File(android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOAD), "FusaoTechX")
+            val dir = java.io.File(android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS), "FusaoTechX")
             dir.mkdirs()
             val f = java.io.File(dir, nome ?: ("ftx_" + System.currentTimeMillis()))
             f.writeBytes(corpo)
