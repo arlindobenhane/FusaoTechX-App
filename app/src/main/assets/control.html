@@ -101,13 +101,13 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 @media (max-width:1150px){.live{grid-template-columns:1fr}.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:1fr}.app{grid-template-columns:200px 1fr}}
 </style></head>
 <body>
-<div id="login"><div class="bx"><img src="/logo" alt=""><h1>FusãoTechX Studio</h1><p>Controlo do telefone</p>
+<div id="login"><div class="bx"><img src="logo" alt=""><h1>FusãoTechX Studio</h1><p>Controlo do telefone</p>
 <input id="pin" type="tel" inputmode="numeric" maxlength="12" placeholder="código"><button class="btn p" style="width:100%" onclick="entrar()">Entrar</button>
 <p style="margin-top:26px;font-size:12px">FusãoTechX Mz · fusaotech.com</p></div></div>
 
 <div class="app" id="app" style="display:none">
   <aside class="side">
-    <div class="brand"><img src="/logo" alt=""><div><b>FusãoTechX</b><small>Studio</small></div></div>
+    <div class="brand"><img src="logo" alt=""><div><b>FusãoTechX</b><small>Studio</small></div></div>
     <nav class="nav" id="nav">
       <button data-v="painel" class="on"><svg class="i" data-i="grid"></svg>Painel</button>
       <button data-v="ecra"><svg class="i" data-i="phone"></svg>Ecrã ao vivo<span class="b" id="bLive">LIVE</span></button>
@@ -231,6 +231,7 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stro
       <button class="btn p" onclick="guardar()">Guardar</button>
       <div class="sep"></div>
       <div class="tiny muted">Endereços (mesma rede / hotspot):</div><div id="ips" class="tiny" style="margin-top:6px"></div>
+      <div class="tiny muted" style="margin-top:12px">Qualquer rede (dados móveis):</div><div id="remoto" class="tiny" style="margin-top:6px">—</div>
     </div>
     <div class="card" style="text-align:center"><h3 style="justify-content:center"><svg class="i" data-i="down"></svg>Instalar noutro telefone</h3>
       <div class="qrbox"><div id="qrDl"></div></div>
@@ -256,21 +257,36 @@ cam:'<path d="M4 8h3l2-3h6l2 3h3v12H4z"/><circle cx="12" cy="13" r="4"/>',type:'
 sim:'<path d="M6 3h8l4 4v14H6z"/><rect x="9" y="12" width="6" height="6" rx="1"/>',file:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>'};
 function ico(n,c=''){return `<svg class="i ${c}" viewBox="0 0 24 24">${ICON[n]||ICON.file}</svg>`}
 document.querySelectorAll('svg[data-i]').forEach(s=>{s.setAttribute('viewBox','0 0 24 24');s.innerHTML=ICON[s.dataset.i]||''});
-const $=s=>document.querySelector(s);let CODE=localStorage.getItem('ftxcode')||'';let W=1080,H=2340;
+// Mesmo painel em dois modos: rede local (http://IP:9999/) ou ligação remota (fusaotech.com/relay/d/ID/).
+const B=location.pathname.replace(/[^/]*$/,'')||'/',RELAY=B!=='/',U=u=>B+String(u).replace(/^\//,''),CK='ftxcode'+(RELAY?B:'');
+const $=s=>document.querySelector(s);let CODE=localStorage.getItem(CK)||'';let W=1080,H=2340;
 const CO=['#22d3ee','#818cf8','#c084fc','#f472b6','#34d399','#fbbf24','#60a5fa'];
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._);t._=setTimeout(()=>t.classList.remove('on'),2200)}
 function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function fmtB(b){if(!b)return '—';if(b>=1073741824)return (b/1073741824).toFixed(1)+' GB';if(b>=1048576)return (b/1048576).toFixed(0)+' MB';if(b>=1024)return (b/1024).toFixed(0)+' KB';return b+' B'}
-async function get(u){const r=await fetch(u+(u.includes('?')?'&':'?')+'k='+CODE);if(r.status===401){sair();throw 0}return r.json()}
-async function post(u,b){const r=await fetch(u+'?k='+CODE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b||{})});if(r.status===401){sair();throw 0}return r.json().catch(()=>({}))}
-function sair(){localStorage.removeItem('ftxcode');location.reload()}
-async function entrar(){const c=$('#pin').value.trim();const r=await fetch('/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:c})}).then(x=>x.json()).catch(()=>({}));
- if(r.ok){CODE=c;localStorage.setItem('ftxcode',c);arrancar()}else toast('Código errado')}
+async function get(u){const r=await fetch(U(u)+(u.includes('?')?'&':'?')+'k='+CODE);if(r.status===401){sair();throw 0}if(r.status===429){toast('Demasiadas tentativas. Aguarde 10 minutos.');throw 0}return r.json()}
+async function post(u,b){const r=await fetch(U(u)+'?k='+CODE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b||{})});if(r.status===401){sair();throw 0}return r.json().catch(()=>({}))}
+function sair(){localStorage.removeItem(CK);location.reload()}
+async function entrar(){const c=$('#pin').value.trim();const r=await fetch(U('/login'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:c})}).then(x=>x.json()).catch(()=>({}));
+ if(r.ok){CODE=c;localStorage.setItem(CK,c);arrancar()}else toast(r.erro==='bloqueado'?'Demasiadas tentativas. Aguarde 10 minutos.':(r.erro==='offline'?'O telefone desligou-se do relay.':'Código errado'))}
 $('#pin').addEventListener('keyup',e=>{if(e.key==='Enter')entrar()});
 
 const TIT={painel:['Painel','Visão geral do telefone'],ecra:['Ecrã ao vivo','Controle com o rato e o teclado'],sms:['Mensagens','SMS e WhatsApp a partir do PC'],call:['Chamadas','Marcador e contactos'],notif:['Notificações','Em tempo real'],apps:['Aplicações','Abrir e gerir'],files:['Ficheiros','Navegar e transferir'],def:['Definições','Ligação e instalação']};
-function arrancar(){$('#login').style.display='none';$('#app').style.display='grid';montarDial();estado();setInterval(estado,4000);$('#scr').src='/stream?k='+CODE+'&t='+Date.now();
- $('#scr').onerror=()=>setTimeout(()=>{$('#scr').src='/stream?k='+CODE+'&t='+Date.now()},1500);
+// Ecrã: na rede local usa o vídeo contínuo (MJPEG); pelo relay pede a imagem mais recente, uma de cada vez.
+let SEQ=0,ecraOn=false;
+function ecraIniciar(){const im=$('#scr');
+ if(!RELAY){im.src=U('/stream')+'?k='+CODE+'&t='+Date.now();im.onerror=()=>setTimeout(()=>{im.src=U('/stream')+'?k='+CODE+'&t='+Date.now()},1500);return}
+ if(ecraOn)return;ecraOn=true;let url=null;
+ const ciclo=async()=>{if(document.hidden){setTimeout(ciclo,800);return}
+  try{const r=await fetch(U('/shot')+'?k='+CODE+'&since='+SEQ+'&t='+Date.now(),{cache:'no-store'});
+   if(r.status===401){sair();return}
+   if(r.status===200){SEQ=+(r.headers.get('X-Seq')||SEQ);const b=await r.blob();const n=URL.createObjectURL(b);
+    await new Promise(ok=>{im.onload=ok;im.onerror=ok;im.src=n});if(url)URL.revokeObjectURL(url);url=n}
+   else if(r.status!==204)await new Promise(ok=>setTimeout(ok,1500));
+  }catch(e){await new Promise(ok=>setTimeout(ok,1500))}
+  setTimeout(ciclo,0)};
+ ciclo()}
+function arrancar(){$('#login').style.display='none';$('#app').style.display='grid';montarDial();estado();setInterval(estado,4000);ecraIniciar();
  try{new QRCode($('#qrDl'),{text:'https://github.com/arlindobenhane/FusaoTechX-App/releases/download/apk/FusaoTechX.apk',width:150,height:150})}catch(e){}}
 $('#nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;ir(b.dataset.v)};
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)ir(g.dataset.go)});
@@ -285,7 +301,8 @@ async function estado(){try{S=await get('/state');W=S.w||W;H=S.h||H;
  const ru=S.ramTotal?(1-S.ramLivre/S.ramTotal)*100:0;$('#ramV').textContent=fmtB(S.ramLivre);$('#ramB').style.width=ru+'%';
  $('#andV').textContent=S.android||'—';$('#modV').textContent=(S.marca||'')+' '+(S.modelo||'');
  pintarSims(S.sims||[]);
- if($('#v-def').classList.contains('on')||!$('#dNome').value){$('#dNome').value=S.nome||'';$('#dCode').value=CODE;$('#ips').innerHTML=(S.ips||[]).map(ip=>'http://'+ip+':9999').join('<br>')||'(sem rede)'}
+ if($('#v-def').classList.contains('on')||!$('#dNome').value){$('#dNome').value=S.nome||'';$('#dCode').value=CODE;$('#ips').innerHTML=(S.ips||[]).map(ip=>'http://'+ip+':9999').join('<br>')||'(sem rede)';
+  $('#remoto').innerHTML=S.relayId?(S.relayOn?'✅ fusaotech.com/relay · ID <b>'+esc(S.relayId.replace(/(\d{3})(?=\d)/g,'$1 '))+'</b>'+(S.relayEstado?' · '+esc(S.relayEstado):''):'Desativada (ative «Ligação remota» na app do telefone)'):'—'}
  }catch(e){$('#dot').classList.remove('on')}}
 function pintarSims(sims){
  if(!sims.length){$('#simWrap').innerHTML='<div class="card"><h3>'+ico('sim')+'SIM</h3><div class="muted tiny">Sem SIM detetado ou permissão de telefone por dar.</div></div>';return}
@@ -307,7 +324,7 @@ scr.addEventListener('keydown',e=>{if(e.ctrlKey||e.altKey)return;const m={Enter:
  if(e.key==='Backspace'){e.preventDefault();post('/backspace');return}
  if(e.key.length===1){e.preventDefault();buf+=e.key;clearTimeout(bt);bt=setTimeout(()=>{const t=buf;buf='';post('/text',{t})},150);return}
  if(m[e.key]){e.preventDefault();post('/global',{a:'back'})}});
-setInterval(()=>{frames++;},0);
+
 scr.addEventListener('load',()=>{frames++;const n=performance.now();if(n-tf>1000){$('#fps').textContent=(frames*1000/(n-tf)).toFixed(0)+' fps';frames=0;tf=n}});
 document.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>post('/global',{a:b.dataset.g}));
 document.querySelectorAll('[data-q]').forEach(c=>c.onclick=()=>{document.querySelectorAll('[data-q]').forEach(x=>x.classList.remove('on'));c.classList.add('on');post('/quality',{q:+c.dataset.q})});
@@ -344,13 +361,13 @@ async function abrir(p){DIR=p;$('#fileList').innerHTML='A abrir…';try{const r=
  const parts=r.dir.replace(/^\/storage\/emulated\/0\/?|^\/sdcard\/?/,'').split('/').filter(Boolean);let acc='/sdcard';
  $('#crumb').innerHTML='<button onclick="abrir(\'/sdcard\')">Armazenamento</button>'+parts.map(x=>{acc+='/'+x;return '<span class="muted">›</span><button onclick="abrir(\''+acc+'\')">'+esc(x)+'</button>'}).join('');
  const it=r.itens||[];$('#fileList').innerHTML='<div class="fgrid">'+it.map(i=>{if(i.d)return `<div class="fi" ondblclick="abrir('${esc(i.p)}')" onclick="abrir('${esc(i.p)}')"><div class="th"><span style="color:#22d3ee">${ico('folder')}</span></div><div class="nm">${esc(i.n)}</div><div class="mt">Pasta</div></div>`;
-  const k=kind(i.e);const th=k==='img'?`<img loading="lazy" src="/file?k=${CODE}&p=${encodeURIComponent(i.p)}">`:`<span class="e" style="background:${KC[k]}22;color:${KC[k]}">${esc((i.e||'?').toUpperCase().slice(0,4))}</span>`;
-  return `<div class="fi" onclick="window.open('/file?k=${CODE}&p=${encodeURIComponent(i.p)}')"><div class="th">${th}</div><div class="nm">${esc(i.n)}</div><div class="mt">${fmtB(i.s)}</div></div>`}).join('')+'</div>'||'<div class="empty">Pasta vazia</div>'}catch(e){}}
+  const k=kind(i.e);const th=k==='img'?`<img loading="lazy" src="${U('/file')}?k=${CODE}&p=${encodeURIComponent(i.p)}">`:`<span class="e" style="background:${KC[k]}22;color:${KC[k]}">${esc((i.e||'?').toUpperCase().slice(0,4))}</span>`;
+  return `<div class="fi" onclick="window.open('${U('/file')}?k=${CODE}&p=${encodeURIComponent(i.p)}')"><div class="th">${th}</div><div class="nm">${esc(i.n)}</div><div class="mt">${fmtB(i.s)}</div></div>`}).join('')+'</div>'||'<div class="empty">Pasta vazia</div>'}catch(e){}}
 function subir(){if(DIR&&!/\/(storage\/emulated\/0|sdcard)$/.test(DIR))abrir(DIR.substring(0,DIR.lastIndexOf('/'))||'')}
-$('#up').onchange=async e=>{for(const f of e.target.files){await fetch('/upload?k='+CODE+'&dir='+encodeURIComponent(DIR)+'&nome='+encodeURIComponent(f.name),{method:'POST',body:f});toast('Enviado: '+f.name)}e.target.value='';abrir(DIR)};
+$('#up').onchange=async e=>{for(const f of e.target.files){await fetch(U('/upload')+'?k='+CODE+'&dir='+encodeURIComponent(DIR)+'&nome='+encodeURIComponent(f.name),{method:'POST',body:f});toast('Enviado: '+f.name)}e.target.value='';abrir(DIR)};
 
 // Definições
-function guardar(){const n=$('#dNome').value.trim(),c=$('#dCode').value.trim();if(n)post('/setname',{nome:n});if(c.length>=4){post('/setcode',{code:c}).then(()=>{CODE=c;localStorage.setItem('ftxcode',c)})}toast('Guardado')}
+function guardar(){const n=$('#dNome').value.trim(),c=$('#dCode').value.trim();if(n)post('/setname',{nome:n});if(c.length>=4){post('/setcode',{code:c}).then(()=>{CODE=c;localStorage.setItem(CK,c)})}toast('Guardado')}
 
 if(CODE)arrancar();else $('#login').style.display='grid';
 </script>

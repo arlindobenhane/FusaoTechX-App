@@ -56,6 +56,8 @@ class CaptureService : Service() {
             httpd = Httpd(this, Prefs.PORT)
             try { httpd?.start() } catch (_: Exception) {}
         }
+        // Ligação remota pelo relay (telefone nos dados móveis, PC noutra rede).
+        if (Prefs.relayOn(this)) Relay.iniciar(this)
         ht = HandlerThread("ftx-cap").also { it.start() }
         handler = Handler(ht!!.looper)
     }
@@ -81,7 +83,10 @@ class CaptureService : Service() {
         val ips = Util.localIps().joinToString(", ") { "$it:${Prefs.PORT}" }
         val n: Notification = Notification.Builder(this, CH)
             .setContentTitle("FusãoTechX ligado")
-            .setContentText(if (ips.isEmpty()) "Código ${Prefs.code(this)}" else "No PC: $ips")
+            .setContentText(
+                (if (ips.isEmpty()) "Código ${Prefs.code(this)}" else "No PC: $ips") +
+                (if (Prefs.relayOn(this)) " · Remoto: ID ${Prefs.relayId(this)}" else "")
+            )
             .setSmallIcon(R.drawable.ic_launcher)
             .setOngoing(true)
             .build()
@@ -154,6 +159,7 @@ class CaptureService : Service() {
 
     override fun onDestroy() {
         ativo = false
+        Relay.parar()
         pararCaptura()
         try { httpd?.parar() } catch (_: Exception) {}
         try { ht?.quitSafely() } catch (_: Exception) {}

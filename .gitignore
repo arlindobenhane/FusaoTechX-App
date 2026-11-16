@@ -6,3 +6,7 @@ local.properties
 *.iml
 .DS_Store
 captures/
+
+# Relay: dados de execução (filas, imagens) nunca vão para o Git
+relay/data/*
+!relay/data/.htaccess

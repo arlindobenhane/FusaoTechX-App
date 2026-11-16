@@ -25,6 +25,7 @@ class MainActivity : Activity() {
     private val REQ_PERM = 102
     private lateinit var info: TextView
     private lateinit var estado: TextView
+    private lateinit var remoto: TextView
 
     private val cor = object {
         val bg = Color.parseColor("#0B1020"); val card = Color.parseColor("#141D38")
@@ -75,6 +76,28 @@ class MainActivity : Activity() {
         col.addView(botao("▶  LIGAR (partilhar ecrã e iniciar)", cor.ok) { iniciar() })
         col.addView(botao("Parar", cor.card) { parar() })
 
+        // Ligação remota: telefone nos dados móveis, PC em qualquer rede.
+        col.addView(espaco(18))
+        col.addView(TextView(this).apply { text = "3 · Ligação remota (qualquer rede)"; setTextColor(cor.ac); textSize = 16f; setTypeface(typeface, android.graphics.Typeface.BOLD) })
+        col.addView(rotulo("Para usar o telefone nos dados móveis com o PC noutra rede. No PC, abra fusaotech.com/relay e escreva o ID."))
+        val cbRemoto = CheckBox(this).apply {
+            text = "Ativar ligação remota pela Internet"; setTextColor(cor.tx); isChecked = Prefs.relayOn(this@MainActivity)
+            setOnCheckedChangeListener { _, v ->
+                Prefs.setRelayOn(this@MainActivity, v)
+                if (v && CaptureService.ativo) Relay.iniciar(this@MainActivity)
+                if (!v) Relay.parar()
+                refrescar()
+            }
+        }
+        col.addView(cbRemoto)
+        remoto = TextView(this).apply { setTextColor(cor.tx); textSize = 15f; setPadding(dp(14), dp(14), dp(14), dp(14)); setBackgroundColor(cor.card) }
+        col.addView(espaco(6)); col.addView(remoto)
+        col.addView(botao("Gerar um ID novo", cor.card) {
+            Relay.parar(); Prefs.novoRelayId(this)
+            if (Prefs.relayOn(this) && CaptureService.ativo) Relay.iniciar(this)
+            toast("ID novo: " + Prefs.relayId(this)); refrescar()
+        })
+
         val cbAuto = CheckBox(this).apply {
             text = "Arrancar com o telefone"; setTextColor(cor.tx); isChecked = Prefs.autostart(this@MainActivity)
             setOnCheckedChangeListener { _, v -> Prefs.setAutostart(this@MainActivity, v) }
@@ -106,11 +129,20 @@ class MainActivity : Activity() {
         if (ips.isEmpty()) sb.append("  (ligue o Wi-Fi ou o hotspot do telefone)") else for (ip in ips) sb.append("  http://").append(ip).append(":").append(Prefs.PORT).append("\n")
         sb.append("\nMesma rede Wi-Fi ou hotspot do telefone.")
         info.text = sb.toString()
+        val idf = Prefs.relayId(this).chunked(3).joinToString(" ")
+        remoto.text = if (Prefs.relayOn(this))
+            "No PC (qualquer rede):\n  fusaotech.com/relay\n\nID: $idf\nCódigo: ${Prefs.code(this)}\n\nEstado: " +
+                (if (Relay.correr) Relay.estado else if (CaptureService.ativo) "a iniciar…" else "toque em LIGAR")
+        else "Desativada. Ative para ligar o PC ao telefone a partir de qualquer rede.\nID deste telefone: $idf"
+        remoto.removeCallbacks(tick); remoto.postDelayed(tick, 3000)
         val c = if (ControlService.inst != null) "ativo" else "por ativar"
         val n = if (NotifService.inst != null) "ativo" else "por ativar"
         val e = if (CaptureService.ativo) "✔ ligado" else "parado"
         estado.text = "Estado:  Serviço $e   ·   Controlo $c   ·   Notificações $n"
     }
+
+    // Atualiza o estado da ligação remota a cada 3 s enquanto a app está visível.
+    private val tick = Runnable { if (!isFinishing && hasWindowFocus()) refrescar() }
 
     private fun iniciar() {
         val mpm = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager

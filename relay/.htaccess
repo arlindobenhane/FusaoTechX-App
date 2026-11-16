@@ -1,0 +1,10 @@
+# FusãoTechX Mz • Relay (ligação telefone ↔ PC por redes diferentes)
+RewriteEngine On
+RewriteRule ^data(/|$) - [F,L]
+RewriteRule ^lib\.php$ - [F,L]
+RewriteRule ^d/[0-9]{9}(/.*)?$ tunel.php [END]
+RewriteRule ^d/[0-9]{9}$ tunel.php [END]
+Options -Indexes
+<IfModule mod_headers.c>
+    Header set Cache-Control "no-store"
+</IfModule>

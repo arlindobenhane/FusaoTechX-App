@@ -156,6 +156,9 @@ class Httpd(ctxIn: Context, private val porta: Int) {
         o.put("w", CaptureService.realW); o.put("h", CaptureService.realH)
         o.put("ips", JSONArray(Util.localIps()))
         o.put("sims", Device.sims(ctx))
+        o.put("relayOn", Prefs.relayOn(ctx))
+        o.put("relayId", Prefs.relayId(ctx))
+        o.put("relayEstado", if (Relay.correr) Relay.estado else "")
         return o
     }
 
