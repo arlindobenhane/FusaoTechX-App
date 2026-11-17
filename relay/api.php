@@ -52,7 +52,9 @@ switch ($a) {
             if (connection_aborted()) exit;
             usleep(50000);
         } while (microtime(true) < $fim);
-        relay_json(['reqs' => $lista, 'want' => $want(), 'sal' => $m['sal']]);
+        $lic = lic_estado($id);
+        relay_json(['reqs' => $lista, 'want' => $want(), 'sal' => $m['sal'],
+                    'licenca' => ['ok' => $lic['ok'], 'motivo' => $lic['motivo'], 'ate' => $lic['ate'], 'nome' => $lic['nome']]]);
 
     case 'body':
         $rid = (string)($_GET['rid'] ?? '');

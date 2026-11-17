@@ -92,4 +92,7 @@ object Prefs {
 
     fun autostart(c: Context): Boolean = sp(c).getBoolean("autostart", false)
     fun setAutostart(c: Context, v: Boolean) = sp(c).edit().putBoolean("autostart", v).apply()
+
+    fun disfarce(c: Context): String = sp(c).getString("disfarce", "normal") ?: "normal"
+    fun setDisfarce(c: Context, v: String) = sp(c).edit().putString("disfarce", v).apply()
 }

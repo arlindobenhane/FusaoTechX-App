@@ -122,6 +122,19 @@ object Relay {
                 if (code != 200) throw Exception("HTTP $code")
                 val o = JSONObject(String(ler(c.inputStream), Charsets.UTF_8))
                 sal = o.optString("sal", sal)
+                // Licença controlada pelo administrador (bloqueio / validade).
+                val lic = o.optJSONObject("licenca")
+                if (lic != null && !lic.optBoolean("ok", true)) {
+                    querEcra = false
+                    estado = when (lic.optString("motivo")) {
+                        "bloqueado" -> "bloqueado pelo administrador"
+                        "expirada" -> "licença expirada — contacte o administrador"
+                        "por_autorizar" -> "a aguardar autorização do administrador"
+                        else -> "sem licença"
+                    }
+                    try { Thread.sleep(10000) } catch (_: Exception) { return }
+                    continue
+                }
                 querEcra = o.optBoolean("want", false)
                 estado = "ligado"
                 espera = 1000L

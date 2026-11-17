@@ -39,6 +39,24 @@ if (!relay_online($m)) {
 }
 $d = relay_dir($id);
 
+// Licença: o administrador controla quem pode usar o serviço e por quanto tempo.
+$lic = lic_estado($id);
+if (!$lic['ok']) {
+    if ($p === '' || $p === 'login') {
+        http_response_code(403);
+        header('Content-Type: text/html; charset=utf-8');
+        $msg = ['bloqueado' => ['🚫', 'Acesso bloqueado', 'Este aparelho foi bloqueado pelo administrador.'],
+                'expirada' => ['⌛', 'Licença expirada', 'O período de utilização deste aparelho terminou.'],
+                'por_autorizar' => ['🔒', 'A aguardar autorização', 'Este aparelho ainda não foi autorizado pelo administrador.']][$lic['motivo']] ?? ['🔒', 'Sem acesso', 'Este aparelho não está autorizado.'];
+        echo '<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . admin_h($msg[1]) . ' · FusãoTechX</title>'
+           . '<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#070a12;color:#eef2ff;font:15px/1.6 "Segoe UI",system-ui,sans-serif;text-align:center;padding:24px}.b{max-width:430px}.i{font-size:56px}h1{font-size:23px;margin:10px 0 6px}p{color:#94a3c4;margin:6px 0}b{color:#22d3ee}</style></head><body><div class="b"><div class="i">' . $msg[0] . '</div>'
+           . '<h1>' . admin_h($msg[1]) . '</h1><p>' . admin_h($msg[2]) . '</p><p style="margin-top:14px">ID <b>' . admin_h(substr($id,0,3).' '.substr($id,3,3).' '.substr($id,6)) . '</b></p>'
+           . '<p style="margin-top:18px;font-size:13px">Contacte o administrador — FusãoTechX Mz · +258 83 333 7906</p></div></body></html>';
+        exit;
+    }
+    relay_json(['erro' => 'licenca', 'motivo' => $lic['motivo']], 403);
+}
+
 // O código de acesso é confirmado aqui (bloqueio por IP) e outra vez no telefone.
 $publico = in_array($p, ['', 'login', 'logo', 'favicon.ico'], true);
 if ($p === 'login' && relay_bloqueado($id)) relay_json(['ok' => false, 'erro' => 'bloqueado'], 429);

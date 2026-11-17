@@ -26,3 +26,10 @@ Copiar a pasta `relay/` para o servidor (PHP 7.4+, Apache com `.htaccess`) e, na
 mudar o endereço do relay (por omissão `https://studio.fusaotech.com`).
 
 FusãoTechX Mz · +258 83 333 7906 · fusaotech.com
+
+## Administração e licenças (studio.fusaotech.com/admin)
+Conta de administrador que gere todos os aparelhos: dar validade (dias, meses, anos ou
+ilimitado), rótulos (ex.: «Polícia · João»), **bloquear** um aparelho e definir se telefones
+novos recebem avaliação automática ou ficam à espera de autorização. Um aparelho bloqueado
+ou com licença expirada deixa de poder usar o serviço (o PC vê um aviso, o telefone pára).
+As licenças ficam em `data/<id>/lic.json`; a conta em `data/admin.json`.

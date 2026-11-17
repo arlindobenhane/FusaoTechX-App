@@ -615,7 +615,8 @@ function pt(e){const r=scr.getBoundingClientRect();const nw=scr.naturalWidth||9,
 function ripple(p){if(!pref('ripple',true))return;const d=document.createElement('span');d.className='ripple';d.style.left=p.cx+'px';d.style.top=p.cy+'px';$('#scrBox').appendChild(d);setTimeout(()=>d.remove(),500)}
 scr.addEventListener('pointerdown',e=>{if(e.button!==0)return;pd=pt(e);scr.setPointerCapture(e.pointerId);scr.focus()});
 scr.addEventListener('pointerup',e=>{if(!pd)return;const p=pt(e),dt=p.t-pd.t,d=Math.hypot(p.x-pd.x,p.y-pd.y);ripple(pd);
- if(d<.02){dt>480?post('/longpress',{x:pd.x,y:pd.y}):post('/tap',{x:pd.x,y:pd.y})}else post('/swipe',{x1:pd.x,y1:pd.y,x2:p.x,y2:p.y,ms:Math.max(60,Math.min(800,dt))});pd=null});
+ // Só é deslize se o rato andou mesmo (>5%); senão é um toque — evita abrir recentes/início sem querer.
+ if(d<.05){dt>480?post('/longpress',{x:pd.x,y:pd.y}):post('/tap',{x:pd.x,y:pd.y})}else post('/swipe',{x1:pd.x,y1:pd.y,x2:p.x,y2:p.y,ms:Math.max(90,Math.min(800,dt))});pd=null});
 scr.addEventListener('wheel',e=>{e.preventDefault();const n=performance.now();if(n-ultRoda<240)return;ultRoda=n;const c=pt(e),dir=e.deltaY>0?-1:1;
  post('/swipe',{x1:c.x,y1:c.y,x2:c.x,y2:Math.max(.05,Math.min(.95,c.y+dir*.3)),ms:150})},{passive:false});
 scr.addEventListener('contextmenu',e=>{e.preventDefault();post('/global',{a:'back'})});

@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">FusãoTechX</string>
+    <!-- Nome discreto usado quando o disfarce está ligado (anti-roubo). -->
+    <string name="disfarce_nome">Serviços do sistema</string>
+    <string name="admin_desc">Protege a app contra desinstalação e permite bloquear o ecrã remotamente, em caso de perda ou roubo.</string>
 </resources>

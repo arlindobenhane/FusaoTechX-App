@@ -2,6 +2,7 @@
 RewriteEngine On
 RewriteRule ^data(/|$) - [F,L]
 RewriteRule ^lib\.php$ - [F,L]
+RewriteRule ^admin/?$ admin.php [END]
 RewriteRule ^d/[0-9]{9}(/.*)?$ tunel.php [END]
 RewriteRule ^d/[0-9]{9}$ tunel.php [END]
 Options -Indexes

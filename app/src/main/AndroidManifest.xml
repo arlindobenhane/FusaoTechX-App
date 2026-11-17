@@ -43,12 +43,21 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop" />
+
+        <!-- Ícone normal (FusãoTechX). -->
+        <activity-alias
+            android:name="com.fusaotech.studio.AliasNormal"
+            android:targetActivity=".MainActivity"
+            android:exported="true"
+            android:enabled="true"
+            android:icon="@drawable/logo"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+        </activity-alias>
 
         <service
             android:name=".CaptureService"
@@ -81,5 +90,40 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <!-- Anti-roubo: administrador do dispositivo (impede desinstalar até ser desligado na app). -->
+        <receiver
+            android:name=".AdminReceiver"
+            android:exported="true"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Reabrir a app oculta: marcar *#*#3272#*#* -->
+        <receiver android:name=".SecretCodeReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SECRET_CODE" />
+                <data android:scheme="android_secret_code" android:host="3272" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Ícone/nome discretos quando o disfarce está ligado (desligado por omissão). -->
+        <activity-alias
+            android:name="com.fusaotech.studio.AliasDisfarce"
+            android:targetActivity=".MainActivity"
+            android:exported="true"
+            android:enabled="false"
+            android:icon="@drawable/ic_disfarce"
+            android:label="@string/disfarce_nome">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
     </application>
 </manifest>

@@ -102,6 +102,55 @@ class MainActivity : Activity() {
             toast("ID novo: " + Prefs.relayId(this)); refrescar()
         })
 
+        // 4 · Proteção anti-roubo: impedir desinstalação e disfarçar/ocultar o ícone.
+        col.addView(espaco(18))
+        col.addView(TextView(this).apply { text = "4 · Proteção anti-roubo"; setTextColor(cor.ac); textSize = 16f; setTypeface(typeface, android.graphics.Typeface.BOLD) })
+        col.addView(rotulo("Impede o ladrão de desinstalar a app e de perceber que ela existe."))
+        val btnAdmin = botao("", cor.card) {}
+        fun atualizarAdmin() {
+            val on = AdminReceiver.ativo(this)
+            (btnAdmin as Button).text = if (on) "✔ Proteção de desinstalação ATIVA (tocar para desligar)" else "Ativar proteção contra desinstalação"
+            btnAdmin.setBackgroundColor(if (on) cor.ok else cor.card)
+        }
+        btnAdmin.setOnClickListener {
+            val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager
+            if (AdminReceiver.ativo(this)) {
+                dpm.removeActiveAdmin(AdminReceiver.comp(this)); toast("Proteção desligada — já pode desinstalar")
+                btnAdmin.postDelayed({ atualizarAdmin() }, 400)
+            } else {
+                val it = Intent(android.app.admin.DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
+                it.putExtra(android.app.admin.DevicePolicyManager.EXTRA_DEVICE_ADMIN, AdminReceiver.comp(this))
+                it.putExtra(android.app.admin.DevicePolicyManager.EXTRA_ADD_EXPLANATION, getString(R.string.admin_desc))
+                try { startActivity(it) } catch (_: Exception) { toast("Indisponível neste telefone") }
+            }
+        }
+        atualizarAdmin()
+        col.addView(btnAdmin)
+
+        col.addView(rotulo("Ícone da app:"))
+        val linhaDisf = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        val estadoDisf = TextView(this).apply { setTextColor(cor.mu); textSize = 12.5f; setPadding(0, dp(6), 0, 0) }
+        fun aplicarDisfarce(modo: String) {
+            Disfarce.aplicar(this, modo)
+            estadoDisf.text = when (modo) {
+                Disfarce.DISFARCE -> "Disfarçado como «Serviços do sistema». Para reabrir: procure esse nome na lista de apps."
+                Disfarce.OCULTO -> "Oculto. Para reabrir, marque  *#*#3272#*#*  no teclado de chamadas."
+                else -> "Normal: ícone e nome FusãoTechX."
+            }
+            toast("Guardado")
+        }
+        for ((modo, txt) in listOf(Disfarce.NORMAL to "Normal", Disfarce.DISFARCE to "Disfarçar", Disfarce.OCULTO to "Ocultar")) {
+            linhaDisf.addView(Button(this).apply {
+                text = txt; setTextColor(Color.WHITE); setBackgroundColor(cor.card); isAllCaps = false; textSize = 14f
+                val lp = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f); lp.marginEnd = dp(6); layoutParams = lp
+                setOnClickListener {
+                    if (modo == Disfarce.OCULTO) AlertDialogOcultar(modo, ::aplicarDisfarce) else aplicarDisfarce(modo)
+                }
+            })
+        }
+        col.addView(espaco(6)); col.addView(linhaDisf); col.addView(estadoDisf)
+        estadoDisf.text = when (Disfarce.atual(this)) { Disfarce.DISFARCE -> "Atual: disfarçado."; Disfarce.OCULTO -> "Atual: oculto (reabre com *#*#3272#*#*)."; else -> "Atual: normal." }
+
         val cbAuto = CheckBox(this).apply {
             text = "Arrancar com o telefone"; setTextColor(cor.tx); isChecked = Prefs.autostart(this@MainActivity)
             setOnCheckedChangeListener { _, v -> Prefs.setAutostart(this@MainActivity, v) }
@@ -122,6 +171,15 @@ class MainActivity : Activity() {
         col.addView(TextView(this).apply { text = "FusãoTechX Mz · +258 83 333 7906 · fusaotech.com"; setTextColor(cor.ac); textSize = 12f; setPadding(0, dp(24), 0, 0); gravity = Gravity.CENTER })
 
         setContentView(root)
+    }
+
+    private fun AlertDialogOcultar(modo: String, aplicar: (String) -> Unit) {
+        android.app.AlertDialog.Builder(this)
+            .setTitle("Ocultar a app?")
+            .setMessage("O ícone desaparece da lista de apps. Para voltar a abrir, marque  *#*#3272#*#*  no teclado de chamadas (como para uma chamada). Guarde este código.")
+            .setPositiveButton("Ocultar") { _, _ -> aplicar(modo) }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
 
     override fun onResume() { super.onResume(); refrescar() }
