@@ -104,7 +104,7 @@ object Device {
         try {
             val cur = c.contentResolver.query(
                 Telephony.Sms.CONTENT_URI,
-                arrayOf(Telephony.Sms.ADDRESS, Telephony.Sms.BODY, Telephony.Sms.DATE, Telephony.Sms.TYPE),
+                arrayOf(Telephony.Sms.ADDRESS, Telephony.Sms.BODY, Telephony.Sms.DATE, Telephony.Sms.TYPE, Telephony.Sms._ID, Telephony.Sms.THREAD_ID, Telephony.Sms.READ),
                 null, null, Telephony.Sms.DATE + " DESC"
             )
             cur?.use {
@@ -115,11 +115,56 @@ object Device {
                     o.put("texto", it.getString(1) ?: "")
                     o.put("data", it.getLong(2))
                     o.put("enviada", it.getInt(3) == Telephony.Sms.MESSAGE_TYPE_SENT)
+                    o.put("id", it.getLong(4))
+                    o.put("conversa", it.getLong(5))
+                    o.put("lida", it.getInt(6) == 1)
                     arr.put(o); n++
                 }
             }
         } catch (_: Exception) {}
         return arr
+    }
+
+    /** Registo de chamadas (recebidas, feitas, perdidas). */
+    fun chamadas(c: Context, limite: Int = 120): JSONArray {
+        val arr = JSONArray()
+        try {
+            val cur = c.contentResolver.query(
+                android.provider.CallLog.Calls.CONTENT_URI,
+                arrayOf(android.provider.CallLog.Calls.NUMBER, android.provider.CallLog.Calls.CACHED_NAME,
+                    android.provider.CallLog.Calls.TYPE, android.provider.CallLog.Calls.DATE, android.provider.CallLog.Calls.DURATION),
+                null, null, android.provider.CallLog.Calls.DATE + " DESC"
+            )
+            cur?.use {
+                var n = 0
+                while (it.moveToNext() && n < limite) {
+                    val o = JSONObject()
+                    o.put("num", it.getString(0) ?: "")
+                    o.put("nome", it.getString(1) ?: "")
+                    o.put("tipo", when (it.getInt(2)) {
+                        android.provider.CallLog.Calls.INCOMING_TYPE -> "recebida"
+                        android.provider.CallLog.Calls.OUTGOING_TYPE -> "feita"
+                        android.provider.CallLog.Calls.MISSED_TYPE -> "perdida"
+                        android.provider.CallLog.Calls.REJECTED_TYPE -> "rejeitada"
+                        else -> "outra"
+                    })
+                    o.put("data", it.getLong(3))
+                    o.put("duracao", it.getLong(4))
+                    arr.put(o); n++
+                }
+            }
+        } catch (_: Exception) {}
+        return arr
+    }
+
+    /** Copia texto do PC para a área de transferência do telefone. */
+    fun copiar(c: Context, texto: String) {
+        android.os.Handler(android.os.Looper.getMainLooper()).post {
+            try {
+                val cm = c.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                cm.setPrimaryClip(android.content.ClipData.newPlainText("FusãoTechX", texto))
+            } catch (_: Exception) {}
+        }
     }
 
     fun contactos(c: Context): JSONArray {

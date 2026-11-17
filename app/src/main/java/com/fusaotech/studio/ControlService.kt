@@ -74,6 +74,22 @@ class ControlService : AccessibilityService() {
         } catch (_: Exception) { false }
     }
 
+    /** Tecla Enter / Enviar do teclado (Android 11+), ou nova linha nos mais antigos. */
+    fun enter(): Boolean {
+        val node = focado() ?: return false
+        return try {
+            if (android.os.Build.VERSION.SDK_INT >= 30)
+                node.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_IME_ENTER.id)
+            else type("\n")
+        } catch (_: Exception) { false }
+    }
+
+    /** Cola no campo focado o que estiver na área de transferência do telefone. */
+    fun colar(): Boolean {
+        val node = focado() ?: return false
+        return try { node.performAction(AccessibilityNodeInfo.ACTION_PASTE) } catch (_: Exception) { false }
+    }
+
     fun backspace(): Boolean {
         val node = focado() ?: return false
         return try {

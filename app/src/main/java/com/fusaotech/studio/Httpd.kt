@@ -102,7 +102,8 @@ class Httpd(ctxIn: Context, private val porta: Int) {
                     if (f != null) enviar(out, 200, "image/jpeg", f) else enviar(out, 503, "text/plain", "sem ecra".toByteArray())
                 }
                 caminho == "/state" -> jsonResp(out, estadoCompleto())
-                caminho == "/sms" -> jsonResp(out, JSONObject().put("lista", Device.smsInbox(ctx)))
+                caminho == "/sms" -> jsonResp(out, JSONObject().put("lista", Device.smsInbox(ctx, (query["n"]?.toIntOrNull() ?: 300).coerceIn(10, 2000))))
+                caminho == "/calls" -> jsonResp(out, JSONObject().put("lista", Device.chamadas(ctx, (query["n"]?.toIntOrNull() ?: 120).coerceIn(10, 1000))))
                 caminho == "/contactos" -> jsonResp(out, JSONObject().put("lista", Device.contactos(ctx)))
                 caminho == "/apps" -> jsonResp(out, JSONObject().put("lista", Device.apps(ctx)))
                 caminho == "/notifs" -> jsonResp(out, notifs())
@@ -128,6 +129,8 @@ class Httpd(ctxIn: Context, private val porta: Int) {
             "/swipe" -> ctl?.swipe(px("x1", rw), px("y1", rh), px("x2", rw), px("y2", rh), b.optLong("ms", 160))
             "/text" -> r.put("ok", ctl?.type(b.optString("t")) ?: false)
             "/backspace" -> ctl?.backspace()
+            "/enter" -> r.put("ok", ctl?.enter() ?: false)
+            "/clip" -> { Device.copiar(ctx, b.optString("t")); if (b.optBoolean("colar")) { Thread.sleep(150); r.put("ok", ctl?.colar() ?: false) } }
             "/limpar" -> ctl?.limparCampo()
             "/global" -> r.put("ok", ctl?.global(b.optString("a")) ?: false)
             "/call" -> Device.ligar(ctx, b.optString("num"))
@@ -156,9 +159,12 @@ class Httpd(ctxIn: Context, private val porta: Int) {
         o.put("w", CaptureService.realW); o.put("h", CaptureService.realH)
         o.put("ips", JSONArray(Util.localIps()))
         o.put("sims", Device.sims(ctx))
+        o.put("versao", try { ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName } catch (_: Exception) { "" })
+        o.put("qualidade", CaptureService.qualidade)
         o.put("relayOn", Prefs.relayOn(ctx))
         o.put("relayId", Prefs.relayId(ctx))
         o.put("relayEstado", if (Relay.correr) Relay.estado else "")
+        o.put("relayUrl", Prefs.relay(ctx))
         return o
     }
 

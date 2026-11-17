@@ -1,166 +1,293 @@
 <!doctype html>
-<html lang="pt"><head>
+<html lang="pt" data-theme="escuro">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
 <title>FusãoTechX Studio</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+// Tema antes de desenhar a página (sem "piscar"): auto · claro · escuro.
+(function(){var t='auto';try{t=localStorage.getItem('ftxTema')||'auto'}catch(e){}
+ var r=t==='auto'?(matchMedia('(prefers-color-scheme: light)').matches?'claro':'escuro'):t;document.documentElement.setAttribute('data-theme',r)})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
 <style>
-:root{--bg:#070a12;--bg2:#0b1020;--p:rgba(255,255,255,.035);--p2:rgba(255,255,255,.06);--l:rgba(255,255,255,.08);--l2:rgba(255,255,255,.14);
---tx:#eef2ff;--mu:#94a3c4;--mu2:#5b678a;--ac:#22d3ee;--ac2:#818cf8;--ac3:#c084fc;--ok:#34d399;--wa:#fbbf24;--er:#fb7185;
---grad:linear-gradient(135deg,#22d3ee 0%,#818cf8 55%,#c084fc 100%);--r:18px;--sh:0 10px 40px rgba(0,0,0,.4)}
+:root{--r:16px;--r2:12px;--grad:linear-gradient(135deg,#22d3ee 0%,#818cf8 55%,#c084fc 100%);--font:"Segoe UI",Inter,system-ui,-apple-system,sans-serif}
+html[data-theme=escuro]{--bg:#070a12;--bg2:#0c1122;--side:rgba(9,12,24,.86);--card:rgba(255,255,255,.035);--card2:rgba(255,255,255,.065);--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.15);
+ --tx:#eef2ff;--tx2:#c7cfe6;--mu:#8f9bbd;--mu2:#5d688c;--ac:#22d3ee;--ac2:#818cf8;--ok:#34d399;--wa:#fbbf24;--er:#fb7185;--in:rgba(0,0,0,.3);--sh:0 18px 50px rgba(0,0,0,.45);--glow1:rgba(129,140,248,.16);--glow2:rgba(34,211,238,.10);--frame:#151b2e}
+html[data-theme=claro]{--bg:#f3f5fb;--bg2:#ffffff;--side:rgba(255,255,255,.92);--card:#ffffff;--card2:#f1f4fa;--line:rgba(18,26,50,.09);--line2:rgba(18,26,50,.17);
+ --tx:#141a2e;--tx2:#344061;--mu:#66708c;--mu2:#9aa3bb;--ac:#0891b2;--ac2:#6366f1;--ok:#059669;--wa:#d97706;--er:#e11d48;--in:#f6f8fc;--sh:0 14px 40px rgba(30,40,80,.10);--glow1:rgba(99,102,241,.10);--glow2:rgba(8,145,178,.08);--frame:#1c2233}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);font:14.5px/1.45 "Segoe UI",Inter,system-ui,sans-serif;overflow:hidden}
-body{background:radial-gradient(1100px 580px at 88% -12%,rgba(129,140,248,.14),transparent 60%),radial-gradient(800px 500px at -8% 112%,rgba(34,211,238,.10),transparent 60%),var(--bg)}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);font:14.5px/1.5 var(--font);overflow:hidden}
+body{background:radial-gradient(1100px 600px at 90% -15%,var(--glow1),transparent 60%),radial-gradient(800px 520px at -10% 115%,var(--glow2),transparent 60%),var(--bg)}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
-input,textarea,select{font:inherit;color:var(--tx);background:rgba(0,0,0,.28);border:1px solid var(--l);border-radius:12px;padding:11px 13px;outline:none;transition:border .15s;width:100%}
-input:focus,textarea:focus{border-color:var(--ac2)}
+a{color:var(--ac)}
+input,textarea,select{font:inherit;color:var(--tx);background:var(--in);border:1px solid var(--line);border-radius:var(--r2);padding:11px 13px;outline:none;transition:border-color .15s,box-shadow .15s;width:100%}
+input:focus,textarea:focus,select:focus{border-color:var(--ac2);box-shadow:0 0 0 3px color-mix(in srgb,var(--ac2) 18%,transparent)}
+textarea{resize:vertical}
+:focus-visible{outline:2px solid var(--ac2);outline-offset:2px}
 svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
-.app{display:grid;grid-template-columns:238px 1fr;height:100vh}
-/* sidebar */
-.side{border-right:1px solid var(--l);background:rgba(7,10,18,.72);backdrop-filter:blur(20px);display:flex;flex-direction:column;padding:20px 14px}
-.brand{display:flex;align-items:center;gap:12px;padding:4px 8px 22px}
-.brand img{width:44px;height:44px;border-radius:12px;object-fit:cover;box-shadow:0 6px 22px rgba(34,211,238,.35)}
-.brand b{display:block;font-size:15px;letter-spacing:.2px}.brand small{color:var(--mu);font-size:11.5px}
-.nav{display:flex;flex-direction:column;gap:3px}
-.nav button{display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:12px;color:var(--mu);font-weight:600;text-align:left;position:relative;transition:.14s}
-.nav button:hover{background:var(--p);color:var(--tx)}.nav button.on{background:var(--p2);color:var(--tx)}
+.app{display:grid;grid-template-columns:248px minmax(0,1fr);height:100vh}.app[hidden]{display:none}
+/* barra lateral */
+.side{border-right:1px solid var(--line);background:var(--side);backdrop-filter:blur(20px);display:flex;flex-direction:column;padding:18px 14px;min-height:0}
+.brand{display:flex;align-items:center;gap:12px;padding:4px 8px 18px}
+.brand img{width:42px;height:42px;border-radius:12px;object-fit:cover;box-shadow:0 6px 22px rgba(34,211,238,.3)}
+.brand b{display:block;font-size:15px}.brand small{color:var(--mu);font-size:11.5px}
+.dev{display:flex;gap:10px;align-items:center;padding:12px;border-radius:14px;background:var(--card);border:1px solid var(--line);margin-bottom:14px}
+.dev .ph{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--grad);color:#06121f;flex:none}
+.dev b{display:block;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dev small{color:var(--mu);font-size:11.5px;display:flex;align-items:center;gap:6px}
+.nav{display:flex;flex-direction:column;gap:2px;overflow:auto;min-height:0}
+.nav button{display:flex;align-items:center;gap:12px;white-space:nowrap;padding:10px 12px;border-radius:12px;color:var(--mu);font-weight:600;text-align:left;position:relative;transition:.14s}
+.nav button:hover{background:var(--card);color:var(--tx)}
+.nav button.on{background:var(--card2);color:var(--tx)}
 .nav button.on::before{content:"";position:absolute;left:-14px;top:9px;bottom:9px;width:3px;border-radius:3px;background:var(--grad)}
-.nav .b{margin-left:auto;font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px;background:rgba(52,211,153,.18);color:var(--ok);display:none}
-.side .foot{margin-top:auto;padding:12px;border-radius:14px;background:var(--p);border:1px solid var(--l);font-size:11.5px;color:var(--mu)}
+.nav .b{margin-left:auto;font-size:10.5px;font-weight:800;min-width:20px;padding:2px 7px;border-radius:99px;background:var(--er);color:#fff;text-align:center;display:none}
+.nav .b.live{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok);font-size:9.5px;letter-spacing:.04em}
+.nav .sec{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mu2);padding:14px 12px 6px}
+.side .foot{margin-top:auto;padding:12px;border-radius:14px;background:var(--card);border:1px solid var(--line);font-size:11.5px;color:var(--mu)}
 .side .foot b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-/* main */
-.main{display:flex;flex-direction:column;min-width:0}
-.top{display:flex;align-items:center;gap:14px;padding:16px 26px;border-bottom:1px solid var(--l)}
-.top h1{margin:0;font-size:21px;letter-spacing:-.3px}.top p{margin:2px 0 0;color:var(--mu);font-size:12.5px}
+/* principal */
+.main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.top{display:flex;align-items:center;gap:12px;padding:14px 26px;border-bottom:1px solid var(--line);min-height:68px}
+.top h1{margin:0;font-size:20px;letter-spacing:-.3px}.top p{margin:1px 0 0;color:var(--mu);font-size:12.5px}
 .top .sp{flex:1}
-.pill{display:flex;align-items:center;gap:9px;padding:7px 14px;border-radius:99px;background:var(--p);border:1px solid var(--l);font-size:13px;font-weight:600}
-.dot{width:9px;height:9px;border-radius:50%;background:var(--er)}.dot.on{background:var(--ok);box-shadow:0 0 0 4px rgba(52,211,153,.14)}
-.content{flex:1;overflow:auto;padding:22px 26px 40px}
-.view{display:none;animation:f .22s}.view.on{display:block}@keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
-/* cards */
-.card{background:var(--p);border:1px solid var(--l);border-radius:var(--r);padding:18px 20px}
+.ibtn.menuBtn{display:none}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:99px;background:var(--card);border:1px solid var(--line);font-size:12.5px;font-weight:700;white-space:nowrap}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--er);flex:none}.dot.on{background:var(--ok);box-shadow:0 0 0 4px color-mix(in srgb,var(--ok) 18%,transparent)}.dot.wa{background:var(--wa)}
+.ibtn{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:var(--card);border:1px solid var(--line);color:var(--tx2)}
+.ibtn:hover{border-color:var(--line2);color:var(--tx)}
+.content{flex:1;overflow:auto;padding:22px 26px 44px;min-height:0}
+.view{display:none;animation:f .2s}.view.on{display:block}@keyframes f{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+/* blocos */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px}
+html[data-theme=claro] .card{box-shadow:0 1px 2px rgba(20,30,60,.04)}
 .card h3{margin:0 0 14px;font-size:14px;display:flex;align-items:center;gap:10px}.card h3 .i{color:var(--ac)}
+.card h3 .r{margin-left:auto;display:flex;gap:6px}
 .grid{display:grid;gap:16px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:11px 15px;border-radius:12px;background:var(--p2);border:1px solid var(--l);font-weight:600;transition:.14s;white-space:nowrap}
-.btn:hover{border-color:var(--l2);background:rgba(255,255,255,.09)}.btn:active{transform:scale(.97)}
-.btn.p{background:var(--grad);color:#06121f;border:0;box-shadow:0 8px 26px rgba(129,140,248,.32)}
-.btn.ok{background:rgba(52,211,153,.14);border-color:rgba(52,211,153,.32);color:#a7f3d0}
-.btn.er{background:rgba(251,113,133,.12);border-color:rgba(251,113,133,.32);color:#fecdd3}
-.btn.sm{padding:8px 11px;font-size:13px;border-radius:10px}
-.muted{color:var(--mu)}.tiny{font-size:12px}.sep{height:1px;background:var(--l);margin:14px 0}
-.kpi .v{font-size:25px;font-weight:800;letter-spacing:-.5px}.kpi .l{color:var(--mu);font-size:12.5px}
-.bar{height:8px;border-radius:9px;background:rgba(255,255,255,.08);overflow:hidden}.bar i{display:block;height:100%;border-radius:9px;background:var(--grad);transition:width .5s}
-.ring{--p:0;width:92px;height:92px;border-radius:50%;background:conic-gradient(var(--ok) calc(var(--p)*1%),rgba(255,255,255,.08) 0);display:grid;place-items:center;flex:none}
-.ring>div{width:72px;height:72px;border-radius:50%;background:var(--bg2);display:grid;place-items:center;font-weight:800;font-size:18px}
-.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;background:var(--p2);border:1px solid var(--l);font-size:12.5px;font-weight:600;color:var(--mu)}
-.chip.on{color:var(--ac);border-color:var(--ac)}
-/* sim */
-.sim{display:flex;gap:14px;align-items:center;padding:16px;border-radius:16px;background:linear-gradient(135deg,rgba(34,211,238,.1),rgba(129,140,248,.08));border:1px solid var(--l)}
-.sim .n{width:46px;height:46px;border-radius:12px;background:var(--grad);display:grid;place-items:center;font-weight:900;color:#06121f;flex:none}
-.sim .tx b{display:block;font-size:15px}.sim .tx span{font-size:12.5px;color:var(--mu)}
-/* phone mirror */
-.live{display:grid;grid-template-columns:1fr 340px;gap:22px;align-items:start}
-.phone{position:relative;border-radius:28px;padding:9px;background:linear-gradient(160deg,#1f2937,#0b1020);box-shadow:var(--sh);display:inline-block;max-width:100%}
-.phone .scr{border-radius:22px;overflow:hidden;background:#000;position:relative;display:grid;place-items:center}
-.phone img{display:block;width:100%;height:auto;touch-action:none;-webkit-user-drag:none}
-.phone .fps{position:absolute;top:12px;right:14px;font-size:11px;padding:3px 8px;border-radius:99px;background:rgba(0,0,0,.55);color:#a7f3d0;font-weight:700;pointer-events:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 15px;border-radius:12px;background:var(--card2);border:1px solid var(--line);font-weight:650;transition:.14s;white-space:nowrap;color:var(--tx)}
+.btn:hover{border-color:var(--line2)}.btn:active{transform:scale(.97)}.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.p{background:var(--grad);color:#06121f;border:0;box-shadow:0 8px 24px rgba(129,140,248,.28)}
+.btn.ok{background:color-mix(in srgb,var(--ok) 14%,transparent);border-color:color-mix(in srgb,var(--ok) 35%,transparent);color:var(--ok)}
+.btn.er{background:color-mix(in srgb,var(--er) 12%,transparent);border-color:color-mix(in srgb,var(--er) 32%,transparent);color:var(--er)}
+.btn.sm{padding:7px 11px;font-size:13px;border-radius:10px}
+.muted{color:var(--mu)}.tiny{font-size:12px}.sep{height:1px;background:var(--line);margin:14px 0}
+.kpi .v{font-size:24px;font-weight:800;letter-spacing:-.5px}.kpi .l{color:var(--mu);font-size:12.5px}
+.bar{height:8px;border-radius:9px;background:var(--card2);overflow:hidden}.bar i{display:block;height:100%;border-radius:9px;background:var(--grad);transition:width .5s}
+.ring{--p:0;width:86px;height:86px;border-radius:50%;background:conic-gradient(var(--ok) calc(var(--p)*1%),var(--card2) 0);display:grid;place-items:center;flex:none}
+.ring>div{width:68px;height:68px;border-radius:50%;background:var(--bg2);display:grid;place-items:center;font-weight:800;font-size:17px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;background:var(--card2);border:1px solid var(--line);font-size:12.5px;font-weight:650;color:var(--mu);cursor:pointer}
+.chip.on{color:var(--ac);border-color:var(--ac);background:color-mix(in srgb,var(--ac) 10%,transparent)}
+.seg{display:inline-flex;padding:3px;border-radius:12px;background:var(--card2);border:1px solid var(--line)}
+.seg button{padding:7px 13px;border-radius:9px;font-weight:650;font-size:13px;color:var(--mu)}
+.seg button.on{background:var(--bg2);color:var(--tx);box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.empty{text-align:center;color:var(--mu);padding:42px 10px}
+.empty .ei{font-size:34px;display:block;margin-bottom:6px}
+.banner{display:flex;gap:12px;align-items:center;padding:13px 15px;border-radius:14px;margin-bottom:16px;border:1px solid color-mix(in srgb,var(--wa) 40%,transparent);background:color-mix(in srgb,var(--wa) 10%,transparent);font-size:13.5px}
+.banner b{display:block}.banner .x{margin-left:auto}
+/* SIM e permissões */
+.sim{display:flex;gap:14px;align-items:center;padding:15px;border-radius:15px;background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 10%,transparent),color-mix(in srgb,var(--ac2) 8%,transparent));border:1px solid var(--line)}
+.sim .n{width:44px;height:44px;border-radius:12px;background:var(--grad);display:grid;place-items:center;font-weight:900;color:#06121f;flex:none;font-size:13px}
+.sim .tx b{display:block;font-size:14.5px}.sim .tx span{font-size:12.5px;color:var(--mu)}
+.perm{display:flex;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}.perm:last-child{border-bottom:0}
+.perm .s{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:none;font-size:15px}
+.perm .s.ok{background:color-mix(in srgb,var(--ok) 15%,transparent)}.perm .s.no{background:color-mix(in srgb,var(--wa) 15%,transparent)}
+.perm b{display:block;font-size:13.5px}.perm span{font-size:12px;color:var(--mu)}
+/* ecrã */
+.live{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:22px;align-items:start}
+.stage{display:flex;flex-direction:column;align-items:center;gap:12px}
+.phone{position:relative;border-radius:34px;padding:10px;background:linear-gradient(160deg,#2a3247,var(--frame));box-shadow:var(--sh),inset 0 0 0 1px rgba(255,255,255,.06);width:min(390px,100%,calc((100vh - 320px) * 9 / 19.5 + 20px));min-width:240px}
+.phone::before{content:"";position:absolute;top:18px;left:50%;transform:translateX(-50%);width:70px;height:6px;border-radius:9px;background:rgba(0,0,0,.5);z-index:2;pointer-events:none}
+.phone .scr{border-radius:26px;overflow:hidden;background:#000;position:relative;aspect-ratio:9/19.5;display:grid;place-items:center}
+.phone img{display:block;width:100%;height:100%;object-fit:contain;touch-action:none;-webkit-user-drag:none;user-select:none;cursor:pointer}
+.phone img:focus{outline:none}
+.phone .scr.focus{box-shadow:inset 0 0 0 2px var(--ac2)}
+.phone .ovl{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:#cbd5f5;font-size:13.5px;padding:24px;background:rgba(5,8,18,.75);pointer-events:none}
+.phone .ovl[hidden]{display:none}
+.ripple{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;border:2px solid var(--ac);pointer-events:none;animation:rp .45s ease-out forwards;z-index:3}
+@keyframes rp{from{transform:scale(.4);opacity:1}to{transform:scale(1.6);opacity:0}}
+.hud{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.navbar{display:flex;gap:6px;justify-content:center}
+.navbar button{width:48px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--card);border:1px solid var(--line);color:var(--tx2)}
+.navbar button:hover{color:var(--tx);border-color:var(--line2)}
 .ctl{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.ctl button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;border-radius:12px;background:var(--p2);border:1px solid var(--l);font-size:11.5px;color:var(--mu);font-weight:600}
-.ctl button:hover{color:var(--tx);border-color:var(--l2)}.ctl button:active{transform:scale(.95)}
-/* lists */
-.it{display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:13px;background:var(--p);border:1px solid var(--l);margin-bottom:8px}
-.it .av{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-weight:800;color:#06121f;flex:none}
-.it .tx{flex:1;min-width:0;text-align:left}.it .tx b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.it .tx span{font-size:12px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
-.msg{padding:10px 13px;border-radius:13px;margin-bottom:8px;max-width:78%;font-size:13.5px}
-.msg.in{background:var(--p2)}.msg.out{background:rgba(34,211,238,.13);margin-left:auto}
-.msg .w{font-size:11px;color:var(--mu);margin-bottom:3px}
+.ctl button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;border-radius:12px;background:var(--card2);border:1px solid var(--line);font-size:11.5px;color:var(--mu);font-weight:650}
+.ctl button:hover{color:var(--tx);border-color:var(--line2)}.ctl button:active{transform:scale(.95)}
+.kbd{font:600 11px var(--font);padding:2px 6px;border-radius:6px;border:1px solid var(--line2);background:var(--card2);color:var(--tx2)}
+.stage:fullscreen{background:var(--bg);justify-content:center}.stage:fullscreen .phone{width:auto;height:94vh}.stage:fullscreen .phone .scr{height:calc(94vh - 20px);aspect-ratio:auto}
+/* listas */
+.it{display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:13px;background:var(--card);border:1px solid var(--line);margin-bottom:8px;width:100%;text-align:left}
+button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
+.av{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-weight:800;color:#06121f;flex:none}
+.it .tx{flex:1;min-width:0}.it .tx b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it .tx span{font-size:12.5px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.it .t{font-size:11.5px;color:var(--mu2);white-space:nowrap}
+.search{position:relative}.search input{padding-left:38px}.search .i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--mu)}
+/* mensagens */
+.chat{display:grid;grid-template-columns:320px minmax(0,1fr);gap:0;height:calc(100vh - 160px);min-height:420px;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--card)}
+.chat .lst{border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.chat .lst .hd{padding:12px;border-bottom:1px solid var(--line);display:flex;gap:8px}
+.chat .lst .bd{overflow:auto;flex:1;padding:8px}
+.conv{display:flex;gap:11px;align-items:center;padding:10px;border-radius:12px;width:100%;text-align:left}
+.conv:hover{background:var(--card2)}.conv.on{background:color-mix(in srgb,var(--ac2) 14%,transparent)}
+.conv .tx{flex:1;min-width:0}.conv b{display:block;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.conv span{display:block;font-size:12.5px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.conv .t{font-size:11px;color:var(--mu2);align-self:flex-start;white-space:nowrap}
+.conv.nl b::after{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ac);margin-left:6px;vertical-align:middle}
+.thr{display:flex;flex-direction:column;min-height:0}
+.thr .hd{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px}
+.thr .hd b{display:block}.thr .hd span{font-size:12px;color:var(--mu)}
+.msgs{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:6px}
+.msg{padding:9px 13px;border-radius:16px;max-width:72%;font-size:14px;white-space:pre-wrap;word-wrap:break-word;line-height:1.45}
+.msg.in{background:var(--card2);border-bottom-left-radius:5px;align-self:flex-start}
+.msg.out{background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 30%,transparent),color-mix(in srgb,var(--ac2) 30%,transparent));border-bottom-right-radius:5px;align-self:flex-end}
+.msg small{display:block;font-size:10.5px;color:var(--mu);margin-top:3px;text-align:right}
+.day{align-self:center;font-size:11px;color:var(--mu2);padding:3px 10px;border-radius:99px;background:var(--card2);margin:8px 0}
+.compose{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line);align-items:flex-end}
+.compose textarea{min-height:44px;max-height:140px;resize:none}
+/* chamadas */
+.dialer{max-width:360px;margin:0 auto}
 .dial{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:12px 0}
-.dial button{padding:15px;border-radius:14px;background:var(--p2);border:1px solid var(--l);font-size:20px;font-weight:600}
+.dial button{padding:14px;border-radius:15px;background:var(--card2);border:1px solid var(--line);font-size:20px;font-weight:650;line-height:1.1}
+.dial button small{display:block;font-size:9.5px;color:var(--mu2);letter-spacing:.12em;font-weight:700}
 .dial button:active{transform:scale(.95)}
-.crumbs{display:flex;align-items:center;gap:3px;flex-wrap:wrap;font-weight:600;font-size:13px}
-.crumbs button{padding:5px 8px;border-radius:8px;color:var(--mu)}.crumbs button:hover{background:var(--p2);color:var(--tx)}
-.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:11px}
-.fi{border-radius:14px;padding:10px;background:var(--p);border:1px solid var(--l);cursor:pointer;transition:.12s}
-.fi:hover{border-color:var(--l2);background:var(--p2)}
-.fi .th{height:88px;border-radius:10px;display:grid;place-items:center;background:rgba(0,0,0,.25);margin-bottom:8px;overflow:hidden}
-.fi .th img{width:100%;height:100%;object-fit:cover}.fi .th .e{font-weight:800;font-size:13px;padding:5px 9px;border-radius:8px}
-.fi .nm{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fi .mt{font-size:11px;color:var(--mu2)}
+.ct{display:inline-flex;width:26px;height:26px;border-radius:8px;align-items:center;justify-content:center;font-size:13px;flex:none}
+.ct.recebida{background:color-mix(in srgb,var(--ok) 15%,transparent)}.ct.feita{background:color-mix(in srgb,var(--ac2) 15%,transparent)}.ct.perdida,.ct.rejeitada{background:color-mix(in srgb,var(--er) 15%,transparent)}
+/* ficheiros */
+.crumbs{display:flex;align-items:center;gap:2px;flex-wrap:wrap;font-weight:650;font-size:13px}
+.crumbs button{padding:5px 8px;border-radius:8px;color:var(--mu)}.crumbs button:hover{background:var(--card2);color:var(--tx)}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:11px}
+.fi{border-radius:14px;padding:10px;background:var(--card);border:1px solid var(--line);cursor:pointer;transition:.12s;text-align:left;width:100%}
+.fi:hover{border-color:var(--line2);transform:translateY(-1px)}
+.fi .th{height:90px;border-radius:10px;display:grid;place-items:center;background:var(--card2);margin-bottom:8px;overflow:hidden}
+.fi .th img{width:100%;height:100%;object-fit:cover}.fi .th .e{font-weight:800;font-size:12.5px;padding:5px 9px;border-radius:8px}
+.fi .nm{font-size:12.5px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fi .mt{font-size:11px;color:var(--mu2)}
+.drop{position:fixed;inset:0;z-index:70;display:none;place-items:center;background:color-mix(in srgb,var(--bg) 80%,transparent);backdrop-filter:blur(6px)}
+.drop.on{display:grid}.drop div{padding:40px 60px;border-radius:24px;border:2px dashed var(--ac);font-size:18px;font-weight:700;text-align:center}
+.prog{position:fixed;right:20px;bottom:20px;width:300px;z-index:65;display:grid;gap:8px}
+.prog .pi{padding:11px 13px;border-radius:13px;background:var(--bg2);border:1px solid var(--line);box-shadow:var(--sh);font-size:12.5px}
+.prog .pi .bar{margin-top:6px;height:6px}
+.lb{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.85);display:none;place-items:center;padding:30px}
+.lb.on{display:grid}.lb img{max-width:100%;max-height:86vh;border-radius:12px}.lb .x{position:absolute;top:16px;right:18px;color:#fff}
+/* definições */
+.set{display:grid;grid-template-columns:220px minmax(0,1fr);gap:20px;align-items:start}
+.setnav{display:flex;flex-direction:column;gap:2px;position:sticky;top:0}
+.setnav button{text-align:left;padding:10px 12px;border-radius:11px;color:var(--mu);font-weight:650}
+.setnav button.on{background:var(--card2);color:var(--tx)}
+.field{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.field:last-child{border-bottom:0}
+.field b{display:block;font-size:14px}.field span{display:block;font-size:12.5px;color:var(--mu);margin-top:2px}
+.sw{position:relative;width:46px;height:26px;flex:none;display:inline-block}
+.sw input{opacity:0;width:0;height:0;position:absolute}
+.sw i{position:absolute;inset:0;border-radius:99px;background:var(--card2);border:1px solid var(--line2);transition:.2s;cursor:pointer}
+.sw i::after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:var(--mu);transition:.2s}
+.sw input:checked+i{background:var(--grad);border-color:transparent}.sw input:checked+i::after{left:23px;background:#fff}
+.sw input:focus-visible+i{outline:2px solid var(--ac2);outline-offset:2px}
 .qrbox{background:#fff;padding:12px;border-radius:14px;display:inline-block}
-.empty{text-align:center;color:var(--mu);padding:46px 10px}
-/* login */
-#login{position:fixed;inset:0;background:var(--bg);display:grid;place-items:center;z-index:50;padding:24px}
-#login .bx{width:100%;max-width:360px;text-align:center}
-#login img{width:92px;height:92px;border-radius:22px;margin-bottom:10px;box-shadow:0 10px 36px rgba(34,211,238,.4)}
-#login h1{color:var(--ac);margin:4px 0 2px;font-size:26px}#login p{color:var(--mu);margin:0 0 20px}
-#login input{text-align:center;font-size:28px;letter-spacing:.3em;margin-bottom:14px}
-#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#0e7490;color:#fff;padding:11px 18px;border-radius:99px;font-weight:600;opacity:0;transition:.25s;z-index:60;pointer-events:none;max-width:90%}
+.field .seg,.field .sw{justify-self:start}.codebox{max-width:max-content;font:800 22px/1 "Segoe UI",monospace;letter-spacing:.14em;padding:12px 16px;border-radius:12px;background:var(--card2);border:1px solid var(--line);display:inline-block}
+/* entrar */
+#login{position:fixed;inset:0;background:radial-gradient(900px 500px at 80% -10%,var(--glow1),transparent 60%),var(--bg);display:grid;place-items:center;z-index:50;padding:24px}
+#login .bx{width:100%;max-width:380px;text-align:center;padding:34px 28px;border-radius:26px;background:var(--card);border:1px solid var(--line);box-shadow:var(--sh)}
+#login img{width:84px;height:84px;border-radius:22px;margin-bottom:12px;box-shadow:0 10px 36px rgba(34,211,238,.35)}
+#login h1{margin:2px 0 4px;font-size:24px}#login p{color:var(--mu);margin:0 0 20px}
+#login input{text-align:center;font-size:26px;letter-spacing:.3em;margin-bottom:12px;font-weight:800}
+#login .via{display:inline-flex;gap:6px;align-items:center;font-size:12px;color:var(--mu);margin-top:16px;padding:5px 11px;border-radius:99px;background:var(--card2)}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--tx);color:var(--bg);padding:11px 18px;border-radius:99px;font-weight:650;opacity:0;transition:.25s;z-index:90;pointer-events:none;max-width:90%;box-shadow:var(--sh)}
 #toast.on{opacity:1;transform:translateX(-50%)}
-::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:10px;border:2px solid transparent;background-clip:padding-box}
-@media (max-width:1150px){.live{grid-template-columns:1fr}.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:1fr}.app{grid-template-columns:200px 1fr}}
-</style></head>
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--line2);border-radius:10px;border:2px solid transparent;background-clip:padding-box}
+@media (max-width:1200px){.live{grid-template-columns:minmax(0,1fr)}.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:900px){.app{grid-template-columns:minmax(0,1fr)}.side{position:fixed;z-index:40;inset:0 auto 0 0;width:270px;transform:translateX(-100%);transition:.2s}.side.open{transform:none;box-shadow:var(--sh)}
+ .ibtn.menuBtn{display:grid}.g2,.g3{grid-template-columns:minmax(0,1fr)}.chat{grid-template-columns:minmax(0,1fr)}.chat .lst{display:none}.chat.lista .lst{display:flex}.chat.lista .thr{display:none}
+ .set{grid-template-columns:minmax(0,1fr)}.setnav{flex-direction:row;overflow:auto;position:static}.field{grid-template-columns:minmax(0,1fr)}.top{padding:12px 16px}.content{padding:16px 16px 40px}.top .hidem{display:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
 <body>
-<div id="login"><div class="bx"><img src="logo" alt=""><h1>FusãoTechX Studio</h1><p>Controlo do telefone</p>
-<input id="pin" type="tel" inputmode="numeric" maxlength="12" placeholder="código"><button class="btn p" style="width:100%" onclick="entrar()">Entrar</button>
-<p style="margin-top:26px;font-size:12px">FusãoTechX Mz · fusaotech.com</p></div></div>
+<div id="login"><div class="bx">
+  <img src="logo" alt="">
+  <h1>FusãoTechX Studio</h1>
+  <p id="lgSub">O seu telefone no PC</p>
+  <input id="pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="12" placeholder="••••" aria-label="Código de acesso">
+  <button class="btn p" style="width:100%;padding:13px" id="lgBtn">Entrar</button>
+  <div class="via" id="lgVia">📶 Rede local</div>
+  <p class="tiny" style="margin:18px 0 0">O código aparece na app FusãoTechX do telefone.</p>
+</div></div>
 
-<div class="app" id="app" style="display:none">
-  <aside class="side">
+<div class="app" id="app" hidden>
+  <aside class="side" id="side">
     <div class="brand"><img src="logo" alt=""><div><b>FusãoTechX</b><small>Studio</small></div></div>
+    <div class="dev"><div class="ph"><svg class="i" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg></div>
+      <div style="min-width:0"><b id="sNome">Telefone</b><small><span class="dot" id="sDot"></span><span id="sEst">a ligar…</span></small></div></div>
     <nav class="nav" id="nav">
       <button data-v="painel" class="on"><svg class="i" data-i="grid"></svg>Painel</button>
-      <button data-v="ecra"><svg class="i" data-i="phone"></svg>Ecrã ao vivo<span class="b" id="bLive">LIVE</span></button>
-      <button data-v="sms"><svg class="i" data-i="msg"></svg>Mensagens</button>
-      <button data-v="call"><svg class="i" data-i="call"></svg>Chamadas</button>
-      <button data-v="notif"><svg class="i" data-i="bell"></svg>Notificações</button>
+      <button data-v="ecra"><svg class="i" data-i="phone"></svg>Ecrã e controlo<span class="b live" id="bLive" title="Ecrã partilhado">LIVE</span></button>
+      <div class="sec">Comunicação</div>
+      <button data-v="sms"><svg class="i" data-i="msg"></svg>Mensagens<span class="b" id="bSms"></span></button>
+      <button data-v="call"><svg class="i" data-i="call"></svg>Chamadas<span class="b" id="bCall"></span></button>
+      <button data-v="notif"><svg class="i" data-i="bell"></svg>Notificações<span class="b" id="bNotif"></span></button>
+      <div class="sec">Conteúdo</div>
       <button data-v="apps"><svg class="i" data-i="apps"></svg>Aplicações</button>
       <button data-v="files"><svg class="i" data-i="folder"></svg>Ficheiros</button>
+      <div class="sec">Sistema</div>
       <button data-v="def"><svg class="i" data-i="cog"></svg>Definições</button>
     </nav>
-    <div class="foot">Desenvolvido por <b>FusãoTechX Mz</b><br>+258 83 333 7906<br>fusaotech.com</div>
+    <div class="foot">Desenvolvido por <b>FusãoTechX Mz</b><br>+258 83 333 7906 · fusaotech.com</div>
   </aside>
 
   <div class="main">
     <header class="top">
+      <button class="ibtn menuBtn" id="menuBtn" aria-label="Menu"><svg class="i" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       <div><h1 id="tTit">Painel</h1><p id="tSub">Visão geral do telefone</p></div>
       <div class="sp"></div>
-      <div class="pill"><span class="dot" id="dot"></span><span id="pNome">Telefone</span></div>
+      <span class="pill hidem" id="pSync" title="Sincronização automática"><svg class="i" data-i="sync" style="width:16px;height:16px"></svg><span id="pSyncT">Sincronizado</span></span>
+      <span class="pill hidem" id="pVia">📶 Local</span>
+      <span class="pill" id="pBat">🔋 —</span>
+      <button class="ibtn" id="tema" aria-label="Mudar tema" title="Tema claro / escuro"><svg class="i" data-i="moon"></svg></button>
     </header>
-    <div class="content">
+    <div class="content" id="content">
 
 <!-- PAINEL -->
 <section class="view on" id="v-painel">
+  <div id="permBanner"></div>
   <div class="grid g4" style="margin-bottom:16px">
-    <div class="card" style="display:flex;gap:14px;align-items:center"><div class="ring" id="batR"><div id="batV">—</div></div><div><div class="kpi"><div class="l">Bateria</div></div><div class="tiny muted" id="batS">—</div></div></div>
-    <div class="card kpi"><div class="l">Armazenamento livre</div><div class="v" id="armV">—</div><div class="bar" style="margin-top:8px"><i id="armB" style="width:0"></i></div></div>
-    <div class="card kpi"><div class="l">Memória RAM livre</div><div class="v" id="ramV">—</div><div class="bar" style="margin-top:8px"><i id="ramB" style="width:0"></i></div></div>
-    <div class="card kpi"><div class="l">Android</div><div class="v" id="andV">—</div><div class="tiny muted" id="modV">—</div></div>
+    <div class="card" style="display:flex;gap:14px;align-items:center"><div class="ring" id="batR"><div id="batV">—</div></div><div><div class="kpi"><div class="l">Bateria</div><div style="font-weight:700" id="batS">—</div></div></div></div>
+    <div class="card kpi"><div class="l">Armazenamento livre</div><div class="v" id="armV">—</div><div class="bar" style="margin-top:8px"><i id="armB" style="width:0"></i></div><div class="tiny muted" id="armT" style="margin-top:5px"></div></div>
+    <div class="card kpi"><div class="l">Memória RAM livre</div><div class="v" id="ramV">—</div><div class="bar" style="margin-top:8px"><i id="ramB" style="width:0"></i></div><div class="tiny muted" id="ramT" style="margin-top:5px"></div></div>
+    <div class="card kpi"><div class="l">Telefone</div><div class="v" id="andV" style="font-size:19px">—</div><div class="tiny muted" id="modV">—</div></div>
   </div>
   <div class="grid g2" style="margin-bottom:16px" id="simWrap"></div>
-  <div class="card"><h3><svg class="i" data-i="bolt"></svg>Ações rápidas</h3>
-    <div class="row">
-      <button class="btn" data-go="ecra"><svg class="i" data-i="phone"></svg>Abrir ecrã ao vivo</button>
-      <button class="btn" data-go="sms"><svg class="i" data-i="msg"></svg>Enviar SMS</button>
-      <button class="btn" data-go="call"><svg class="i" data-i="call"></svg>Ligar</button>
-      <button class="btn" data-go="files"><svg class="i" data-i="folder"></svg>Ficheiros</button>
-      <button class="btn ok" id="qFotos"><svg class="i" data-i="cam"></svg>Ver fotos (Câmara)</button>
+  <div class="grid g2" style="align-items:start">
+    <div class="card"><h3><svg class="i" data-i="bolt"></svg>Ações rápidas</h3>
+      <div class="grid g2" style="gap:8px">
+        <button class="btn" data-go="ecra"><svg class="i" data-i="phone"></svg>Ecrã e controlo</button>
+        <button class="btn" data-go="sms"><svg class="i" data-i="msg"></svg>Mensagens</button>
+        <button class="btn" data-go="call"><svg class="i" data-i="call"></svg>Ligar</button>
+        <button class="btn" id="qFotos"><svg class="i" data-i="cam"></svg>Fotos da câmara</button>
+        <button class="btn" id="qClip"><svg class="i" data-i="clip"></svg>Copiar texto para o telefone</button>
+        <button class="btn" id="qUrl"><svg class="i" data-i="link"></svg>Abrir link no telefone</button>
+      </div>
     </div>
+    <div class="card"><h3><svg class="i" data-i="bell"></svg>Últimas notificações<span class="r"><button class="btn sm" data-go="notif">Ver todas</button></span></h3><div id="pNotif"><div class="empty">—</div></div></div>
   </div>
 </section>
 
-<!-- ECRA -->
+<!-- ECRÃ -->
 <section class="view" id="v-ecra">
+  <div id="ctlBanner"></div>
   <div class="live">
-    <div style="display:flex;justify-content:center"><div class="phone" style="width:min(400px,100%)"><div class="scr"><img id="scr" tabindex="0" alt=""></div><span class="fps" id="fps">—</span></div></div>
+    <div class="stage" id="stage">
+      <div class="phone"><div class="scr" id="scrBox"><img id="scr" tabindex="0" alt="Ecrã do telefone — clique para tocar"><div class="ovl" id="ovl">A ligar ao ecrã…<br><br>No telefone, toque em LIGAR e aceite a partilha do ecrã.</div></div></div>
+      <div class="navbar">
+        <button data-g="back" title="Voltar (Esc)" aria-label="Voltar"><svg class="i" data-i="back"></svg></button>
+        <button data-g="home" title="Início" aria-label="Início"><svg class="i" data-i="circle"></svg></button>
+        <button data-g="recents" title="Recentes" aria-label="Recentes"><svg class="i" data-i="square"></svg></button>
+      </div>
+      <div class="hud"><span class="pill" id="fps">— fps</span><span class="pill" id="lat">—</span><button class="pill" id="full" title="Ecrã inteiro"><svg class="i" data-i="max" style="width:16px;height:16px"></svg>Ecrã inteiro</button></div>
+    </div>
     <div class="grid">
-      <div class="card"><h3><svg class="i" data-i="mouse"></svg>Controlo</h3>
-        <div class="tiny muted" style="margin-bottom:10px">Clique = tocar · Arrastar = deslizar · Roda = rolar · Clique direito = voltar · Escreva com o teclado.</div>
+      <div class="card"><h3><svg class="i" data-i="mouse"></svg>Controlo do telefone</h3>
+        <div class="tiny muted" style="margin-bottom:12px;line-height:1.7">Clique = tocar · Manter = toque longo · Arrastar = deslizar · Roda = rolar · Clique direito = voltar.<br>Clique no ecrã e escreva com o teclado do PC: <span class="kbd">Enter</span> envia, <span class="kbd">Esc</span> volta, <span class="kbd">Ctrl</span>+<span class="kbd">V</span> cola.</div>
         <div class="ctl">
-          <button data-g="back"><svg class="i" data-i="back"></svg>Voltar</button>
-          <button data-g="home"><svg class="i" data-i="circle"></svg>Início</button>
-          <button data-g="recents"><svg class="i" data-i="square"></svg>Recentes</button>
-          <button data-g="notifications"><svg class="i" data-i="bell"></svg>Barra</button>
+          <button data-g="notifications"><svg class="i" data-i="bell"></svg>Notificações</button>
           <button data-g="quicksettings"><svg class="i" data-i="cog"></svg>Atalhos</button>
           <button data-g="power"><svg class="i" data-i="power"></svg>Energia</button>
           <button id="bCap"><svg class="i" data-i="shot"></svg>Captura</button>
@@ -168,207 +295,440 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stro
           <button id="bCam"><svg class="i" data-i="cam"></svg>Câmara</button>
         </div>
         <div class="sep"></div>
-        <div class="row"><span class="tiny muted">Qualidade</span><span class="chip" data-q="40">Rápido</span><span class="chip on" data-q="60">Normal</span><span class="chip" data-q="80">Nítido</span></div>
+        <div class="row"><span class="tiny muted">Qualidade</span><span class="chip" data-q="35">Rápido</span><span class="chip on" data-q="55">Normal</span><span class="chip" data-q="80">Nítido</span></div>
       </div>
-      <div class="card"><h3><svg class="i" data-i="type"></svg>Escrever</h3>
-        <textarea id="kb" rows="2" placeholder="Toque num campo no telefone e escreva…"></textarea>
-        <div class="row" style="margin-top:8px"><button class="btn p sm" onclick="escrever()">Enviar texto</button><button class="btn sm" onclick="post('/backspace')">Apagar</button></div>
+      <div class="card"><h3><svg class="i" data-i="type"></svg>Escrever no telefone</h3>
+        <textarea id="kb" rows="3" placeholder="Toque num campo de texto no telefone e escreva aqui…"></textarea>
+        <div class="row" style="margin-top:9px"><button class="btn p sm" id="kbSend">Escrever</button><button class="btn sm" id="kbEnter">↵ Enter</button><button class="btn sm" id="kbBack">⌫ Apagar</button><button class="btn sm" id="kbPaste">📋 Colar</button></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- SMS -->
+<!-- MENSAGENS -->
 <section class="view" id="v-sms">
-  <div class="grid g2" style="align-items:start">
-    <div class="card"><h3><svg class="i" data-i="msg"></svg>Nova mensagem</h3>
-      <input id="smsNum" placeholder="Número (+258…)" inputmode="tel">
-      <textarea id="smsTxt" rows="4" placeholder="Mensagem…" style="margin-top:9px"></textarea>
-      <div class="row" style="margin-top:9px"><button class="btn p" onclick="enviarSms()">Enviar SMS</button><button class="btn ok" onclick="enviarWa()">WhatsApp</button></div>
+  <div class="chat lista" id="chat">
+    <div class="lst">
+      <div class="hd"><div class="search" style="flex:1"><svg class="i" data-i="search"></svg><input id="cvBusca" placeholder="Procurar conversa…"></div><button class="ibtn" id="novaMsg" title="Nova mensagem" aria-label="Nova mensagem"><svg class="i" data-i="plus"></svg></button></div>
+      <div class="bd" id="convList"><div class="empty">A carregar…</div></div>
     </div>
-    <div class="card"><h3><svg class="i" data-i="msg"></svg>Recebidas<button class="btn sm" style="margin-left:auto" onclick="carregarSms()"><svg class="i" data-i="refresh"></svg></button></h3><div id="smsList" class="empty">Toque em atualizar</div></div>
+    <div class="thr">
+      <div class="hd"><button class="ibtn menuBtn" id="voltarLista" aria-label="Voltar às conversas"><svg class="i" data-i="back"></svg></button><div class="av" id="thAv" style="background:var(--ac2)">?</div><div style="flex:1;min-width:0"><b id="thNome">Escolha uma conversa</b><span id="thNum">ou comece uma nova</span></div>
+        <button class="btn sm" id="thCall" hidden><svg class="i" data-i="call"></svg>Ligar</button></div>
+      <div class="msgs" id="msgs"><div class="empty"><span class="ei">💬</span>As mensagens do telefone aparecem aqui e atualizam sozinhas.</div></div>
+      <div class="compose" id="compose">
+        <input id="smsNum" placeholder="Número (+258…)" inputmode="tel" style="max-width:190px" hidden>
+        <textarea id="smsTxt" rows="1" placeholder="Escreva uma mensagem…"></textarea>
+        <button class="btn p" id="smsSend" title="Enviar SMS (Enter)"><svg class="i" data-i="send"></svg>SMS</button>
+        <button class="btn ok" id="waSend" title="Abrir no WhatsApp do telefone">WhatsApp</button>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- CALL -->
+<!-- CHAMADAS -->
 <section class="view" id="v-call">
-  <div class="grid g2" style="align-items:start">
+  <div class="grid g3" style="align-items:start;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr) minmax(0,1fr)">
     <div class="card"><h3><svg class="i" data-i="call"></svg>Marcador</h3>
-      <input id="num" style="font-size:24px;text-align:center" placeholder="+258 …" inputmode="tel">
-      <div class="dial" id="dial"></div>
-      <div class="row"><button class="btn ok" style="flex:1" onclick="ligar()"><svg class="i" data-i="call"></svg>Ligar</button><button class="btn er" style="flex:1" onclick="post('/endcall')">Terminar</button></div>
-      <button class="btn" style="width:100%;margin-top:9px" onclick="post('/global',{a:'back'})">Atender (abrir ecrã)</button>
+      <div class="dialer">
+        <input id="num" style="font-size:24px;text-align:center;font-weight:700" placeholder="+258 …" inputmode="tel">
+        <div class="dial" id="dial"></div>
+        <div class="row"><button class="btn ok" style="flex:1" id="bLigar"><svg class="i" data-i="call"></svg>Ligar</button><button class="btn er" style="flex:1" id="bTerminar">Terminar</button></div>
+        <div class="tiny muted" style="margin-top:10px;text-align:center">A chamada é feita pelo telefone (use o ecrã ao vivo para atender).</div>
+      </div>
     </div>
-    <div class="card"><h3><svg class="i" data-i="users"></svg>Contactos<button class="btn sm" style="margin-left:auto" onclick="carregarContactos()"><svg class="i" data-i="refresh"></svg></button></h3>
-      <input id="cBusca" placeholder="Procurar…" oninput="pintarContactos()" style="margin-bottom:10px"><div id="contList" style="max-height:440px;overflow:auto" class="empty">Toque em atualizar</div></div>
+    <div class="card"><h3><svg class="i" data-i="clock"></svg>Recentes<span class="r"><button class="btn sm" id="callRef" aria-label="Atualizar"><svg class="i" data-i="refresh"></svg></button></span></h3><div id="callList" style="max-height:560px;overflow:auto"><div class="empty">A carregar…</div></div></div>
+    <div class="card"><h3><svg class="i" data-i="users"></svg>Contactos</h3>
+      <div class="search" style="margin-bottom:10px"><svg class="i" data-i="search"></svg><input id="cBusca" placeholder="Procurar nome ou número…"></div>
+      <div id="contList" style="max-height:520px;overflow:auto"><div class="empty">A carregar…</div></div></div>
   </div>
 </section>
 
-<!-- NOTIF -->
+<!-- NOTIFICAÇÕES -->
 <section class="view" id="v-notif">
-  <div class="row" style="margin-bottom:14px"><button class="btn sm" onclick="carregarNotifs()"><svg class="i" data-i="refresh"></svg>Atualizar</button><button class="btn sm er" onclick="post('/notifdismiss',{key:''}).then(carregarNotifs)">Limpar todas</button></div>
-  <div id="notifList" class="empty">Toque em atualizar</div>
+  <div class="row" style="margin-bottom:14px">
+    <div class="search" style="flex:1;max-width:340px"><svg class="i" data-i="search"></svg><input id="nBusca" placeholder="Filtrar por app ou texto…"></div>
+    <span class="tiny muted" id="nTot"></span><div style="flex:1"></div>
+    <button class="btn sm er" id="nLimpar">Limpar todas</button>
+  </div>
+  <div id="notifList"><div class="empty">A carregar…</div></div>
 </section>
 
-<!-- APPS -->
+<!-- APLICAÇÕES -->
 <section class="view" id="v-apps">
-  <div class="row" style="margin-bottom:14px"><input id="aBusca" placeholder="Procurar app…" oninput="pintarApps()" style="max-width:320px"><span class="muted tiny" id="aTot"></span><button class="btn sm" style="margin-left:auto" onclick="carregarApps(1)"><svg class="i" data-i="refresh"></svg>Atualizar</button></div>
-  <div id="appList" class="empty">A carregar…</div>
+  <div class="row" style="margin-bottom:14px"><div class="search" style="flex:1;max-width:340px"><svg class="i" data-i="search"></svg><input id="aBusca" placeholder="Procurar aplicação…"></div><span class="muted tiny" id="aTot"></span></div>
+  <div id="appList"><div class="empty">A carregar…</div></div>
 </section>
 
-<!-- FILES -->
+<!-- FICHEIROS -->
 <section class="view" id="v-files">
-  <div class="row" style="margin-bottom:14px"><button class="btn sm" onclick="subir()"><svg class="i" data-i="back"></svg></button><div class="crumbs" id="crumb"></div><div class="sp" style="flex:1"></div><label class="btn sm"><svg class="i" data-i="up"></svg>Enviar<input type="file" id="up" hidden multiple></label><button class="btn sm" onclick="abrir(DIR)"><svg class="i" data-i="refresh"></svg></button></div>
-  <div id="fileList" class="empty">A carregar…</div>
+  <div class="row" style="margin-bottom:12px">
+    <button class="btn sm" id="fUp" aria-label="Pasta acima"><svg class="i" data-i="back"></svg></button>
+    <div class="crumbs" id="crumb"></div><div style="flex:1"></div>
+    <label class="btn sm p" style="cursor:pointer"><svg class="i" data-i="up"></svg>Enviar ficheiros<input type="file" id="up" multiple hidden></label>
+  </div>
+  <div class="row" style="margin-bottom:14px" id="atalhos">
+    <span class="chip" data-p="/sdcard/DCIM/Camera">📷 Câmara</span><span class="chip" data-p="/sdcard/Pictures">🖼️ Imagens</span><span class="chip" data-p="/sdcard/Download">⬇️ Transferências</span>
+    <span class="chip" data-p="/sdcard/Documents">📄 Documentos</span><span class="chip" data-p="/sdcard/Music">🎵 Música</span><span class="chip" data-p="/sdcard/Android/media/com.whatsapp/WhatsApp/Media">💬 WhatsApp</span>
+  </div>
+  <div class="tiny muted" style="margin-bottom:12px">Arraste ficheiros do PC para esta janela para os enviar — ficam em <b>Transferências › FusaoTechX</b> no telefone.</div>
+  <div id="fileList"><div class="empty">A carregar…</div></div>
 </section>
 
-<!-- DEF -->
+<!-- DEFINIÇÕES -->
 <section class="view" id="v-def">
-  <div class="grid g2" style="align-items:start">
-    <div class="card"><h3><svg class="i" data-i="cog"></svg>Ligação</h3>
-      <div class="tiny muted">Nome do telefone</div><input id="dNome" style="margin:6px 0 12px">
-      <div class="tiny muted">Código de acesso</div><input id="dCode" inputmode="numeric" style="margin:6px 0 12px">
-      <button class="btn p" onclick="guardar()">Guardar</button>
-      <div class="sep"></div>
-      <div class="tiny muted">Endereços (mesma rede / hotspot):</div><div id="ips" class="tiny" style="margin-top:6px"></div>
-      <div class="tiny muted" style="margin-top:12px">Qualquer rede (dados móveis):</div><div id="remoto" class="tiny" style="margin-top:6px">—</div>
-    </div>
-    <div class="card" style="text-align:center"><h3 style="justify-content:center"><svg class="i" data-i="down"></svg>Instalar noutro telefone</h3>
-      <div class="qrbox"><div id="qrDl"></div></div>
-      <div class="tiny muted" style="margin-top:12px">Lê este QR com outro telefone para descarregar a app.</div>
-      <a class="btn sm" style="margin-top:10px" href="https://github.com/arlindobenhane/FusaoTechX-App/releases/download/apk/FusaoTechX.apk">Link de descarga</a>
+  <div class="set">
+    <nav class="setnav" id="setnav">
+      <button data-s="sTel" class="on">📱 Telefone</button><button data-s="sLig">🌐 Ligação</button><button data-s="sEcr">🖥️ Ecrã</button>
+      <button data-s="sNot">🔔 Notificações</button><button data-s="sApa">🎨 Aparência</button><button data-s="sPer">🛡️ Permissões</button><button data-s="sSob">ℹ️ Sobre</button>
+    </nav>
+    <div class="grid">
+      <div class="card" id="sTel"><h3>📱 Telefone</h3>
+        <div class="field"><div><b>Nome do telefone</b><span>Como aparece no PC e no relay.</span></div><input id="dNome" maxlength="60"></div>
+        <div class="field"><div><b>Código de acesso</b><span>4 a 12 dígitos. O PC pede-o para entrar.</span></div><input id="dCode" inputmode="numeric" maxlength="12"></div>
+        <div class="row" style="margin-top:14px"><button class="btn p" id="dGuardar">Guardar alterações</button></div>
+      </div>
+      <div class="card" id="sLig"><h3>🌐 Ligação</h3>
+        <div class="field"><div><b>Mesma rede / hotspot</b><span>Mais rápido. PC e telefone na mesma Wi-Fi.</span></div><div id="ips" class="tiny">—</div></div>
+        <div class="field"><div><b>Qualquer rede (dados móveis)</b><span>Ative «Ligação remota» na app do telefone. A ligação volta sozinha quando o telefone troca de rede.</span></div><div id="remoto" class="tiny">—</div></div>
+        <div class="field"><div><b>Esta sessão</b><span>Por onde este PC está ligado agora.</span></div><div id="sessao" class="tiny">—</div></div>
+      </div>
+      <div class="card" id="sEcr"><h3>🖥️ Ecrã ao vivo</h3>
+        <div class="field"><div><b>Qualidade da imagem</b><span>Rápido gasta menos dados móveis.</span></div><div class="seg" id="segQ"><button data-q="35">Rápido</button><button data-q="55" class="on">Normal</button><button data-q="80">Nítido</button></div></div>
+        <div class="field"><div><b>Mostrar toques</b><span>Um círculo indica onde clicou.</span></div><label class="sw"><input type="checkbox" id="optRipple" checked><i></i></label></div>
+        <div class="field"><div><b>Teclado do PC vai para o telefone</b><span>Depois de clicar no ecrã ao vivo.</span></div><label class="sw"><input type="checkbox" id="optKb" checked><i></i></label></div>
+      </div>
+      <div class="card" id="sNot"><h3>🔔 Notificações e sincronização</h3>
+        <div class="field"><div><b>Avisos no ambiente de trabalho</b><span>Mostra no PC as notificações novas do telefone.</span></div><label class="sw"><input type="checkbox" id="optDesk"><i></i></label></div>
+        <div class="field"><div><b>Som nas mensagens novas</b><span>Um aviso discreto quando chega um SMS.</span></div><label class="sw"><input type="checkbox" id="optSom" checked><i></i></label></div>
+        <div class="field"><div><b>Sincronizar automaticamente</b><span>Estado, notificações, mensagens e chamadas atualizam sozinhos.</span></div><label class="sw"><input type="checkbox" id="optSync" checked><i></i></label></div>
+      </div>
+      <div class="card" id="sApa"><h3>🎨 Aparência</h3>
+        <div class="field"><div><b>Tema</b><span>Automático segue o sistema do PC.</span></div><div class="seg" id="segT"><button data-t="auto">Automático</button><button data-t="claro">☀️ Claro</button><button data-t="escuro">🌙 Escuro</button></div></div>
+      </div>
+      <div class="card" id="sPer"><h3>🛡️ Permissões no telefone</h3><div id="permList"></div>
+        <div class="tiny muted" style="margin-top:10px">As permissões dão-se na app FusãoTechX do telefone, em «1 · Permissões».</div></div>
+      <div class="card" id="sSob"><h3>ℹ️ Sobre</h3>
+        <div class="grid g2" style="align-items:center">
+          <div><b style="font-size:16px">FusãoTechX Studio</b><div class="tiny muted" id="versao">—</div>
+            <p class="tiny muted">App própria da FusãoTechX Mz para usar o telefone no PC. Sem conta e sem anúncios.</p>
+            <a class="btn sm" href="https://github.com/arlindobenhane/FusaoTechX-App/releases/download/apk/FusaoTechX.apk">⬇️ Descarregar a APK</a></div>
+          <div style="text-align:center"><div class="qrbox"><div id="qrDl"></div></div><div class="tiny muted" style="margin-top:8px">Instalar noutro telefone</div></div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
     </div>
   </div>
 </div>
-<div id="toast"></div>
-
+<div class="drop" id="drop"><div>📥 Largue para enviar para o telefone</div></div>
+<div class="prog" id="prog"></div>
+<div class="lb" id="lb"><button class="ibtn x" id="lbX" aria-label="Fechar">✕</button><img id="lbImg" alt=""></div>
+<div id="toast" role="status" aria-live="polite"></div>
 <script>
 const ICON={grid:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
-phone:'<rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/>',msg:'<path d="M4 5h16v11H8l-4 4z"/>',call:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
-bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>',apps:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/>',
-folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',cog:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',
-bolt:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',down:'<path d="M12 3v12M7 10l5 5 5-5M4 21h16"/>',up:'<path d="M12 15V3M7 8l5-5 5 5M4 21h16"/>',mouse:'<rect x="6" y="3" width="12" height="18" rx="6"/><path d="M12 7v4"/>',
-back:'<path d="M15 6l-6 6 6 6"/>',circle:'<circle cx="12" cy="12" r="7"/>',square:'<rect x="6" y="6" width="12" height="12" rx="2"/>',power:'<path d="M12 3v9"/><path d="M6.3 7a8 8 0 1 0 11.4 0"/>',
+phone:'<rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/>',msg:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',call:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
+bell:'<path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/>',apps:'<circle cx="6" cy="6" r="2.2"/><circle cx="12" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="6" cy="12" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="18" cy="12" r="2.2"/><circle cx="6" cy="18" r="2.2"/><circle cx="12" cy="18" r="2.2"/><circle cx="18" cy="18" r="2.2"/>',
+folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',cog:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+bolt:'<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',back:'<path d="M15 18l-6-6 6-6"/>',circle:'<circle cx="12" cy="12" r="7"/>',square:'<rect x="5" y="5" width="14" height="14" rx="3"/>',power:'<path d="M12 2v10"/><path d="M5.6 6.6a8 8 0 1 0 12.8 0"/>',
 shot:'<path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><circle cx="12" cy="12" r="3"/>',lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
-cam:'<path d="M4 8h3l2-3h6l2 3h3v12H4z"/><circle cx="12" cy="13" r="4"/>',type:'<path d="M4 7V5h16v2M12 5v14M9 19h6"/>',refresh:'<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/>',users:'<circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 4a3.5 3.5 0 0 1 0 7"/>',
-sim:'<path d="M6 3h8l4 4v14H6z"/><rect x="9" y="12" width="6" height="6" rx="1"/>',file:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>'};
-function ico(n,c=''){return `<svg class="i ${c}" viewBox="0 0 24 24">${ICON[n]||ICON.file}</svg>`}
-document.querySelectorAll('svg[data-i]').forEach(s=>{s.setAttribute('viewBox','0 0 24 24');s.innerHTML=ICON[s.dataset.i]||''});
-// Mesmo painel em dois modos: rede local (http://IP:9999/) ou ligação remota (fusaotech.com/relay/d/ID/).
-const B=location.pathname.replace(/[^/]*$/,'')||'/',RELAY=B!=='/',U=u=>B+String(u).replace(/^\//,''),CK='ftxcode'+(RELAY?B:'');
-const $=s=>document.querySelector(s);let CODE=localStorage.getItem(CK)||'';let W=1080,H=2340;
-const CO=['#22d3ee','#818cf8','#c084fc','#f472b6','#34d399','#fbbf24','#60a5fa'];
-function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._);t._=setTimeout(()=>t.classList.remove('on'),2200)}
-function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-function fmtB(b){if(!b)return '—';if(b>=1073741824)return (b/1073741824).toFixed(1)+' GB';if(b>=1048576)return (b/1048576).toFixed(0)+' MB';if(b>=1024)return (b/1024).toFixed(0)+' KB';return b+' B'}
-async function get(u){const r=await fetch(U(u)+(u.includes('?')?'&':'?')+'k='+CODE);if(r.status===401){sair();throw 0}if(r.status===429){toast('Demasiadas tentativas. Aguarde 10 minutos.');throw 0}return r.json()}
-async function post(u,b){const r=await fetch(U(u)+'?k='+CODE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b||{})});if(r.status===401){sair();throw 0}return r.json().catch(()=>({}))}
-function sair(){localStorage.removeItem(CK);location.reload()}
-async function entrar(){const c=$('#pin').value.trim();const r=await fetch(U('/login'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:c})}).then(x=>x.json()).catch(()=>({}));
- if(r.ok){CODE=c;localStorage.setItem(CK,c);arrancar()}else toast(r.erro==='bloqueado'?'Demasiadas tentativas. Aguarde 10 minutos.':(r.erro==='offline'?'O telefone desligou-se do relay.':'Código errado'))}
-$('#pin').addEventListener('keyup',e=>{if(e.key==='Enter')entrar()});
+mouse:'<rect x="6" y="3" width="12" height="18" rx="6"/><path d="M12 7v4"/>',cam:'<path d="M4 8h3l2-3h6l2 3h3v12H4z"/><circle cx="12" cy="13" r="4"/>',type:'<path d="M4 7V5h16v2M12 5v14M9 19h6"/>',refresh:'<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/>',
+users:'<circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 4a3.5 3.5 0 0 1 0 7"/><path d="M21 20a6 6 0 0 0-3.5-5.5"/>',up:'<path d="M12 19V5M5 12l7-7 7 7"/>',down:'<path d="M12 5v14M5 12l7 7 7-7"/>',
+search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',plus:'<path d="M12 5v14M5 12h14"/>',send:'<path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+sync:'<path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 21v-5h5M21 3v5h-5"/>',max:'<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>',clip:'<rect x="8" y="3" width="8" height="4" rx="1"/><path d="M8 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>',
+link:'<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>',file:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',sim:'<path d="M6 3h8l4 4v14H6z"/><rect x="9" y="12" width="6" height="6" rx="1"/>'};
+function ico(n,st=''){return `<svg class="i" viewBox="0 0 24 24" style="${st}">${ICON[n]||ICON.file}</svg>`}
+function pintarIcones(r=document){r.querySelectorAll('svg[data-i]').forEach(s=>{s.setAttribute('viewBox','0 0 24 24');s.innerHTML=ICON[s.dataset.i]||''})}
+pintarIcones();
 
-const TIT={painel:['Painel','Visão geral do telefone'],ecra:['Ecrã ao vivo','Controle com o rato e o teclado'],sms:['Mensagens','SMS e WhatsApp a partir do PC'],call:['Chamadas','Marcador e contactos'],notif:['Notificações','Em tempo real'],apps:['Aplicações','Abrir e gerir'],files:['Ficheiros','Navegar e transferir'],def:['Definições','Ligação e instalação']};
-// Ecrã: na rede local usa o vídeo contínuo (MJPEG); pelo relay pede a imagem mais recente, uma de cada vez.
-let SEQ=0,ecraOn=false;
-function ecraIniciar(){const im=$('#scr');
- if(!RELAY){im.src=U('/stream')+'?k='+CODE+'&t='+Date.now();im.onerror=()=>setTimeout(()=>{im.src=U('/stream')+'?k='+CODE+'&t='+Date.now()},1500);return}
+// ===== Base: rede local (http://IP:9999/) ou ligação remota (studio.fusaotech.com/d/ID/) =====
+const B=location.pathname.replace(/[^/]*$/,'')||'/',RELAY=B!=='/',U=u=>B+String(u).replace(/^\//,''),CK='ftxcode'+(RELAY?B:'');
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+let CODE='';try{CODE=localStorage.getItem(CK)||''}catch(e){}
+const pref=(k,d)=>{try{const v=localStorage.getItem('ftx_'+k);return v===null?d:JSON.parse(v)}catch(e){return d}};
+const guardarPref=(k,v)=>{try{localStorage.setItem('ftx_'+k,JSON.stringify(v))}catch(e){}};
+const CO=['#22d3ee','#818cf8','#c084fc','#f472b6','#34d399','#fbbf24','#60a5fa'];
+const cor=s=>CO[[...String(s||'?')].reduce((a,c)=>a+c.charCodeAt(0),0)%CO.length];
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._);t._=setTimeout(()=>t.classList.remove('on'),2400)}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function fmtB(b){if(!b)return '—';if(b>=1073741824)return (b/1073741824).toFixed(1)+' GB';if(b>=1048576)return (b/1048576).toFixed(0)+' MB';if(b>=1024)return (b/1024).toFixed(0)+' KB';return b+' B'}
+function quando(ms){if(!ms)return '';const d=new Date(+ms),h=new Date();const mesmoDia=d.toDateString()===h.toDateString();
+ const ontem=new Date(h-864e5).toDateString()===d.toDateString();const hh=d.toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
+ return mesmoDia?hh:(ontem?'Ontem':d.toLocaleDateString('pt-PT',{day:'2-digit',month:'short'}))}
+function dia(ms){const d=new Date(+ms),h=new Date();if(d.toDateString()===h.toDateString())return 'Hoje';if(new Date(h-864e5).toDateString()===d.toDateString())return 'Ontem';return d.toLocaleDateString('pt-PT',{weekday:'long',day:'numeric',month:'long'})}
+const normNum=n=>String(n||'').replace(/[^\d+]/g,'').replace(/^00/,'+').replace(/^\+?258(?=\d{9}$)/,'');
+
+let falhas=0,ultimaResp=0;
+async function req(u,o={}){const t0=performance.now();const r=await fetch(U(u)+(u.includes('?')?'&':'?')+'k='+encodeURIComponent(CODE),o);
+ if(r.status===401){sair();throw new Error('codigo')}if(r.status===429){toast('Demasiadas tentativas. Aguarde 10 minutos.');throw new Error('bloqueado')}
+ if(r.status===503){ligado(false,'Telefone desligado');throw new Error('offline')}
+ ligado(true);LAT=Math.round(performance.now()-t0);return r}
+async function get(u){return (await req(u)).json()}
+async function post(u,b){const r=await req(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b||{})});return r.json().catch(()=>({}))}
+function sair(){try{localStorage.removeItem(CK)}catch(e){}location.reload()}
+let LAT=0;
+function ligado(ok,txt){$('#sDot').className='dot'+(ok?' on':'');$('#sEst').textContent=ok?(RELAY?'Remoto · ligado':'Rede local · ligado'):(txt||'sem ligação')}
+
+// ===== Entrar =====
+$('#lgVia').textContent=RELAY?'🌐 Ligação remota · '+B.replace(/.*\/d\/(\d{3})(\d{3})(\d{3}).*/,'ID $1 $2 $3'):'📶 Rede local';
+$('#pVia').textContent=RELAY?'🌐 Remoto':'📶 Local';
+async function entrar(){const c=$('#pin').value.trim();if(!c)return;$('#lgBtn').disabled=true;
+ const r=await fetch(U('/login'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:c})}).then(x=>x.json()).catch(()=>({}));
+ $('#lgBtn').disabled=false;
+ if(r.ok){CODE=c;try{localStorage.setItem(CK,c)}catch(e){}arrancar()}
+ else{toast(r.erro==='bloqueado'?'Demasiadas tentativas. Aguarde 10 minutos.':(r.erro==='offline'?'O telefone não está ligado.':'Código errado'));$('#pin').select()}}
+$('#lgBtn').onclick=entrar;$('#pin').addEventListener('keydown',e=>{if(e.key==='Enter')entrar()});
+
+// ===== Navegação =====
+const TIT={painel:['Painel','Visão geral do telefone'],ecra:['Ecrã e controlo','Veja e controle o telefone com o rato e o teclado'],sms:['Mensagens','SMS e WhatsApp, sincronizados'],call:['Chamadas','Marcador, recentes e contactos'],
+ notif:['Notificações','Em tempo real'],apps:['Aplicações','Abrir apps no telefone'],files:['Ficheiros','Navegar, ver e transferir'],def:['Definições','Telefone, ligação, ecrã e aparência']};
+let VISTA='painel';
+function ir(v){VISTA=v;$$('#nav button').forEach(x=>x.classList.toggle('on',x.dataset.v===v));$$('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));
+ $('#tTit').textContent=TIT[v][0];$('#tSub').textContent=TIT[v][1];$('#side').classList.remove('open');try{history.replaceState(null,'','#'+v)}catch(e){}
+ if(v==='apps')carregarApps();if(v==='notif'){carregarNotifs();marcarVisto('notif')}if(v==='files'&&!DIR)abrir('');if(v==='sms'){carregarSms();marcarVisto('sms')}
+ if(v==='call'){carregarChamadas();carregarContactos();marcarVisto('call')}if(v==='ecra')setTimeout(()=>scr.focus(),150);if(v==='def')pintarDef()}
+$('#nav').onclick=e=>{const b=e.target.closest('button[data-v]');if(b)ir(b.dataset.v)};
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)ir(g.dataset.go)});
+$('#menuBtn').onclick=()=>$('#side').classList.toggle('open');
+
+// ===== Tema =====
+function aplicarTema(t){guardarPref('tema',t);try{localStorage.setItem('ftxTema',t)}catch(e){}
+ const r=t==='auto'?(matchMedia('(prefers-color-scheme: light)').matches?'claro':'escuro'):t;document.documentElement.setAttribute('data-theme',r);
+ $('#tema').innerHTML=ico(r==='claro'?'moon':'sun');$$('#segT button').forEach(b=>b.classList.toggle('on',b.dataset.t===t))}
+$('#tema').onclick=()=>aplicarTema(document.documentElement.getAttribute('data-theme')==='claro'?'escuro':'claro');
+$$('#segT button').forEach(b=>b.onclick=()=>aplicarTema(b.dataset.t));
+aplicarTema((()=>{try{return localStorage.getItem('ftxTema')||'auto'}catch(e){return 'auto'}})());
+
+// ===== Estado e sincronização =====
+let S={};
+async function estado(){try{S=await get('/state');}catch(e){if(e.message!=='codigo'&&e.message!=='offline')ligado(false);return}
+ $('#sNome').textContent=S.nome||'Telefone';
+ $('#batR').style.setProperty('--p',S.bateria||0);$('#batV').textContent=(S.bateria??'—')+'%';$('#batS').textContent=S.carregar?'A carregar ⚡':'Em uso';
+ $('#pBat').textContent=(S.carregar?'⚡ ':'🔋 ')+(S.bateria??'—')+'%';
+ const au=S.total?(1-S.livre/S.total)*100:0;$('#armV').textContent=fmtB(S.livre);$('#armB').style.width=au+'%';$('#armT').textContent=S.total?'de '+fmtB(S.total):'';
+ const ru=S.ramTotal?(1-S.ramLivre/S.ramTotal)*100:0;$('#ramV').textContent=fmtB(S.ramLivre);$('#ramB').style.width=ru+'%';$('#ramT').textContent=S.ramTotal?'de '+fmtB(S.ramTotal):'';
+ $('#andV').textContent=((S.marca||'')+' '+(S.modelo||'')).trim()||'—';$('#modV').textContent='Android '+(S.android||'—')+(S.versao?' · app '+S.versao:'');
+ pintarSims(S.sims||[]);pintarPermissoes();
+ $('#ovl').hidden=!!S.ecra;if(!S.ecra)$('#ovl').innerHTML='Partilha do ecrã desligada.<br><br>No telefone, abra a app e toque em <b>LIGAR</b>.';
+ $('#bLive').style.display=S.ecra?'inline-block':'none';
+ if(VISTA==='def')pintarDef()}
+function pintarSims(sims){
+ if(!sims.length){$('#simWrap').innerHTML='<div class="card"><h3>'+ico('sim')+'SIM</h3><div class="muted tiny">Sem SIM detetado ou permissão de telefone por dar.</div></div>';return}
+ $('#simWrap').innerHTML=sims.map(s=>`<div class="sim"><div class="n">SIM${s.slot}</div><div class="tx"><b>${esc(s.operadora||s.nome||('SIM '+s.slot))}</b><span>${esc(s.numero||'número não disponível')}${s.roaming?' · roaming':''}${s.pais?' · '+esc(s.pais):''}</span></div></div>`).join('')}
+function pintarPermissoes(){
+ const p=[['controlo',S.controlo,'Controlo (Acessibilidade)','Tocar, deslizar e escrever a partir do PC'],['notif',S.notif,'Ler notificações','Ver e dispensar notificações no PC'],['ecra',S.ecra,'Partilha do ecrã','Ver o ecrã ao vivo']];
+ $('#permList').innerHTML=p.map(x=>`<div class="perm"><span class="s ${x[1]?'ok':'no'}">${x[1]?'✓':'!'}</span><div><b>${x[2]}</b><span>${x[1]?'Ativo':'Por ativar'} · ${x[3]}</span></div></div>`).join('');
+ const falta=p.filter(x=>!x[1]&&x[0]!=='ecra');
+ $('#permBanner').innerHTML=falta.length?`<div class="banner"><span style="font-size:22px">🛡️</span><div><b>Falta ${falta.length===1?'uma permissão':'dar permissões'} no telefone</b>${falta.map(x=>esc(x[2])).join(' · ')} — abra a app FusãoTechX › «1 · Permissões».</div><button class="btn sm x" data-go="def">Ver</button></div>`:'';
+ $('#ctlBanner').innerHTML=S.controlo===false?'<div class="banner"><span style="font-size:22px">🖱️</span><div><b>Para mexer no telefone a partir do PC</b>No telefone: app FusãoTechX › «Permitir controlo (Acessibilidade)» › ative FusãoTechX. Até lá, só pode ver o ecrã.</div></div>':''}
+
+// Notificações, mensagens e chamadas novas (badges + avisos no PC)
+const VISTO=pref('visto',{sms:0,call:0,notif:0});
+function marcarVisto(k){VISTO[k]=Date.now();guardarPref('visto',VISTO);badge(k,0)}
+function badge(k,n){const el=$('#b'+k[0].toUpperCase()+k.slice(1));if(!el)return;el.textContent=n>99?'99+':n;el.style.display=n?'inline-block':'none'}
+let NOTIFS=[],SMS=[],CALLS=[],avisadas=new Set(pref('avisadas',[]));
+function avisoPC(titulo,corpo,tag){if(!pref('desk',false)||!('Notification' in window)||Notification.permission!=='granted'||!document.hidden)return;try{new Notification(titulo,{body:corpo,tag,icon:U('/logo')})}catch(e){}}
+function som(){if(!pref('som',true))return;try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=880;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+.25);o.stop(a.currentTime+.26)}catch(e){}}
+async function syncNotifs(){try{const r=await get('/notifs');NOTIFS=(r.lista||[]).sort((a,b)=>b.data-a.data);NOTIFS.ativo=r.ativo;
+ const novas=NOTIFS.filter(n=>n.data>VISTO.notif);badge('notif',VISTA==='notif'?0:novas.length);
+ for(const n of NOTIFS)if(!avisadas.has(n.key+n.data)){avisadas.add(n.key+n.data);if(n.data>Date.now()-120000)avisoPC(n.titulo||n.app,n.texto,n.key)}
+ guardarPref('avisadas',[...avisadas].slice(-200));pintarNotifs()}catch(e){}}
+async function syncSms(){try{const r=await get('/sms?n=400');const novo=r.lista||[];const antes=SMS.length?SMS[0].data:0;SMS=novo;
+ const nl=SMS.filter(m=>!m.enviada&&m.data>VISTO.sms).length;badge('sms',VISTA==='sms'?0:nl);
+ if(antes&&SMS[0]&&SMS[0].data>antes&&!SMS[0].enviada){som();avisoPC('SMS de '+nomeDe(SMS[0].de),SMS[0].texto,'sms')}
+ if(VISTA==='sms')pintarConversas()}catch(e){}}
+async function syncCalls(){try{const r=await get('/calls');CALLS=r.lista||[];badge('call',VISTA==='call'?0:CALLS.filter(c=>c.tipo==='perdida'&&c.data>VISTO.call).length);if(VISTA==='call')pintarChamadas()}catch(e){}}
+let syncTimer=null,ciclo=0;
+function sincronizar(){clearTimeout(syncTimer);const on=pref('sync',true);
+ const passo=async()=>{ciclo++;$('#pSyncT').textContent='A sincronizar…';await estado();
+  if(on){await syncNotifs();if(ciclo%3===1)await syncSms();if(ciclo%6===1)await syncCalls()}
+  $('#pSyncT').textContent=on?'Sincronizado':'Sincronização pausada';syncTimer=setTimeout(passo,document.hidden?15000:(RELAY?6000:4000))};
+ passo()}
+
+function arrancar(){$('#login').style.display='none';$('#app').hidden=false;montarDial();sincronizar();ecraIniciar();carregarContactos(true);
+ const v=(location.hash||'').slice(1);if(TIT[v])ir(v);
+ setTimeout(()=>{try{new QRCode($('#qrDl'),{text:'https://github.com/arlindobenhane/FusaoTechX-App/releases/download/apk/FusaoTechX.apk',width:140,height:140})}catch(e){}},800)}
+
+// ===== Ecrã ao vivo e controlo =====
+const scr=$('#scr');let SEQ=0,ecraOn=false,frames=0,tf=performance.now();
+function contarFrame(){frames++;const n=performance.now();if(n-tf>1000){$('#fps').textContent=Math.round(frames*1000/(n-tf))+' fps';frames=0;tf=n;$('#lat').textContent=LAT?('⏱ '+LAT+' ms'):'—'}}
+function ecraIniciar(){
+ if(!RELAY){scr.onload=contarFrame;scr.src=U('/stream')+'?k='+CODE+'&t='+Date.now();scr.onerror=()=>setTimeout(()=>{scr.src=U('/stream')+'?k='+CODE+'&t='+Date.now()},1500);return}
  if(ecraOn)return;ecraOn=true;let url=null;
- const ciclo=async()=>{if(document.hidden){setTimeout(ciclo,800);return}
-  try{const r=await fetch(U('/shot')+'?k='+CODE+'&since='+SEQ+'&t='+Date.now(),{cache:'no-store'});
+ const ciclo=async()=>{if(document.hidden||VISTA!=='ecra'){setTimeout(ciclo,700);return}
+  try{const t0=performance.now();const r=await fetch(U('/shot')+'?k='+CODE+'&since='+SEQ+'&t='+Date.now(),{cache:'no-store'});
    if(r.status===401){sair();return}
-   if(r.status===200){SEQ=+(r.headers.get('X-Seq')||SEQ);const b=await r.blob();const n=URL.createObjectURL(b);
-    await new Promise(ok=>{im.onload=ok;im.onerror=ok;im.src=n});if(url)URL.revokeObjectURL(url);url=n}
+   if(r.status===200){SEQ=+(r.headers.get('X-Seq')||SEQ);const b=await r.blob();const n=URL.createObjectURL(b);LAT=Math.round(performance.now()-t0);
+    await new Promise(ok=>{scr.onload=ok;scr.onerror=ok;scr.src=n});if(url)URL.revokeObjectURL(url);url=n;contarFrame();$('#ovl').hidden=true}
    else if(r.status!==204)await new Promise(ok=>setTimeout(ok,1500));
   }catch(e){await new Promise(ok=>setTimeout(ok,1500))}
   setTimeout(ciclo,0)};
  ciclo()}
-function arrancar(){$('#login').style.display='none';$('#app').style.display='grid';montarDial();estado();setInterval(estado,4000);ecraIniciar();
- try{new QRCode($('#qrDl'),{text:'https://github.com/arlindobenhane/FusaoTechX-App/releases/download/apk/FusaoTechX.apk',width:150,height:150})}catch(e){}}
-$('#nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;ir(b.dataset.v)};
-document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)ir(g.dataset.go)});
-function ir(v){document.querySelectorAll('nav button,.view').forEach(x=>x.classList.remove('on'));$('#nav [data-v="'+v+'"]').classList.add('on');$('#v-'+v).classList.add('on');$('#tTit').textContent=TIT[v][0];$('#tSub').textContent=TIT[v][1];
- if(v==='apps')carregarApps();if(v==='notif')carregarNotifs();if(v==='files'&&!DIR)abrir('');if(v==='sms')carregarSms();if(v==='call')carregarContactos();if(v==='ecra')setTimeout(()=>$('#scr').focus(),150)}
-
-let S={};
-async function estado(){try{S=await get('/state');W=S.w||W;H=S.h||H;
- $('#dot').classList.add('on');$('#pNome').textContent=S.nome||'Telefone';
- $('#batR').style.setProperty('--p',S.bateria||0);$('#batV').textContent=(S.bateria||0)+'%';$('#batS').textContent=S.carregar?'A carregar ⚡':'Em uso';
- const au=S.total?(1-S.livre/S.total)*100:0;$('#armV').textContent=fmtB(S.livre);$('#armB').style.width=au+'%';
- const ru=S.ramTotal?(1-S.ramLivre/S.ramTotal)*100:0;$('#ramV').textContent=fmtB(S.ramLivre);$('#ramB').style.width=ru+'%';
- $('#andV').textContent=S.android||'—';$('#modV').textContent=(S.marca||'')+' '+(S.modelo||'');
- pintarSims(S.sims||[]);
- if($('#v-def').classList.contains('on')||!$('#dNome').value){$('#dNome').value=S.nome||'';$('#dCode').value=CODE;$('#ips').innerHTML=(S.ips||[]).map(ip=>'http://'+ip+':9999').join('<br>')||'(sem rede)';
-  $('#remoto').innerHTML=S.relayId?(S.relayOn?'✅ fusaotech.com/relay · ID <b>'+esc(S.relayId.replace(/(\d{3})(?=\d)/g,'$1 '))+'</b>'+(S.relayEstado?' · '+esc(S.relayEstado):''):'Desativada (ative «Ligação remota» na app do telefone)'):'—'}
- }catch(e){$('#dot').classList.remove('on')}}
-function pintarSims(sims){
- if(!sims.length){$('#simWrap').innerHTML='<div class="card"><h3>'+ico('sim')+'SIM</h3><div class="muted tiny">Sem SIM detetado ou permissão de telefone por dar.</div></div>';return}
- $('#simWrap').innerHTML=sims.map(s=>`<div class="sim"><div class="n">SIM${s.slot}</div><div class="tx"><b>${esc(s.operadora||s.nome||('SIM '+s.slot))}</b><span>${esc(s.numero||'número não disponível')}${s.roaming?' · roaming':''}${s.pais?' · '+esc(s.pais):''}</span></div></div>`).join('')}
-$('#qFotos').onclick=()=>{ir('files');abrir('/sdcard/DCIM/Camera')};
-
-// ecrã
-const scr=$('#scr');let pd=null,ultRoda=0,frames=0,tf=performance.now();
-scr.addEventListener('load',()=>{});
-function pt(e){const r=scr.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height,t:performance.now()}}
+let pd=null,ultRoda=0;
+function pt(e){const r=scr.getBoundingClientRect();const nw=scr.naturalWidth||9,nh=scr.naturalHeight||19.5;
+ // A imagem usa object-fit:contain: calcula a área real desenhada.
+ const k=Math.min(r.width/nw,r.height/nh),w=nw*k,h=nh*k,ox=r.left+(r.width-w)/2,oy=r.top+(r.height-h)/2;
+ return{x:Math.max(0,Math.min(1,(e.clientX-ox)/w)),y:Math.max(0,Math.min(1,(e.clientY-oy)/h)),t:performance.now(),cx:e.clientX-r.left,cy:e.clientY-r.top}}
+function ripple(p){if(!pref('ripple',true))return;const d=document.createElement('span');d.className='ripple';d.style.left=p.cx+'px';d.style.top=p.cy+'px';$('#scrBox').appendChild(d);setTimeout(()=>d.remove(),500)}
 scr.addEventListener('pointerdown',e=>{if(e.button!==0)return;pd=pt(e);scr.setPointerCapture(e.pointerId);scr.focus()});
-scr.addEventListener('pointerup',e=>{if(!pd)return;const p=pt(e),dt=p.t-pd.t,d=Math.hypot(p.x-pd.x,p.y-pd.y);
+scr.addEventListener('pointerup',e=>{if(!pd)return;const p=pt(e),dt=p.t-pd.t,d=Math.hypot(p.x-pd.x,p.y-pd.y);ripple(pd);
  if(d<.02){dt>480?post('/longpress',{x:pd.x,y:pd.y}):post('/tap',{x:pd.x,y:pd.y})}else post('/swipe',{x1:pd.x,y1:pd.y,x2:p.x,y2:p.y,ms:Math.max(60,Math.min(800,dt))});pd=null});
 scr.addEventListener('wheel',e=>{e.preventDefault();const n=performance.now();if(n-ultRoda<240)return;ultRoda=n;const c=pt(e),dir=e.deltaY>0?-1:1;
- post('/swipe',{x1:c.x,y1:c.y,x2:c.x,y2:Math.max(.02,Math.min(.98,c.y+dir*.28)),ms:150})},{passive:false});
+ post('/swipe',{x1:c.x,y1:c.y,x2:c.x,y2:Math.max(.05,Math.min(.95,c.y+dir*.3)),ms:150})},{passive:false});
 scr.addEventListener('contextmenu',e=>{e.preventDefault();post('/global',{a:'back'})});
+scr.addEventListener('focus',()=>$('#scrBox').classList.add('focus'));scr.addEventListener('blur',()=>$('#scrBox').classList.remove('focus'));
 let buf='',bt=null;
-scr.addEventListener('keydown',e=>{if(e.ctrlKey||e.altKey)return;const m={Enter:'KEYCODE_ENTER',Escape:'KEYCODE_BACK',Tab:'KEYCODE_TAB'};
+scr.addEventListener('keydown',e=>{if(!pref('kb',true))return;
+ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='v')return; // trata-se no "paste"
+ if(e.ctrlKey||e.altKey||e.metaKey)return;
  if(e.key==='Backspace'){e.preventDefault();post('/backspace');return}
- if(e.key.length===1){e.preventDefault();buf+=e.key;clearTimeout(bt);bt=setTimeout(()=>{const t=buf;buf='';post('/text',{t})},150);return}
- if(m[e.key]){e.preventDefault();post('/global',{a:'back'})}});
-
-scr.addEventListener('load',()=>{frames++;const n=performance.now();if(n-tf>1000){$('#fps').textContent=(frames*1000/(n-tf)).toFixed(0)+' fps';frames=0;tf=n}});
-document.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>post('/global',{a:b.dataset.g}));
-document.querySelectorAll('[data-q]').forEach(c=>c.onclick=()=>{document.querySelectorAll('[data-q]').forEach(x=>x.classList.remove('on'));c.classList.add('on');post('/quality',{q:+c.dataset.q})});
-$('#bCap').onclick=()=>{post('/captura').then(r=>toast(r&&r.ok?'Captura guardada no telefone (Imagens)':'Falhou'))};
+ if(e.key==='Enter'){e.preventDefault();despejar().then(()=>post('/enter'));return}
+ if(e.key==='Escape'){e.preventDefault();post('/global',{a:'back'});return}
+ if(e.key.length===1){e.preventDefault();buf+=e.key;clearTimeout(bt);bt=setTimeout(despejar,140)}});
+function despejar(){clearTimeout(bt);const t=buf;buf='';return t?post('/text',{t}):Promise.resolve()}
+scr.addEventListener('paste',e=>{const t=(e.clipboardData||window.clipboardData).getData('text');if(t){e.preventDefault();post('/clip',{t,colar:true}).then(r=>toast(r&&r.ok?'Colado no telefone':'Copiado para o telefone — toque num campo e cole'))}});
+$$('[data-g]').forEach(b=>b.onclick=()=>post('/global',{a:b.dataset.g}));
+function qualidade(q){$$('[data-q]').forEach(x=>x.classList.toggle('on',+x.dataset.q===q));post('/quality',{q});guardarPref('q',q)}
+$$('[data-q]').forEach(c=>c.onclick=()=>qualidade(+c.dataset.q));
+$('#bCap').onclick=()=>post('/captura').then(r=>toast(r&&r.ok?'Captura guardada no telefone (Imagens › FusaoTechX)':'Falhou — o ecrã está partilhado?'));
 $('#bCam').onclick=()=>{post('/camara');toast('Câmara aberta no telefone')};
-function escrever(){const t=$('#kb').value;if(!t)return;post('/text',{t}).then(r=>{if(r&&r.ok===false)toast('Toque primeiro num campo no telefone');else $('#kb').value=''})}
+$('#full').onclick=()=>{const s=$('#stage');if(document.fullscreenElement)document.exitFullscreen();else if(s.requestFullscreen)s.requestFullscreen()};
+$('#kbSend').onclick=()=>{const t=$('#kb').value;if(!t)return;post('/text',{t}).then(r=>{if(r&&r.ok===false)toast('Toque primeiro num campo de texto no telefone');else $('#kb').value=''})};
+$('#kbEnter').onclick=()=>post('/enter');$('#kbBack').onclick=()=>post('/backspace');
+$('#kbPaste').onclick=async()=>{let t=$('#kb').value;if(!t){try{t=await navigator.clipboard.readText()}catch(e){}}if(!t)return toast('Escreva o texto ou copie algo no PC');post('/clip',{t,colar:true}).then(r=>toast(r&&r.ok?'Colado no telefone':'Copiado para o telefone'))};
+$('#qClip').onclick=async()=>{let t='';try{t=await navigator.clipboard.readText()}catch(e){}t=prompt('Texto para a área de transferência do telefone:',t||'');if(t){post('/clip',{t});toast('Copiado para o telefone')}};
+$('#qUrl').onclick=()=>{const u=prompt('Link para abrir no telefone:','https://');if(u&&u.length>8){post('/open',{url:u});toast('A abrir no telefone')}};
+$('#qFotos').onclick=()=>{ir('files');abrir('/sdcard/DCIM/Camera')};
 
-// SMS
-async function carregarSms(){$('#smsList').innerHTML='A carregar…';try{const r=await get('/sms');const l=r.lista||[];$('#smsList').innerHTML=l.length?l.map(m=>`<div class="msg ${m.enviada?'out':'in'}"><div class="w">${esc(m.de)}</div>${esc(m.texto)}</div>`).join(''):'<div class="empty">Sem mensagens</div>'}catch(e){}}
-function enviarSms(){const num=$('#smsNum').value,t=$('#smsTxt').value;if(!num||!t)return toast('Número e texto');post('/sendsms',{num,texto:t}).then(r=>{toast(r&&r.ok?'SMS enviado':'Falhou (permissão SMS?)');if(r&&r.ok)$('#smsTxt').value=''})}
-function enviarWa(){const num=$('#smsNum').value;if(!num)return toast('Número');post('/whatsapp',{num,texto:$('#smsTxt').value});toast('WhatsApp aberto no telefone')}
+// ===== Contactos =====
+let CONT=[],MAPA={};
+async function carregarContactos(silencio){if(CONT.length&&silencio)return;try{const r=await get('/contactos');CONT=r.lista||[];MAPA={};for(const c of CONT)MAPA[normNum(c.num)]=c.nome;pintarContactos();if(VISTA==='sms')pintarConversas()}catch(e){}}
+const nomeDe=n=>MAPA[normNum(n)]||n||'Desconhecido';
+function pintarContactos(){const f=($('#cBusca').value||'').toLowerCase();const l=CONT.filter(c=>!f||(c.nome+' '+c.num).toLowerCase().includes(f)).slice(0,400);
+ $('#contList').innerHTML=l.length?l.map(c=>`<div class="it ck" data-num="${esc(c.num)}" data-nome="${esc(c.nome)}"><div class="av" style="background:${cor(c.nome)}">${esc((c.nome[0]||'?').toUpperCase())}</div><div class="tx"><b>${esc(c.nome)}</b><span>${esc(c.num)}</span></div>
+  <button class="btn sm ok" data-acao="ligar" title="Ligar">${ico('call','width:16px;height:16px')}</button><button class="btn sm" data-acao="sms" title="Mensagem">${ico('msg','width:16px;height:16px')}</button></div>`).join(''):'<div class="empty">Sem contactos (ou permissão de contactos por dar).</div>'}
+$('#cBusca').oninput=pintarContactos;
+$('#contList').onclick=e=>{const it=e.target.closest('[data-num]');if(!it)return;const a=e.target.closest('[data-acao]'),n=it.dataset.num;
+ if(a&&a.dataset.acao==='ligar'){post('/call',{num:n});toast('A ligar para '+it.dataset.nome+'…')}else if(a&&a.dataset.acao==='sms'){ir('sms');abrirConversa(n)}else $('#num').value=n};
 
-// Chamadas
-function montarDial(){$('#dial').innerHTML=['1','2','3','4','5','6','7','8','9','+','0','⌫'].map(k=>`<button>${k}</button>`).join('');
- $('#dial').onclick=e=>{const b=e.target.closest('button');if(!b)return;const n=$('#num');n.value=b.textContent==='⌫'?n.value.slice(0,-1):n.value+b.textContent}}
-function ligar(){const num=$('#num').value;if(!num)return toast('Número');post('/call',{num});toast('A ligar…')}
-let CONT=[];async function carregarContactos(){$('#contList').innerHTML='A carregar…';try{const r=await get('/contactos');CONT=r.lista||[];pintarContactos()}catch(e){}}
-function pintarContactos(){const f=($('#cBusca').value||'').toLowerCase();$('#contList').innerHTML=CONT.filter(c=>!f||(c.nome+c.num).toLowerCase().includes(f)).slice(0,400).map(c=>`<div class="it" onclick="$('#num').value='${esc(c.num)}';ir('call');toast('Número: ${esc(c.num)}')"><div class="av" style="background:${CO[c.nome.length%7]}">${esc((c.nome[0]||'?').toUpperCase())}</div><div class="tx"><b>${esc(c.nome)}</b><span>${esc(c.num)}</span></div></div>`).join('')||'<div class="empty">Sem contactos</div>'}
+// ===== Mensagens (conversas) =====
+let CONV=null;
+function conversas(){const g={};for(const m of SMS){const k=normNum(m.de)||m.de;(g[k]=g[k]||{num:m.de,lista:[],nl:0}).lista.push(m);if(!m.enviada&&!m.lida)g[k].nl++}
+ return Object.values(g).sort((a,b)=>b.lista[0].data-a.lista[0].data)}
+async function carregarSms(){if(!SMS.length)$('#convList').innerHTML='<div class="empty">A carregar…</div>';await syncSms();pintarConversas()}
+function pintarConversas(){const f=($('#cvBusca').value||'').toLowerCase();const cs=conversas().filter(c=>!f||(nomeDe(c.num)+' '+c.num+' '+c.lista[0].texto).toLowerCase().includes(f));
+ $('#convList').innerHTML=cs.length?cs.map(c=>{const n=nomeDe(c.num),u=c.lista[0];return `<button class="conv ${normNum(c.num)===normNum(CONV)?'on':''} ${c.nl?'nl':''}" data-num="${esc(c.num)}"><div class="av" style="background:${cor(n)}">${esc((n[0]||'?').toUpperCase())}</div><div class="tx"><b>${esc(n)}</b><span>${u.enviada?'Eu: ':''}${esc(u.texto)}</span></div><span class="t">${quando(u.data)}</span></button>`}).join('')
+  :'<div class="empty"><span class="ei">📭</span>Sem mensagens (ou permissão de SMS por dar).</div>';
+ if(CONV)pintarThread()}
+function abrirConversa(num){CONV=num;$('#chat').classList.remove('lista');$('#smsNum').hidden=true;pintarConversas();pintarThread();setTimeout(()=>$('#smsTxt').focus(),50)}
+function pintarThread(){const n=nomeDe(CONV);$('#thNome').textContent=n;$('#thNum').textContent=CONV;$('#thAv').textContent=(n[0]||'?').toUpperCase();$('#thAv').style.background=cor(n);$('#thCall').hidden=false;
+ const ms=SMS.filter(m=>normNum(m.de)===normNum(CONV)).sort((a,b)=>a.data-b.data);let ult='';
+ const box=$('#msgs'),noFundo=box.scrollHeight-box.scrollTop-box.clientHeight<60;
+ box.innerHTML=ms.length?ms.map(m=>{const d=dia(m.data);const sep=d!==ult?`<div class="day">${esc(d)}</div>`:'';ult=d;
+  return sep+`<div class="msg ${m.enviada?'out':'in'}">${esc(m.texto)}<small>${new Date(+m.data).toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'})}</small></div>`}).join(''):'<div class="empty">Ainda sem mensagens com este número.</div>';
+ if(noFundo||!box.dataset.c||box.dataset.c!==CONV){box.scrollTop=box.scrollHeight}box.dataset.c=CONV}
+$('#convList').onclick=e=>{const b=e.target.closest('[data-num]');if(b)abrirConversa(b.dataset.num)};
+$('#cvBusca').oninput=pintarConversas;
+$('#voltarLista').onclick=()=>$('#chat').classList.add('lista');
+$('#novaMsg').onclick=()=>{CONV=null;$('#chat').classList.remove('lista');$('#thNome').textContent='Nova mensagem';$('#thNum').textContent='Escreva o número abaixo';$('#thAv').textContent='+';$('#thCall').hidden=true;
+ $('#msgs').innerHTML='<div class="empty"><span class="ei">✍️</span>Escreva o número e a mensagem.</div>';$('#smsNum').hidden=false;$('#smsNum').focus()};
+$('#thCall').onclick=()=>{if(CONV){post('/call',{num:CONV});toast('A ligar…')}};
+function destino(){return CONV||$('#smsNum').value.trim()}
+async function enviarSms(){const num=destino(),t=$('#smsTxt').value.trim();if(!num)return toast('Indique o número');if(!t)return;
+ $('#smsSend').disabled=true;const r=await post('/sendsms',{num,texto:t}).catch(()=>({}));$('#smsSend').disabled=false;
+ if(r&&r.ok){$('#smsTxt').value='';toast('SMS enviado');SMS.unshift({de:num,texto:t,data:Date.now(),enviada:true,lida:true});CONV=num;$('#smsNum').hidden=true;pintarConversas();setTimeout(syncSms,2500)}else toast('Não foi enviado (permissão de SMS?)')}
+$('#smsSend').onclick=enviarSms;
+$('#smsTxt').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();enviarSms()}});
+$('#smsTxt').addEventListener('input',e=>{e.target.style.height='auto';e.target.style.height=Math.min(140,e.target.scrollHeight)+'px'});
+$('#waSend').onclick=()=>{const num=destino();if(!num)return toast('Indique o número');post('/whatsapp',{num,texto:$('#smsTxt').value});toast('WhatsApp aberto no telefone — use o ecrã ao vivo para enviar')};
 
-// Notif
-async function carregarNotifs(){$('#notifList').innerHTML='A carregar…';try{const r=await get('/notifs');if(!r.ativo){$('#notifList').innerHTML='<div class="empty">Ative "ler notificações" na app do telefone (Definições).</div>';return}const l=r.lista||[];
- $('#notifList').innerHTML=l.length?l.map(n=>`<div class="it"><div class="av" style="background:${CO[(n.app||' ').length%7]}">${esc((n.app[0]||'?').toUpperCase())}</div><div class="tx"><b>${esc(n.titulo||n.app)}</b><span>${esc(n.texto)}</span></div><button class="btn sm er" onclick="post('/notifdismiss',{key:'${esc(n.key)}'}).then(carregarNotifs)">✕</button></div>`).join(''):'<div class="empty">Sem notificações</div>'}catch(e){}}
+// ===== Chamadas =====
+function montarDial(){const L={'2':'ABC','3':'DEF','4':'GHI','5':'JKL','6':'MNO','7':'PQRS','8':'TUV','9':'WXYZ','0':'+'};
+ $('#dial').innerHTML=['1','2','3','4','5','6','7','8','9','*','0','⌫'].map(k=>`<button data-k="${k}">${k}<small>${L[k]||'&nbsp;'}</small></button>`).join('');
+ $('#dial').onclick=e=>{const b=e.target.closest('button');if(!b)return;const n=$('#num');n.value=b.dataset.k==='⌫'?n.value.slice(0,-1):n.value+b.dataset.k}}
+$('#bLigar').onclick=()=>{const num=$('#num').value.trim();if(!num)return toast('Escreva o número');post('/call',{num});toast('A ligar para '+nomeDe(num)+'…')};
+$('#bTerminar').onclick=()=>post('/endcall');
+async function carregarChamadas(){await syncCalls();pintarChamadas()}
+$('#callRef').onclick=carregarChamadas;
+const TIPO={recebida:['↙','Recebida'],feita:['↗','Feita'],perdida:['✕','Perdida'],rejeitada:['⊘','Rejeitada'],outra:['•','Chamada']};
+function dur(s){s=+s||0;if(!s)return '';const m=Math.floor(s/60);return m?m+' min '+(s%60)+' s':s+' s'}
+function pintarChamadas(){$('#callList').innerHTML=CALLS.length?CALLS.map(c=>{const n=c.nome||nomeDe(c.num),t=TIPO[c.tipo]||TIPO.outra;
+ return `<div class="it ck" data-num="${esc(c.num)}"><span class="ct ${esc(c.tipo)}" title="${t[1]}">${t[0]}</span><div class="tx"><b>${esc(n)}</b><span>${t[1]}${c.duracao?' · '+dur(c.duracao):''} · ${esc(c.num)}</span></div><span class="t">${quando(c.data)}</span>
+  <button class="btn sm ok" data-acao="ligar" title="Ligar de volta">${ico('call','width:16px;height:16px')}</button></div>`}).join(''):'<div class="empty">Sem chamadas (ou permissão do registo de chamadas por dar).</div>'}
+$('#callList').onclick=e=>{const it=e.target.closest('[data-num]');if(!it)return;if(e.target.closest('[data-acao]')){post('/call',{num:it.dataset.num});toast('A ligar…')}else $('#num').value=it.dataset.num};
 
-// Apps
-let APPS=[];async function carregarApps(f){if(APPS.length&&!f){pintarApps();return}$('#appList').innerHTML='A carregar…';try{const r=await get('/apps');APPS=(r.lista||[]).sort((a,b)=>a.nome.localeCompare(b.nome));pintarApps()}catch(e){}}
-function pintarApps(){const f=($('#aBusca').value||'').toLowerCase();const l=APPS.filter(a=>!f||a.nome.toLowerCase().includes(f)||a.pkg.includes(f));$('#aTot').textContent=APPS.length+' apps';
- $('#appList').innerHTML='<div class="fgrid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">'+l.map(a=>`<div class="it" style="margin:0"><div class="av" style="background:${CO[a.pkg.length%7]}">${esc((a.nome[0]||'?').toUpperCase())}</div><div class="tx"><b>${esc(a.nome)}</b><span>${esc(a.pkg)}</span></div><button class="btn sm p" onclick="post('/applaunch',{pkg:'${esc(a.pkg)}'});toast('A abrir')">Abrir</button></div>`).join('')+'</div>'||'<div class="empty">Nada</div>'}
+// ===== Notificações =====
+async function carregarNotifs(){await syncNotifs()}
+function pintarNotifs(){
+ const card=n=>`<div class="it"><div class="av" style="background:${cor(n.app)}">${esc(((n.app||'?')[0]).toUpperCase())}</div><div class="tx"><b>${esc(n.titulo||n.app)}</b><span>${esc(n.app)} · ${esc(n.texto)}</span></div><span class="t">${quando(n.data)}</span><button class="btn sm" data-key="${esc(n.key)}" title="Dispensar" aria-label="Dispensar">✕</button></div>`;
+ if(NOTIFS.ativo===false){const m='<div class="empty"><span class="ei">🔕</span>Ative «ler notificações» na app do telefone.</div>';$('#notifList').innerHTML=m;$('#pNotif').innerHTML=m;return}
+ const f=($('#nBusca').value||'').toLowerCase(),l=NOTIFS.filter(n=>!f||(n.app+' '+n.titulo+' '+n.texto).toLowerCase().includes(f));
+ $('#nTot').textContent=NOTIFS.length+' notificações';
+ $('#notifList').innerHTML=l.length?l.map(card).join(''):'<div class="empty"><span class="ei">✨</span>Sem notificações</div>';
+ $('#pNotif').innerHTML=NOTIFS.length?NOTIFS.slice(0,4).map(card).join(''):'<div class="empty">Sem notificações</div>'}
+$('#nBusca').oninput=pintarNotifs;
+document.addEventListener('click',e=>{const b=e.target.closest('[data-key]');if(!b)return;post('/notifdismiss',{key:b.dataset.key}).then(syncNotifs)});
+$('#nLimpar').onclick=()=>{if(confirm('Dispensar todas as notificações do telefone?'))post('/notifdismiss',{key:''}).then(syncNotifs)};
 
-// Ficheiros
+// ===== Aplicações =====
+let APPS=[];
+async function carregarApps(){if(APPS.length){pintarApps();return}try{const r=await get('/apps');APPS=(r.lista||[]).sort((a,b)=>a.nome.localeCompare(b.nome));pintarApps()}catch(e){}}
+function pintarApps(){const f=($('#aBusca').value||'').toLowerCase();const l=APPS.filter(a=>!f||a.nome.toLowerCase().includes(f)||a.pkg.includes(f));$('#aTot').textContent=APPS.length+' aplicações';
+ $('#appList').innerHTML=l.length?'<div class="fgrid" style="grid-template-columns:repeat(auto-fill,minmax(250px,1fr))">'+l.map(a=>`<div class="it" style="margin:0"><div class="av" style="background:${cor(a.pkg)}">${esc((a.nome[0]||'?').toUpperCase())}</div><div class="tx"><b>${esc(a.nome)}</b><span>${esc(a.pkg)}</span></div><button class="btn sm p" data-pkg="${esc(a.pkg)}">Abrir</button></div>`).join('')+'</div>':'<div class="empty">Nada encontrado</div>'}
+$('#aBusca').oninput=pintarApps;
+$('#appList').onclick=e=>{const b=e.target.closest('[data-pkg]');if(!b)return;post('/applaunch',{pkg:b.dataset.pkg});toast('A abrir no telefone');ir('ecra')};
+
+// ===== Ficheiros =====
 let DIR='';const EXT={img:['jpg','jpeg','png','gif','webp','bmp','heic'],vid:['mp4','mkv','avi','mov','3gp','webm'],aud:['mp3','m4a','wav','ogg','opus','aac'],doc:['pdf','doc','docx','txt','xls','xlsx','ppt','pptx']};
 function kind(e){for(const k in EXT)if(EXT[k].includes(e))return k;return 'f'}
 const KC={img:'#22d3ee',vid:'#c084fc',aud:'#f472b6',doc:'#818cf8',f:'#94a3c4'};
-async function abrir(p){DIR=p;$('#fileList').innerHTML='A abrir…';try{const r=await get('/files?p='+encodeURIComponent(p||''));DIR=r.dir;
+const fUrl=(p,baixar)=>U('/file')+'?k='+encodeURIComponent(CODE)+'&p='+encodeURIComponent(p)+(baixar?'&baixar=1':'');
+async function abrir(p){DIR=p;$('#fileList').innerHTML='<div class="empty">A abrir…</div>';try{const r=await get('/files?p='+encodeURIComponent(p||''));DIR=r.dir;
  const parts=r.dir.replace(/^\/storage\/emulated\/0\/?|^\/sdcard\/?/,'').split('/').filter(Boolean);let acc='/sdcard';
- $('#crumb').innerHTML='<button onclick="abrir(\'/sdcard\')">Armazenamento</button>'+parts.map(x=>{acc+='/'+x;return '<span class="muted">›</span><button onclick="abrir(\''+acc+'\')">'+esc(x)+'</button>'}).join('');
- const it=r.itens||[];$('#fileList').innerHTML='<div class="fgrid">'+it.map(i=>{if(i.d)return `<div class="fi" ondblclick="abrir('${esc(i.p)}')" onclick="abrir('${esc(i.p)}')"><div class="th"><span style="color:#22d3ee">${ico('folder')}</span></div><div class="nm">${esc(i.n)}</div><div class="mt">Pasta</div></div>`;
-  const k=kind(i.e);const th=k==='img'?`<img loading="lazy" src="${U('/file')}?k=${CODE}&p=${encodeURIComponent(i.p)}">`:`<span class="e" style="background:${KC[k]}22;color:${KC[k]}">${esc((i.e||'?').toUpperCase().slice(0,4))}</span>`;
-  return `<div class="fi" onclick="window.open('${U('/file')}?k=${CODE}&p=${encodeURIComponent(i.p)}')"><div class="th">${th}</div><div class="nm">${esc(i.n)}</div><div class="mt">${fmtB(i.s)}</div></div>`}).join('')+'</div>'||'<div class="empty">Pasta vazia</div>'}catch(e){}}
-function subir(){if(DIR&&!/\/(storage\/emulated\/0|sdcard)$/.test(DIR))abrir(DIR.substring(0,DIR.lastIndexOf('/'))||'')}
-$('#up').onchange=async e=>{for(const f of e.target.files){await fetch(U('/upload')+'?k='+CODE+'&dir='+encodeURIComponent(DIR)+'&nome='+encodeURIComponent(f.name),{method:'POST',body:f});toast('Enviado: '+f.name)}e.target.value='';abrir(DIR)};
+ $('#crumb').innerHTML='<button data-p="/sdcard">Armazenamento</button>'+parts.map(x=>{acc+='/'+x;return '<span class="muted">›</span><button data-p="'+esc(acc)+'">'+esc(x)+'</button>'}).join('');
+ const it=r.itens||[];
+ $('#fileList').innerHTML=it.length?'<div class="fgrid">'+it.map(i=>{if(i.d)return `<button class="fi" data-p="${esc(i.p)}"><div class="th"><span style="color:var(--ac)">${ico('folder','width:34px;height:34px')}</span></div><div class="nm">${esc(i.n)}</div><div class="mt">Pasta</div></button>`;
+  const k=kind(i.e);const th=k==='img'?`<img loading="lazy" src="${fUrl(i.p)}" alt="">`:`<span class="e" style="background:${KC[k]}22;color:${KC[k]}">${esc((i.e||'?').toUpperCase().slice(0,4))}</span>`;
+  return `<button class="fi" data-f="${esc(i.p)}" data-k="${k}" title="${esc(i.n)}"><div class="th">${th}</div><div class="nm">${esc(i.n)}</div><div class="mt">${fmtB(i.s)}</div></button>`}).join('')+'</div>':'<div class="empty"><span class="ei">📂</span>Pasta vazia (ou permissão de ficheiros por dar)</div>'}catch(e){}}
+$('#fileList').onclick=e=>{const d=e.target.closest('[data-p]');if(d)return abrir(d.dataset.p);const f=e.target.closest('[data-f]');if(!f)return;
+ if(f.dataset.k==='img'){$('#lbImg').src=fUrl(f.dataset.f);$('#lb').classList.add('on')}else window.open(fUrl(f.dataset.f,!['vid','aud','doc'].includes(f.dataset.k)),'_blank')};
+$('#crumb').onclick=e=>{const b=e.target.closest('[data-p]');if(b)abrir(b.dataset.p)};
+$('#atalhos').onclick=e=>{const c=e.target.closest('[data-p]');if(c)abrir(c.dataset.p)};
+$('#fUp').onclick=()=>{if(DIR&&!/\/(storage\/emulated\/0|sdcard)$/.test(DIR))abrir(DIR.substring(0,DIR.lastIndexOf('/'))||'')};
+$('#lbX').onclick=()=>$('#lb').classList.remove('on');$('#lb').onclick=e=>{if(e.target.id==='lb')$('#lb').classList.remove('on')};
+function enviarFicheiros(fs){for(const f of fs){const el=document.createElement('div');el.className='pi';el.innerHTML=`<b>${esc(f.name)}</b> · ${fmtB(f.size)}<div class="bar"><i style="width:0"></i></div>`;$('#prog').appendChild(el);
+ const x=new XMLHttpRequest();x.open('POST',U('/upload')+'?k='+encodeURIComponent(CODE)+'&nome='+encodeURIComponent(f.name));
+ x.upload.onprogress=e=>{if(e.lengthComputable)el.querySelector('i').style.width=(e.loaded/e.total*100)+'%'};
+ x.onload=()=>{el.querySelector('i').style.width='100%';el.insertAdjacentHTML('beforeend','<div class="tiny muted">✅ Enviado para Transferências › FusaoTechX</div>');setTimeout(()=>el.remove(),3500);if(VISTA==='files')abrir(DIR)};
+ x.onerror=()=>{el.insertAdjacentHTML('beforeend','<div class="tiny" style="color:var(--er)">Falhou</div>');setTimeout(()=>el.remove(),5000)};x.send(f)}}
+$('#up').onchange=e=>{enviarFicheiros(e.target.files);e.target.value=''};
+let dc=0;addEventListener('dragenter',e=>{if(e.dataTransfer&&[...e.dataTransfer.types].includes('Files')&&!$('#app').hidden){dc++;$('#drop').classList.add('on')}});
+addEventListener('dragleave',()=>{dc=Math.max(0,dc-1);if(!dc)$('#drop').classList.remove('on')});
+addEventListener('dragover',e=>e.preventDefault());
+addEventListener('drop',e=>{e.preventDefault();dc=0;$('#drop').classList.remove('on');if(e.dataTransfer&&e.dataTransfer.files.length)enviarFicheiros(e.dataTransfer.files)});
 
-// Definições
-function guardar(){const n=$('#dNome').value.trim(),c=$('#dCode').value.trim();if(n)post('/setname',{nome:n});if(c.length>=4){post('/setcode',{code:c}).then(()=>{CODE=c;localStorage.setItem(CK,c)})}toast('Guardado')}
+// ===== Definições =====
+$('#setnav').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;$$('#setnav button').forEach(x=>x.classList.toggle('on',x===b));$('#'+b.dataset.s).scrollIntoView({behavior:'smooth',block:'start'})};
+function pintarDef(){if(document.activeElement!==$('#dNome'))$('#dNome').value=S.nome||'';if(document.activeElement!==$('#dCode'))$('#dCode').value=CODE;
+ $('#ips').innerHTML=(S.ips||[]).map(ip=>'<code>http://'+esc(ip)+':9999</code>').join('<br>')||'(sem Wi-Fi)';
+ const idf=(S.relayId||'').replace(/(\d{3})(?=\d)/g,'$1 '),host=(S.relayUrl||'https://studio.fusaotech.com').replace(/^https?:\/\//,'');
+ $('#remoto').innerHTML=S.relayId?(S.relayOn?'✅ <b>'+esc(host)+'</b><br>ID <span class="codebox" style="font-size:15px;padding:5px 9px">'+esc(idf)+'</span>'+(S.relayEstado?'<br><span class="muted">'+esc(S.relayEstado)+'</span>':''):'Desativada — ative «Ligação remota» na app do telefone.<br>ID: '+esc(idf)):'—';
+ $('#sessao').innerHTML=(RELAY?'🌐 Remota (relay)':'📶 Rede local')+(LAT?' · '+LAT+' ms':'');
+ $('#versao').textContent='Versão '+(S.versao||'—')+' · Android '+(S.android||'—');
+ const q=S.qualidade||pref('q',55);$$('#segQ button').forEach(b=>b.classList.toggle('on',+b.dataset.q===(q<45?35:q<70?55:80)))}
+$('#dGuardar').onclick=async()=>{const n=$('#dNome').value.trim(),c=$('#dCode').value.trim();
+ if(c&&!/^\d{4,12}$/.test(c))return toast('O código tem de ter 4 a 12 dígitos');
+ if(n)await post('/setname',{nome:n});if(c&&c!==CODE){await post('/setcode',{code:c});CODE=c;try{localStorage.setItem(CK,c)}catch(e){}}
+ toast('Guardado');estado()};
+$$('#segQ button').forEach(b=>b.onclick=()=>{$$('#segQ button').forEach(x=>x.classList.toggle('on',x===b));qualidade(+b.dataset.q)});
+[['optRipple','ripple',true],['optKb','kb',true],['optSom','som',true],['optSync','sync',true],['optDesk','desk',false]].forEach(([id,k,d])=>{const el=$('#'+id);el.checked=pref(k,d);
+ el.onchange=async()=>{if(k==='desk'&&el.checked&&'Notification' in window&&Notification.permission!=='granted'){const p=await Notification.requestPermission();if(p!=='granted'){el.checked=false;toast('O navegador bloqueou os avisos');return}}
+  guardarPref(k,el.checked);if(k==='sync')sincronizar();toast('Guardado')}});
 
-if(CODE)arrancar();else $('#login').style.display='grid';
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!$('#app').hidden)sincronizar()});
+if(CODE)arrancar();else{$('#login').style.display='grid';setTimeout(()=>$('#pin').focus(),50)}
 </script>
-</body></html>
+</body>
+</html>

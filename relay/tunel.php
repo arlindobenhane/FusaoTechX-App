@@ -1,7 +1,7 @@
 <?php
 /**
  * FusãoTechX Mz • Relay — lado do PC.
- * fusaotech.com/relay/d/<ID>/<caminho> → o pedido fica na fila do telefone <ID>,
+ * studio.fusaotech.com/d/<ID>/<caminho> → o pedido fica na fila do telefone <ID>,
  * o telefone executa-o no seu próprio servidor (o mesmo da rede local) e devolve a resposta.
  * O ecrã ao vivo não passa pela fila: o telefone envia a última imagem e o PC vai buscá-la em /shot.
  */

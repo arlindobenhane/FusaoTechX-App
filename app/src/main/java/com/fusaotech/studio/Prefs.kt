@@ -39,14 +39,18 @@ object Prefs {
     fun setName(c: Context, v: String) = sp(c).edit().putString("name", v).apply()
 
     /** Endereço do relay (ligação por redes diferentes). Vazio = o da FusãoTechX. */
-    const val RELAY_PADRAO = "https://fusaotech.com/relay"
-    fun relay(c: Context): String = (sp(c).getString("relay", "") ?: "").ifBlank { RELAY_PADRAO }.trimEnd('/')
+    const val RELAY_PADRAO = "https://studio.fusaotech.com"
+    fun relay(c: Context): String {
+        val v = (sp(c).getString("relay", "") ?: "").trimEnd('/')
+        // O relay mudou de fusaotech.com/relay para o subdomínio studio.fusaotech.com.
+        return if (v.isBlank() || v == "https://fusaotech.com/relay") RELAY_PADRAO else v
+    }
     fun setRelay(c: Context, v: String) = sp(c).edit().putString("relay", v).apply()
 
     fun relayOn(c: Context): Boolean = sp(c).getBoolean("relayOn", false)
     fun setRelayOn(c: Context, v: Boolean) = sp(c).edit().putBoolean("relayOn", v).apply()
 
-    /** ID público de 9 dígitos (o PC escreve-o em fusaotech.com/relay). */
+    /** ID público de 9 dígitos (o PC escreve-o em studio.fusaotech.com). */
     fun relayId(c: Context): String {
         val sp = sp(c)
         var v = sp.getString("relayId", null)

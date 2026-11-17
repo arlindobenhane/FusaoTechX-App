@@ -79,7 +79,7 @@ class MainActivity : Activity() {
         // Ligação remota: telefone nos dados móveis, PC em qualquer rede.
         col.addView(espaco(18))
         col.addView(TextView(this).apply { text = "3 · Ligação remota (qualquer rede)"; setTextColor(cor.ac); textSize = 16f; setTypeface(typeface, android.graphics.Typeface.BOLD) })
-        col.addView(rotulo("Para usar o telefone nos dados móveis com o PC noutra rede. No PC, abra fusaotech.com/relay e escreva o ID."))
+        col.addView(rotulo("Para usar o telefone nos dados móveis com o PC noutra rede. No PC, abra studio.fusaotech.com e escreva o ID."))
         val cbRemoto = CheckBox(this).apply {
             text = "Ativar ligação remota pela Internet"; setTextColor(cor.tx); isChecked = Prefs.relayOn(this@MainActivity)
             setOnCheckedChangeListener { _, v ->
@@ -131,7 +131,7 @@ class MainActivity : Activity() {
         info.text = sb.toString()
         val idf = Prefs.relayId(this).chunked(3).joinToString(" ")
         remoto.text = if (Prefs.relayOn(this))
-            "No PC (qualquer rede):\n  fusaotech.com/relay\n\nID: $idf\nCódigo: ${Prefs.code(this)}\n\nEstado: " +
+            "No PC (qualquer rede):\n  studio.fusaotech.com\n\nID: $idf\nCódigo: ${Prefs.code(this)}\n\nEstado: " +
                 (if (Relay.correr) Relay.estado else if (CaptureService.ativo) "a iniciar…" else "toque em LIGAR")
         else "Desativada. Ative para ligar o PC ao telefone a partir de qualquer rede.\nID deste telefone: $idf"
         remoto.removeCallbacks(tick); remoto.postDelayed(tick, 3000)

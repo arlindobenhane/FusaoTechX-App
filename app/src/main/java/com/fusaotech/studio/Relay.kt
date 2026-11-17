@@ -13,7 +13,7 @@ import java.util.concurrent.Executors
 /**
  * FusãoTechX Mz • Ligação remota (telefone e PC em redes diferentes).
  *
- * O telefone liga-se PARA FORA ao relay (fusaotech.com/relay), por isso funciona nos dados móveis,
+ * O telefone liga-se PARA FORA ao relay (studio.fusaotech.com), por isso funciona nos dados móveis,
  * sem IP público e sem abrir portas. Três tarefas:
  *  1. Espera por pedidos do PC (long-poll) e executa-os no servidor local do próprio telefone (Httpd, porta 9999):
  *     o código de acesso continua a ser verificado pelo telefone, como na rede local.
@@ -25,19 +25,60 @@ object Relay {
     @Volatile var estado = "desligado"; private set
     @Volatile private var querEcra = false
     @Volatile private var sal = ""
+    @Volatile var latenciaMs = 0L; private set
     private var ctx: Context? = null
     private val pool = Executors.newFixedThreadPool(6)
+    @Volatile private var pollAtual: HttpURLConnection? = null
+    @Volatile private var redeMudou = false
+    private var redeCb: android.net.ConnectivityManager.NetworkCallback? = null
+    private var wake: android.os.PowerManager.WakeLock? = null
 
     fun iniciar(c: Context) {
         if (correr) return
         ctx = c.applicationContext
         correr = true
         estado = "a ligar…"
+        vigiarRede()
+        // Mantém o processador acordado para a ligação não cair com o ecrã apagado.
+        try {
+            val pm = c.getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+            wake = pm.newWakeLock(android.os.PowerManager.PARTIAL_WAKE_LOCK, "FusaoTechX:relay").also { it.setReferenceCounted(false); it.acquire() }
+        } catch (_: Exception) {}
         Thread({ cicloPedidos() }, "ftx-relay-poll").start()
         Thread({ cicloEcra() }, "ftx-relay-ecra").start()
     }
 
-    fun parar() { correr = false; querEcra = false; estado = "desligado" }
+    fun parar() {
+        correr = false; querEcra = false; estado = "desligado"
+        try { pollAtual?.disconnect() } catch (_: Exception) {}
+        try { redeCb?.let { (ctx?.getSystemService(Context.CONNECTIVITY_SERVICE) as? android.net.ConnectivityManager)?.unregisterNetworkCallback(it) } } catch (_: Exception) {}
+        redeCb = null
+        try { wake?.release() } catch (_: Exception) {}
+        wake = null
+    }
+
+    /**
+     * Wi-Fi ↔ dados móveis: quando a rede muda, a ligação antiga fica "pendurada".
+     * Cortamo-la logo e voltamos a ligar pela rede nova, sem esperar pelo tempo limite.
+     */
+    private fun vigiarRede() {
+        try {
+            val cm = ctx!!.getSystemService(Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
+            val cb = object : android.net.ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: android.net.Network) { religar("rede disponível") }
+                override fun onLost(network: android.net.Network) { estado = "sem rede — à espera de Wi-Fi ou dados móveis" }
+            }
+            cm.registerDefaultNetworkCallback(cb)
+            redeCb = cb
+        } catch (_: Exception) {}
+    }
+
+    private fun religar(motivo: String) {
+        if (!correr) return
+        redeMudou = true
+        estado = "a religar ($motivo)…"
+        try { pollAtual?.disconnect() } catch (_: Exception) {}
+    }
 
     private fun base(): String = Prefs.relay(ctx!!)
     private fun id(): String = Prefs.relayId(ctx!!)
@@ -70,16 +111,21 @@ object Relay {
         var espera = 2000L
         while (correr) {
             try {
+                redeMudou = false
+                val t0 = System.currentTimeMillis()
                 val c = abrir(base() + "/api.php?a=poll&id=" + id(), "GET", 40000)
                 c.setRequestProperty("X-Pushing", if (querEcra) "1" else "0")
+                pollAtual = c
                 val code = c.responseCode
+                pollAtual = null
                 if (code == 403) { estado = "ID em uso por outro aparelho — gere um ID novo"; Thread.sleep(15000); continue }
                 if (code != 200) throw Exception("HTTP $code")
                 val o = JSONObject(String(ler(c.inputStream), Charsets.UTF_8))
                 sal = o.optString("sal", sal)
                 querEcra = o.optBoolean("want", false)
                 estado = "ligado"
-                espera = 2000L
+                espera = 1000L
+                if (l0(o)) latenciaMs = System.currentTimeMillis() - t0
                 val l = o.optJSONArray("reqs")
                 if (l != null) for (i in 0 until l.length()) {
                     val r = l.getJSONObject(i)
@@ -88,13 +134,19 @@ object Relay {
             } catch (_: InterruptedException) {
                 return
             } catch (_: Exception) {
+                pollAtual = null
                 if (!correr) return
-                estado = "sem Internet — a tentar de novo"
-                try { Thread.sleep(espera) } catch (_: Exception) { return }
-                espera = (espera * 2).coerceAtMost(20000L)
+                if (redeMudou) { espera = 300L } else estado = "sem Internet — a tentar de novo"
+                // Volta a tentar depressa: no máximo de 8 em 8 segundos, ou logo que a rede mude.
+                var dormido = 0L
+                while (dormido < espera && correr && !redeMudou) { try { Thread.sleep(200) } catch (_: Exception) { return }; dormido += 200 }
+                espera = if (redeMudou) 300L else (espera * 2).coerceAtMost(8000L)
             }
         }
     }
+
+    /** Resposta que chegou logo (pedidos à espera): serve para medir a latência real. */
+    private fun l0(o: JSONObject): Boolean = (o.optJSONArray("reqs")?.length() ?: 0) > 0
 
     private fun atender(r: JSONObject) {
         val rid = r.optString("rid")

@@ -4,7 +4,7 @@
  *
  * O telefone liga-se PARA FORA (funciona em dados móveis, sem IP público):
  *  - api.php: o telefone pergunta "há pedidos para mim?" (long-poll), responde-lhes e envia imagens do ecrã.
- *  - tunel.php: o PC abre fusaotech.com/relay/d/<ID>/ e cada pedido do painel fica numa fila até o telefone responder.
+ *  - tunel.php: o PC abre studio.fusaotech.com/d/<ID>/ e cada pedido do painel fica numa fila até o telefone responder.
  * Tudo em ficheiros dentro de data/ (pasta bloqueada ao público). Sem base de dados.
  */
 if (!defined('FTX_RELAY')) { http_response_code(404); exit; }

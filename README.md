@@ -8,7 +8,7 @@ A app abre um painel web dentro do próprio telefone (porta 9999). Duas formas d
 
 - **Mesma rede Wi‑Fi ou hotspot do telefone:** no PC abre-se `http://IP-DO-TELEFONE:9999`.
 - **Qualquer rede (telefone nos dados móveis):** ativar «Ligação remota» na app e, no PC,
-  abrir **fusaotech.com/relay** com o ID de 9 dígitos. Ver [`relay/LEIA-ME.md`](relay/LEIA-ME.md).
+  abrir **studio.fusaotech.com** com o ID de 9 dígitos. Ver [`relay/LEIA-ME.md`](relay/LEIA-ME.md).
 
 ## Compilar a APK
 Esta automação (GitHub Actions) compila sozinha: a cada envio, o ficheiro

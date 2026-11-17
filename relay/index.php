@@ -1,6 +1,6 @@
 <?php
 /**
- * FusãoTechX Mz • Relay — página de entrada (fusaotech.com/relay).
+ * FusãoTechX Mz • Relay — página de entrada (studio.fusaotech.com).
  * O PC escreve o ID do telefone (9 dígitos, mostrado na app) e abre o painel.
  */
 define('FTX_RELAY', 1);
@@ -17,7 +17,7 @@ header('Content-Type: text/html; charset=utf-8');
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>FusãoTechX Studio · Ligar ao telefone</title>
 <meta name="description" content="Use o seu telefone no PC a partir de qualquer rede: ecrã ao vivo, SMS, chamadas, notificações e ficheiros.">
-<link rel="icon" href="/assets/images/logos/favicon.ico">
+<link rel="icon" href="https://fusaotech.com/assets/images/logos/favicon.ico">
 <style>
 :root{--bg:#070a12;--p:rgba(255,255,255,.04);--l:rgba(255,255,255,.09);--tx:#eef2ff;--mu:#94a3c4;--ac:#22d3ee;--grad:linear-gradient(135deg,#22d3ee 0%,#818cf8 55%,#c084fc 100%)}
 *{box-sizing:border-box}
@@ -52,7 +52,7 @@ footer{text-align:center;color:var(--mu);font-size:12.5px;padding:22px}
 </style>
 </head>
 <body>
-<header class="top"><img src="/assets/images/logos/android-chrome-192x192.png" alt=""><div><b>FusãoTechX Studio</b><small>O seu telefone no PC</small></div></header>
+<header class="top"><img src="https://fusaotech.com/assets/images/logos/android-chrome-192x192.png" alt=""><div><b>FusãoTechX Studio</b><small>O seu telefone no PC</small></div></header>
 <main class="wrap">
     <section>
         <h1>O seu telefone no PC, <span class="g">em qualquer rede</span></h1>
@@ -82,7 +82,7 @@ footer{text-align:center;color:var(--mu);font-size:12.5px;padding:22px}
         </ol>
     </section>
 </main>
-<footer>FusãoTechX Mz · +258 83 333 7906 · <a href="/">fusaotech.com</a></footer>
+<footer>FusãoTechX Mz · +258 83 333 7906 · <a href="https://fusaotech.com/">fusaotech.com</a></footer>
 <script>
 (function () {
     var inp = document.getElementById('id'), go = document.getElementById('go'), err = document.getElementById('err');

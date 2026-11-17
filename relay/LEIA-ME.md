@@ -2,15 +2,15 @@
 
 O telefone nos **dados móveis** e o PC noutra rede qualquer: a operadora bloqueia
 ligações a entrar no telefone, por isso o telefone liga-se **para fora** a um ponto
-de encontro público — este relay, que corre em `fusaotech.com/relay` (PHP, sem base de dados).
+de encontro público — este relay, que corre em `studio.fusaotech.com` (PHP, sem base de dados).
 
 ## Como usar
 1. No telefone: app FusãoTechX → **3 · Ligação remota** → ativar → **LIGAR**.
-2. No PC: abrir **fusaotech.com/relay**, escrever o **ID** (9 dígitos) e depois o **código**.
+2. No PC: abrir **studio.fusaotech.com**, escrever o **ID** (9 dígitos) e depois o **código**.
 
 ## Como funciona
 - `api.php` — o telefone pergunta por pedidos (long-poll de 20 s), responde e envia imagens do ecrã.
-- `tunel.php` — `fusaotech.com/relay/d/<ID>/…`: cada pedido do painel fica numa fila até o telefone responder.
+- `tunel.php` — `studio.fusaotech.com/d/<ID>/…`: cada pedido do painel fica numa fila até o telefone responder.
   O telefone executa-o no seu próprio servidor (o mesmo da rede local), por isso o código continua a ser verificado no telefone.
 - O ecrã ao vivo: o telefone só envia imagens enquanto o PC está a ver (até ~10 por segundo).
 - `data/` guarda filas e a última imagem (pasta bloqueada ao público; os ficheiros antigos apagam-se sozinhos).
@@ -23,6 +23,6 @@ de encontro público — este relay, que corre em `fusaotech.com/relay` (PHP, se
 
 ## Instalar noutro servidor
 Copiar a pasta `relay/` para o servidor (PHP 7.4+, Apache com `.htaccess`) e, na app,
-mudar o endereço do relay (por omissão `https://fusaotech.com/relay`).
+mudar o endereço do relay (por omissão `https://studio.fusaotech.com`).
 
 FusãoTechX Mz · +258 83 333 7906 · fusaotech.com
