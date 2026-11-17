@@ -89,11 +89,20 @@ class NotifService : NotificationListenerService() {
     override fun onListenerDisconnected() { if (inst === this) inst = null }
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
+        // WhatsApp/WhatsApp Business: processamento dedicado com MessagingStyle
+        if (sbn != null && sbn.packageName in WhatsAppStore.PACOTES) {
+            WhatsAppStore.processar(this, sbn)
+        }
         guardarMsg(sbn)
         bump()
     }
 
-    override fun onNotificationRemoved(sbn: StatusBarNotification?) { bump() }
+    override fun onNotificationRemoved(sbn: StatusBarNotification?) {
+        if (sbn != null && sbn.packageName in WhatsAppStore.PACOTES) {
+            WhatsAppStore.notificacaoRemovida(sbn.key)
+        }
+        bump()
+    }
 
     private fun guardarMsg(sbn: StatusBarNotification?) {
         try {

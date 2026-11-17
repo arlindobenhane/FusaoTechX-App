@@ -176,6 +176,34 @@ class Httpd(ctxIn: Context, private val porta: Int) {
                         } catch (_: Exception) {}
                     } else enviar(out, 404, "application/json", "{\"erro\":\"nao_encontrada\"}".toByteArray())
                 }
+                // ── WhatsApp ──────────────────────────────────────────────────
+                caminho == "/wa-convs" -> jsonResp(out, JSONObject()
+                    .put("lista", WhatsAppStore.resumoConversas())
+                    .put("ativo", NotifService.inst != null))
+                caminho == "/wa-msgs" -> {
+                    val chave = query["chave"]
+                    val limite = (query["n"]?.toIntOrNull() ?: 100).coerceIn(10, 500)
+                    if (chave != null) {
+                        jsonResp(out, JSONObject()
+                            .put("lista", WhatsAppStore.mensagensConversa(chave, limite))
+                            .put("chave", chave))
+                    } else {
+                        jsonResp(out, JSONObject()
+                            .put("lista", WhatsAppStore.todasMensagens(limite)))
+                    }
+                }
+                caminho == "/wa-reply" && metodo == "POST" -> {
+                    val b = json(corpo)
+                    val chave = b.optString("chave")
+                    val texto = b.optString("texto")
+                    if (chave.isEmpty() || texto.isEmpty()) {
+                        jsonResp(out, JSONObject().put("ok", false).put("erro", "chave e texto obrigatorios"))
+                    } else {
+                        val resultado = WhatsAppStore.responder(ctx, chave, texto)
+                        jsonResp(out, JSONObject().put("ok", resultado == "ok").put("estado", resultado))
+                    }
+                }
+                // ─────────────────────────────────────────────────────────────
                 caminho == "/files" -> jsonResp(out, Device.listar(query["p"], ctx))
                 caminho == "/file" -> servirFicheiro(out, Device.caminhoReal(query["p"]), query["baixar"] != null)
                 caminho == "/upload" && metodo == "POST" -> jsonResp(out, upload(query["nome"], corpo))

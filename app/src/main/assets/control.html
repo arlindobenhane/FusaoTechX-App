@@ -224,7 +224,8 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
       <button data-v="sms"><svg class="i" data-i="msg"></svg>Mensagens<span class="b" id="bSms"></span></button>
       <button data-v="call"><svg class="i" data-i="call"></svg>Chamadas<span class="b" id="bCall"></span></button>
       <button data-v="notif"><svg class="i" data-i="bell"></svg>Notificações<span class="b" id="bNotif"></span></button>
-      <button data-v="appmsgs"><svg class="i" data-i="chat"></svg>WhatsApp &amp; apps<span class="b" id="bApp"></span></button>
+      <button data-v="appmsgs"><svg class="i" data-i="chat"></svg>Notificações de apps<span class="b" id="bApp"></span></button>
+      <button data-v="wa"><svg class="i wa-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.09-1.34C8.5 21.52 10.21 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.68 0-3.25-.46-4.6-1.26l-.33-.19-3.02.79.82-2.95-.21-.34C3.47 15.17 3 13.64 3 12c0-4.96 4.04-9 9-9s9 4.04 9 9-4.04 9-9 9z"/></svg>WhatsApp<span class="b" id="bWa"></span></button>
       <div class="sec">Conteúdo</div>
       <button data-v="apps"><svg class="i" data-i="apps"></svg>Aplicações</button>
       <button data-v="files"><svg class="i" data-i="folder"></svg>Ficheiros</button>
@@ -363,6 +364,103 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
   <div class="pl-chips" id="appTabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"></div>
   <div id="appMsgs"><div class="empty">A carregar…</div></div>
 </section>
+
+<!-- WHATSAPP -->
+<section class="view" id="v-wa">
+  <style>
+    .wa-icon path{fill:currentColor}
+    .wa-hdr{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+    .wa-hdr svg{width:28px;height:28px;color:#25d366}
+    .wa-hdr h2{margin:0;font-size:17px}
+    .wa-hdr .muted{font-size:12px;color:var(--mu)}
+    .wa-perm{display:flex;align-items:center;gap:12px;background:color-mix(in srgb,#25d366 10%,var(--bg));border:1px solid color-mix(in srgb,#25d366 30%,transparent);border-radius:12px;padding:14px 16px;margin-bottom:16px}
+    .wa-perm span{font-size:26px}
+    .wa-perm b{display:block;margin-bottom:2px}
+    .wa-perm .muted{font-size:12px;color:var(--mu)}
+    #waWrap{display:grid;grid-template-columns:280px 1fr;gap:0;border:1px solid var(--bd);border-radius:12px;overflow:hidden;height:calc(100vh - 220px);min-height:400px}
+    @media(max-width:640px){#waWrap{grid-template-columns:minmax(0,1fr)}#waThr{display:none}#waWrap.conv #waLst{display:none}#waWrap.conv #waThr{display:flex}}
+    #waLst{display:flex;flex-direction:column;border-right:1px solid var(--bd);overflow:hidden}
+    .wa-lsthd{padding:12px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px}
+    .wa-lsthd svg{width:16px;height:16px;color:#25d366;flex-shrink:0}
+    .wa-lsthd input{flex:1;border:none;background:transparent;color:var(--tx);font-size:13px;outline:none}
+    #waConvs{flex:1;overflow-y:auto}
+    .wa-conv{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;border-bottom:1px solid var(--bd);transition:background .12s}
+    .wa-conv:hover,.wa-conv.on{background:var(--hover)}
+    .wa-conv .av{width:38px;height:38px;border-radius:50%;background:var(--ac2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#fff;flex-shrink:0}
+    .wa-conv .av.grp{background:color-mix(in srgb,#25d366 70%,#000)}
+    .wa-conv .col{flex:1;min-width:0}
+    .wa-conv .col b{display:block;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .wa-conv .col span{display:block;font-size:12px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+    .wa-conv .meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+    .wa-conv .meta time{font-size:11px;color:var(--mu)}
+    .wa-conv .meta .nb{background:#25d366;color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700}
+    #waThr{display:flex;flex-direction:column;overflow:hidden}
+    .wa-thrhd{padding:12px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
+    .wa-thrhd .av{width:36px;height:36px;border-radius:50%;background:var(--ac2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;flex-shrink:0}
+    .wa-thrhd .av.grp{background:color-mix(in srgb,#25d366 70%,#000)}
+    .wa-thrhd .col b{display:block;font-size:14px}
+    .wa-thrhd .col span{font-size:11px;color:var(--mu)}
+    .wa-thrhd .ibtn{margin-left:auto}
+    #waMsgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+    .wa-msg{max-width:72%;padding:7px 11px 4px;border-radius:10px;position:relative;line-height:1.45}
+    .wa-msg.eu{align-self:flex-end;background:color-mix(in srgb,#25d366 22%,var(--card));border-radius:10px 2px 10px 10px}
+    .wa-msg.eles{align-self:flex-start;background:var(--card);border-radius:2px 10px 10px 10px}
+    .wa-msg .rem{font-size:11px;font-weight:700;color:#25d366;margin-bottom:2px}
+    .wa-msg .txt{font-size:13.5px;word-break:break-word}
+    .wa-msg time{font-size:10px;color:var(--mu);float:right;margin-left:8px;margin-top:3px}
+    .wa-vazio{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--mu)}
+    .wa-vazio svg{width:48px;height:48px;opacity:.25}
+    .wa-vazio p{margin:0;font-size:14px}
+    .wa-reply{padding:10px 12px;border-top:1px solid var(--bd);display:flex;gap:8px;align-items:flex-end}
+    .wa-reply textarea{flex:1;border:1px solid var(--bd);border-radius:20px;padding:9px 14px;font-size:13.5px;resize:none;background:var(--inp);color:var(--tx);outline:none;max-height:120px;min-height:38px;line-height:1.4}
+    .wa-reply textarea:focus{border-color:#25d366}
+    .wa-reply .btn-send{width:38px;height:38px;border-radius:50%;background:#25d366;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s}
+    .wa-reply .btn-send:hover{opacity:.85}
+    .wa-reply .btn-send svg{width:18px;height:18px;color:#fff}
+    .wa-noreply{padding:9px 14px;border-top:1px solid var(--bd);text-align:center;font-size:12px;color:var(--mu)}
+  </style>
+
+  <div class="wa-hdr">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.09-1.34C8.5 21.52 10.21 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.68 0-3.25-.46-4.6-1.26l-.33-.19-3.02.79.82-2.95-.21-.34C3.47 15.17 3 13.64 3 12c0-4.96 4.04-9 9-9s9 4.04 9 9-4.04 9-9 9z"/></svg>
+    <div><h2>WhatsApp</h2><span class="muted" id="waStatus">A carregar…</span></div>
+    <button class="btn sm" id="waRefresh" title="Atualizar" style="margin-left:auto"><svg class="i" data-i="sync" style="width:14px;height:14px"></svg></button>
+  </div>
+  <div class="wa-perm" id="waPerm" hidden>
+    <span>🔔</span>
+    <div><b>Permissão de notificações necessária</b><span class="muted">No telefone: Definições › Apps › Acesso a notificações › ative FusãoTechX.</span></div>
+  </div>
+  <div id="waWrap">
+    <div id="waLst">
+      <div class="wa-lsthd">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input id="waBusca" placeholder="Procurar conversa…" autocomplete="off">
+      </div>
+      <div id="waConvs"><div class="empty">A carregar conversas…</div></div>
+    </div>
+    <div id="waThr">
+      <div class="wa-vazio" id="waVazio">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.09-1.34C8.5 21.52 10.21 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.68 0-3.25-.46-4.6-1.26l-.33-.19-3.02.79.82-2.95-.21-.34C3.47 15.17 3 13.64 3 12c0-4.96 4.04-9 9-9s9 4.04 9 9-4.04 9-9 9z"/></svg>
+        <p>Escolha uma conversa</p>
+      </div>
+      <div id="waThrInner" style="display:none;flex:1;flex-direction:column;overflow:hidden">
+        <div class="wa-thrhd">
+          <div class="av" id="waThAv">?</div>
+          <div class="col"><b id="waThNome">—</b><span id="waThSub">—</span></div>
+          <button class="ibtn" id="waVoltar" aria-label="Voltar" style="display:none"><svg class="i" data-i="back"></svg></button>
+        </div>
+        <div id="waMsgs"></div>
+        <div class="wa-reply" id="waReplyBox">
+          <textarea id="waTxt" rows="1" placeholder="Responder…" maxlength="4096"></textarea>
+          <button class="btn-send" id="waEnviar" title="Enviar resposta">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </button>
+        </div>
+        <div class="wa-noreply" id="waNoReply" hidden>Esta conversa não suporta resposta direta (a notificação já foi dispensada).</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 
 <!-- APLICAÇÕES -->
 <section class="view" id="v-apps">
@@ -537,11 +635,11 @@ $('#lgBtn').onclick=entrar;$('#pin').addEventListener('keydown',e=>{if(e.key==='
 
 // ===== Navegação =====
 const TIT={painel:['Painel','Visão geral do telefone'],ecra:['Ecrã e controlo','Veja e controle o telefone com o rato e o teclado'],sms:['Mensagens','SMS e WhatsApp, sincronizados'],call:['Chamadas','Marcador, recentes e contactos'],
- notif:['Notificações','Em tempo real'],appmsgs:['WhatsApp & apps','Ler mensagens das apps sem o ecrã'],apps:['Aplicações','Abrir apps no telefone'],files:['Ficheiros','Navegar, ver e transferir'],def:['Definições','Telefone, ligação, ecrã e aparência'],adv:['Modo avançado','Segurança e anti-roubo — câmara, localização, alarme']};
+ notif:['Notificações','Em tempo real'],appmsgs:['Notificações de apps','Ler mensagens das apps sem o ecrã'],wa:['WhatsApp','Conversas, mensagens e respostas directas'],apps:['Aplicações','Abrir apps no telefone'],files:['Ficheiros','Navegar, ver e transferir'],def:['Definições','Telefone, ligação, ecrã e aparência'],adv:['Modo avançado','Segurança e anti-roubo — câmara, localização, alarme']};
 let VISTA='painel';
 function ir(v){VISTA=v;$$('#nav button').forEach(x=>x.classList.toggle('on',x.dataset.v===v));$$('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));
  $('#tTit').textContent=TIT[v][0];$('#tSub').textContent=TIT[v][1];$('#side').classList.remove('open');try{history.replaceState(null,'','#'+v)}catch(e){}
- if(v==='apps')carregarApps();if(v==='notif'){carregarNotifs();marcarVisto('notif')}if(v==='appmsgs'){carregarAppMsgs();marcarVisto('app')}if(v==='files'&&!DIR)abrir('');if(v==='sms'){carregarSms();marcarVisto('sms')}
+ if(v==='apps')carregarApps();if(v==='notif'){carregarNotifs();marcarVisto('notif')}if(v==='appmsgs'){carregarAppMsgs();marcarVisto('app')}if(v==='wa'){carregarWa();marcarVisto('wa')}if(v==='files'&&!DIR)abrir('');if(v==='sms'){carregarSms();marcarVisto('sms')}
  if(v==='call'){carregarChamadas();carregarContactos();marcarVisto('call')}if(v==='ecra')setTimeout(()=>scr.focus(),150);if(v==='def')pintarDef();if(v==='adv')pintarAdv()}
 $('#nav').onclick=e=>{const b=e.target.closest('button[data-v]');if(b)ir(b.dataset.v)};
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)ir(g.dataset.go)});
@@ -579,7 +677,7 @@ function pintarPermissoes(){
  $('#ctlBanner').innerHTML=S.controlo===false?'<div class="banner"><span style="font-size:22px">🖱️</span><div><b>Para mexer no telefone a partir do PC</b>No telefone: app FusãoTechX › «Permitir controlo (Acessibilidade)» › ative FusãoTechX. Até lá, só pode ver o ecrã.</div></div>':''}
 
 // Notificações, mensagens e chamadas novas (badges + avisos no PC)
-const VISTO=pref('visto',{sms:0,call:0,notif:0});
+const VISTO=pref('visto',{sms:0,call:0,notif:0,wa:0});
 function marcarVisto(k){VISTO[k]=Date.now();guardarPref('visto',VISTO);badge(k,0)}
 function badge(k,n){const el=$('#b'+k[0].toUpperCase()+k.slice(1));if(!el)return;el.textContent=n>99?'99+':n;el.style.display=n?'inline-block':'none'}
 let NOTIFS=[],SMS=[],CALLS=[],avisadas=new Set(pref('avisadas',[]));
@@ -594,10 +692,132 @@ async function syncSms(){try{const r=await get('/sms?n=400');const novo=r.lista|
  if(antes&&SMS[0]&&SMS[0].data>antes&&!SMS[0].enviada){som();avisoPC('SMS de '+nomeDe(SMS[0].de),SMS[0].texto,'sms')}
  if(VISTA==='sms')pintarConversas()}catch(e){}}
 async function syncCalls(){try{const r=await get('/calls');CALLS=r.lista||[];badge('call',VISTA==='call'?0:CALLS.filter(c=>c.tipo==='perdida'&&c.data>VISTO.call).length);if(VISTA==='call')pintarChamadas()}catch(e){}}
+
+// ===== WhatsApp =====
+let WA_CONVS=[], WA_CONV_CHAVE=null, WA_MSGS=[];
+
+async function carregarWa(){
+  try{
+    const r=await get('/wa-convs');
+    WA_CONVS=r.lista||[];
+    const ativo=r.ativo;
+    document.getElementById('waPerm').hidden=ativo;
+    document.getElementById('waStatus').textContent=ativo
+      ?(WA_CONVS.length?WA_CONVS.length+' conversa'+(WA_CONVS.length===1?'':'s'):'Sem conversas ainda — aguarda uma notificação do WhatsApp.')
+      :'Permissão de notificações não ativa';
+    pintarWaConvs();
+  }catch(e){document.getElementById('waStatus').textContent='Erro ao carregar'}
+}
+
+function pintarWaConvs(){
+  const busca=(document.getElementById('waBusca').value||'').toLowerCase().trim();
+  const lista=busca?WA_CONVS.filter(c=>(c.conversa||'').toLowerCase().includes(busca)):WA_CONVS;
+  const el=document.getElementById('waConvs');
+  if(!lista.length){el.innerHTML='<div class="empty">'+(busca?'Sem resultados.':'Sem conversas. As mensagens aparecem quando chegar uma notificação do WhatsApp.')+'</div>';return}
+  el.innerHTML=lista.map(c=>{
+    const ini=(c.conversa||'?')[0].toUpperCase();
+    const ts=c.ultima_ts?horaWa(c.ultima_ts):'';
+    const on=WA_CONV_CHAVE===c.chave?'on':'';
+    return '<div class="wa-conv '+on+'" data-chave="'+esc(c.chave)+'" data-conv="'+esc(c.conversa||'')+'" data-grp="'+(c.isGrupo?1:0)+'" data-rep="'+(c.pode_responder?1:0)+'">'
+      +'<div class="av'+(c.isGrupo?' grp':'')+'">'+ini+'</div>'
+      +'<div class="col"><b>'+esc(c.conversa||'?')+'</b><span>'+esc(c.ultima_msg||'')+'</span></div>'
+      +'<div class="meta"><time>'+ts+'</time>'+(c.n>0?'<span class="nb">'+(c.n>99?'99+':c.n)+'</span>':'')+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+document.getElementById('waConvs').addEventListener('click',function(e){
+  const item=e.target.closest('.wa-conv');if(!item)return;
+  WA_CONV_CHAVE=item.dataset.chave;
+  const nome=item.dataset.conv||'?';
+  const isGrp=item.dataset.grp==='1';
+  const podeResp=item.dataset.rep==='1';
+  document.getElementById('waWrap').classList.add('conv');
+  Array.from(document.querySelectorAll('#waConvs .wa-conv')).forEach(x=>x.classList.toggle('on',x.dataset.chave===WA_CONV_CHAVE));
+  document.getElementById('waThAv').textContent=nome[0].toUpperCase();
+  document.getElementById('waThAv').className='av'+(isGrp?' grp':'');
+  document.getElementById('waThNome').textContent=nome;
+  document.getElementById('waThSub').textContent=isGrp?'Grupo':'Conversa individual';
+  document.getElementById('waVoltar').style.display='';
+  document.getElementById('waVazio').style.display='none';
+  document.getElementById('waThrInner').style.display='flex';
+  document.getElementById('waReplyBox').hidden=!podeResp;
+  document.getElementById('waNoReply').hidden=podeResp;
+  carregarWaMsgs(WA_CONV_CHAVE);
+});
+
+document.getElementById('waVoltar').onclick=function(){document.getElementById('waWrap').classList.remove('conv');WA_CONV_CHAVE=null};
+document.getElementById('waRefresh').onclick=function(){carregarWa()};
+document.getElementById('waBusca').oninput=function(){pintarWaConvs()};
+
+async function carregarWaMsgs(chave){
+  document.getElementById('waMsgs').innerHTML='<div class="empty">A carregar…</div>';
+  try{
+    const r=await get('/wa-msgs?chave='+encodeURIComponent(chave)+'&n=100');
+    WA_MSGS=r.lista||[];
+    pintarWaMsgs();
+  }catch(e){document.getElementById('waMsgs').innerHTML='<div class="empty">Erro ao carregar.</div>'}
+}
+
+function pintarWaMsgs(){
+  const el=document.getElementById('waMsgs');
+  if(!WA_MSGS.length){el.innerHTML='<div class="empty">Sem mensagens registadas nesta conversa.</div>';return}
+  const conv=WA_CONVS.find(c=>c.chave===WA_CONV_CHAVE);
+  const isGrp=conv?conv.isGrupo:false;
+  el.innerHTML=WA_MSGS.map(function(m){
+    const rem=isGrp&&m.remetente?'<div class="rem">'+esc(m.remetente)+'</div>':'';
+    return '<div class="wa-msg eles">'+rem+'<div class="txt">'+esc(m.texto)+'</div><time>'+horaWa(m.id)+'</time></div>';
+  }).join('');
+  el.scrollTop=el.scrollHeight;
+}
+
+document.getElementById('waEnviar').onclick=function(){waEnviar()};
+document.getElementById('waTxt').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();waEnviar()}});
+document.getElementById('waTxt').addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'});
+
+async function waEnviar(){
+  const txt=document.getElementById('waTxt').value.trim();
+  if(!txt||!WA_CONV_CHAVE)return;
+  document.getElementById('waEnviar').disabled=true;
+  try{
+    const r=await post('/wa-reply',{chave:WA_CONV_CHAVE,texto:txt});
+    if(r.ok){document.getElementById('waTxt').value='';document.getElementById('waTxt').style.height='auto';toast('Mensagem enviada ✓')}
+    else{
+      if(r.estado==='sem_notif'||r.estado==='sem_acao'){
+        document.getElementById('waReplyBox').hidden=true;document.getElementById('waNoReply').hidden=false;
+        toast('Notificação expirou — não é possível responder agora.');
+      }else toast('Erro: '+r.estado);
+    }
+  }catch(e){toast('Erro de ligação')}
+  document.getElementById('waEnviar').disabled=false;
+}
+
+async function syncWa(){
+  try{
+    const r=await get('/wa-convs');
+    WA_CONVS=r.lista||[];
+    const novas=WA_CONVS.filter(c=>c.ultima_ts>VISTO.wa);
+    badge('Wa',VISTA==='wa'?0:novas.length);
+    if(VISTA==='wa'){pintarWaConvs();if(WA_CONV_CHAVE)carregarWaMsgs(WA_CONV_CHAVE)}
+    for(const c of WA_CONVS){
+      if(c.ultima_ts>Date.now()-120000&&c.ultima_ts>VISTO.wa){
+        avisoPC('WhatsApp · '+c.conversa,c.ultima_msg||'','wa-'+c.chave);break;
+      }
+    }
+  }catch(e){}
+}
+
+function horaWa(ts){
+  if(!ts)return'';
+  const d=new Date(ts),ag=new Date();
+  if(d.toDateString()===ag.toDateString())return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  return d.toLocaleDateString([],{day:'2-digit',month:'2-digit'});
+}
+
 let syncTimer=null,ciclo=0;
 function sincronizar(){clearTimeout(syncTimer);const on=pref('sync',true);
  const passo=async()=>{ciclo++;$('#pSyncT').textContent='A sincronizar…';await estado();
-  if(on){await syncNotifs();if(ciclo%3===1)await syncSms();if(ciclo%6===1)await syncCalls()}
+  if(on){await syncNotifs();if(ciclo%3===1)await syncSms();if(ciclo%6===1)await syncCalls();if(ciclo%4===2)await syncWa()}
   $('#pSyncT').textContent=on?'Sincronizado':'Sincronização pausada';syncTimer=setTimeout(passo,document.hidden?15000:(RELAY?6000:4000))};
  passo()}
 
