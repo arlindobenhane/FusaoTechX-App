@@ -24,3 +24,11 @@ Protegido por um **segundo código** (diferente do normal). Inclui câmara silen
 (tira uma foto sem abrir a câmara e com o ecrã apagado, só para o PC), localização GPS,
 alarme alto e bloqueio do ecrã. Pensado para quando o telefone se perde ou é roubado.
 Notificações e mensagens chegam ao PC em tempo real.
+
+## Ligação permanente (reconecta sozinha)
+Com a «Ligação remota permanente» ativa, o telefone mantém-se ligado ao relay para sempre:
+funciona com a app fechada, reconecta ao reiniciar o telefone, ao trocar de Wi-Fi/dados móveis
+e volta sozinho se o sistema matar o serviço (um «cão de guarda» revê-o a cada ~15 min).
+A identidade é permanente (ID + segredo do aparelho) — **não precisa de conta Google**. Só termina
+ao desinstalar (bloqueado por Administrador do dispositivo) ou formatar, ou quando o admin bloqueia.
+Para funcionar bem, permita «sem restrições de bateria» quando a app pedir.

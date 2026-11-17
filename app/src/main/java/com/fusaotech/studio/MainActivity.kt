@@ -83,13 +83,22 @@ class MainActivity : Activity() {
         // Ligação remota: telefone nos dados móveis, PC em qualquer rede.
         col.addView(espaco(18))
         col.addView(TextView(this).apply { text = "3 · Ligação remota (qualquer rede)"; setTextColor(cor.ac); textSize = 16f; setTypeface(typeface, android.graphics.Typeface.BOLD) })
-        col.addView(rotulo("Para usar o telefone nos dados móveis com o PC noutra rede. No PC, abra studio.fusaotech.com e escreva o ID."))
+        col.addView(rotulo("Para usar o telefone nos dados móveis com o PC noutra rede. No PC, abra studio.fusaotech.com e escreva o ID. Fica ligada sempre, mesmo com a app fechada ou após reiniciar — reconecta sozinha."))
         val cbRemoto = CheckBox(this).apply {
-            text = "Ativar ligação remota pela Internet"; setTextColor(cor.tx); isChecked = Prefs.relayOn(this@MainActivity)
+            text = "Ligação remota permanente (reconecta sozinha)"; setTextColor(cor.tx); isChecked = Prefs.relayOn(this@MainActivity)
             setOnCheckedChangeListener { _, v ->
                 Prefs.setRelayOn(this@MainActivity, v)
-                if (v && CaptureService.ativo) Relay.iniciar(this@MainActivity)
-                if (!v) Relay.parar()
+                if (v) {
+                    Prefs.setAutostart(this@MainActivity, true)
+                    // Arranca o serviço permanente (sem ecrã) e o cão de guarda.
+                    val si = Intent(this@MainActivity, CaptureService::class.java).setAction("remoto")
+                    if (android.os.Build.VERSION.SDK_INT >= 26) startForegroundService(si) else startService(si)
+                    Watchdog.agendar(this@MainActivity)
+                    pedirSemBateria()
+                } else {
+                    val si = Intent(this@MainActivity, CaptureService::class.java).setAction("stop")
+                    startService(si); Watchdog.cancelar(this@MainActivity)
+                }
                 refrescar()
             }
         }
@@ -224,7 +233,30 @@ class MainActivity : Activity() {
     }
 
     private fun parar() {
-        stopService(Intent(this, CaptureService::class.java)); toast("Parado"); refrescar()
+        if (Prefs.relayOn(this)) {
+            // Mantém a ligação remota permanente; pára só a partilha do ecrã.
+            val si = Intent(this, CaptureService::class.java).setAction("parar_ecra"); startService(si)
+            toast("Ecrã parado (a ligação remota continua ligada)")
+        } else {
+            val si = Intent(this, CaptureService::class.java).setAction("stop"); startService(si)
+            toast("Parado")
+        }
+        refrescar()
+    }
+
+    /** Pede para a app não ser desligada em segundo plano (crucial para a ligação ser permanente). */
+    private fun pedirSemBateria() {
+        try {
+            val pm = getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+                android.app.AlertDialog.Builder(this)
+                    .setTitle("Manter sempre ligada")
+                    .setMessage("Para a ligação ser permanente e reconectar sozinha, permita que a app funcione sem restrições de bateria. No ecrã seguinte, escolha «Permitir».")
+                    .setPositiveButton("Permitir") { _, _ -> bateria() }
+                    .setNegativeButton("Agora não", null)
+                    .show()
+            }
+        } catch (_: Exception) {}
     }
 
     private fun pedirPermissoes() {

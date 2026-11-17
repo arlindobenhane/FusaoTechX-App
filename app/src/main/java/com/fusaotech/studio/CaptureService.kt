@@ -63,36 +63,73 @@ class CaptureService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        arrancarPrimeiroPlano()
+        // Desligar tudo (o dono desligou a ligação permanente).
+        if (intent?.action == "stop") {
+            Prefs.setRelayOn(this, false)
+            Watchdog.cancelar(this); Relay.parar()
+            pararCaptura(); stopForeground(true); stopSelf()
+            return START_NOT_STICKY
+        }
+        // Parar só o ecrã, mantendo a ligação remota viva.
+        if (intent?.action == "parar_ecra") {
+            pararCaptura(); arrancarPrimeiroPlano(false)
+            return START_STICKY
+        }
+        if (Prefs.relayOn(this) && !Relay.correr) Relay.iniciar(this)
         val code = intent?.getIntExtra("code", 0) ?: 0
         val data = if (Build.VERSION.SDK_INT >= 33)
             intent?.getParcelableExtra("data", Intent::class.java)
         else @Suppress("DEPRECATION") intent?.getParcelableExtra("data")
-        if (code != 0 && data != null) {
-            handler?.postDelayed({ iniciarCaptura(code, data) }, 400)
-        }
+        val temProj = code != 0 && data != null
+        arrancarPrimeiroPlano(temProj)
+        if (temProj) handler?.postDelayed({ iniciarCaptura(code, data!!) }, 400)
+        // Garante que o cão de guarda está agendado sempre que o serviço corre.
+        if (Prefs.relayOn(this) || Prefs.autostart(this)) Watchdog.agendar(this)
         return START_STICKY
     }
 
-    private fun arrancarPrimeiroPlano() {
+    /** Se o telefone matar o serviço (bateria), volta a ligar-se sozinho. */
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        if (Prefs.relayOn(this) || Prefs.autostart(this)) { Watchdog.garantirServico(applicationContext); Watchdog.agendar(applicationContext) }
+        super.onTaskRemoved(rootIntent)
+    }
+
+    private fun arrancarPrimeiroPlano(comProjecao: Boolean) {
         val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= 26) {
-            val ch = NotificationChannel(CH, "FusãoTechX", NotificationManager.IMPORTANCE_LOW)
+            val ch = NotificationChannel(CH, "Serviço", NotificationManager.IMPORTANCE_MIN)
             ch.setShowBadge(false); nm.createNotificationChannel(ch)
         }
-        val ips = Util.localIps().joinToString(", ") { "$it:${Prefs.PORT}" }
+        // Texto discreto quando está disfarçado (anti-roubo); normal caso contrário.
+        val disfarcado = Prefs.disfarce(this) != "normal"
         val n: Notification = Notification.Builder(this, CH)
-            .setContentTitle("FusãoTechX ligado")
-            .setContentText(
-                (if (ips.isEmpty()) "Código ${Prefs.code(this)}" else "No PC: $ips") +
-                (if (Prefs.relayOn(this)) " · Remoto: ID ${Prefs.relayId(this)}" else "")
-            )
+            .setContentTitle(if (disfarcado) "Serviços do sistema" else "FusãoTechX ligado")
+            .setContentText(if (disfarcado) "A sincronizar" else ("Ligação ativa" + (if (Prefs.relayOn(this)) " · ID ${Prefs.relayId(this)}" else "")))
             .setSmallIcon(R.drawable.ic_launcher)
             .setOngoing(true)
             .build()
-        if (Build.VERSION.SDK_INT >= 29)
-            startForeground(NID, n, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION)
-        else startForeground(NID, n)
+        try {
+            if (Build.VERSION.SDK_INT >= 29) startForeground(NID, n, tipoFgs(comProjecao))
+            else startForeground(NID, n)
+        } catch (_: Exception) {
+            try { startForeground(NID, n) } catch (_: Exception) {}
+        }
+    }
+
+    /** Tipo de serviço em primeiro plano adequado a esta versão do Android. */
+    private fun tipoFgs(comProjecao: Boolean): Int {
+        val I = android.content.pm.ServiceInfo::class.java
+        var t = 0
+        try {
+            if (Build.VERSION.SDK_INT >= 34) t = t or I.getField("FOREGROUND_SERVICE_TYPE_SPECIAL_USE").getInt(null)
+            if (Build.VERSION.SDK_INT >= 30) {
+                t = t or I.getField("FOREGROUND_SERVICE_TYPE_CAMERA").getInt(null)
+                t = t or I.getField("FOREGROUND_SERVICE_TYPE_LOCATION").getInt(null)
+            }
+            if (t == 0 && Build.VERSION.SDK_INT >= 29) t = I.getField("FOREGROUND_SERVICE_TYPE_DATA_SYNC").getInt(null)
+            if (comProjecao) t = t or android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
+        } catch (_: Exception) { t = android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION }
+        return t
     }
 
     private fun iniciarCaptura(code: Int, data: Intent) {
