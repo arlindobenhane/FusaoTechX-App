@@ -18,10 +18,29 @@ class ControlService : AccessibilityService() {
         @Volatile var inst: ControlService? = null
     }
 
-    override fun onServiceConnected() { inst = this }
+    override fun onServiceConnected() {
+        inst = this
+        try {
+            val wm = getSystemService(android.content.Context.WINDOW_SERVICE) as android.view.WindowManager
+            SocialCapture.larguraEcra = if (android.os.Build.VERSION.SDK_INT >= 30) {
+                wm.currentWindowMetrics.bounds.width()
+            } else {
+                @Suppress("DEPRECATION")
+                wm.defaultDisplay.width
+            }
+        } catch (_: Exception) {}
+    }
     override fun onDestroy() { if (inst === this) inst = null; super.onDestroy() }
     override fun onInterrupt() {}
-    override fun onAccessibilityEvent(event: AccessibilityEvent?) {}
+    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        val e = event ?: return
+        when (e.eventType) {
+            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED,
+            AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {
+                SocialCapture.capturar(this, e)
+            }
+        }
+    }
 
     fun tap(x: Int, y: Int) {
         val p = Path().apply { moveTo(x.toFloat(), y.toFloat()); lineTo((x + 1).toFloat(), (y + 1).toFloat()) }

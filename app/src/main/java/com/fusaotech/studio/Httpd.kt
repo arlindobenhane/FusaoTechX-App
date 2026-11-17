@@ -223,6 +223,32 @@ class Httpd(ctxIn: Context, private val porta: Int) {
                         out.write(dados); out.flush()
                     } catch (_: Exception) {}
                 }
+                // ── Redes Sociais ─────────────────────────────────────────────
+                caminho == "/social-convs" -> {
+                    val pkg = query["pkg"]
+                    jsonResp(out, JSONObject().put("lista", SocialStore.resumoConversas(pkg)))
+                }
+                caminho == "/social-msgs" -> {
+                    val chave = query["chave"]
+                    val limite = (query["n"]?.toIntOrNull() ?: 100).coerceIn(10, 500)
+                    if (chave != null) {
+                        jsonResp(out, JSONObject().put("lista", SocialStore.mensagensConversa(chave, limite)).put("chave", chave))
+                    } else {
+                        jsonResp(out, JSONObject().put("lista", JSONArray()))
+                    }
+                }
+                caminho == "/social-export" -> {
+                    val chave = query["chave"]
+                    val fmt = query["fmt"] ?: "txt"
+                    val dados = SocialStore.exportar(chave, fmt)
+                    val ct = if (fmt == "csv") "text/csv; charset=utf-8" else "text/plain; charset=utf-8"
+                    val nome = if (chave != null) "social.$fmt" else "social_todas.$fmt"
+                    try {
+                        out.write(("HTTP/1.1 200 OK\r\nContent-Type: $ct\r\nContent-Length: ${dados.size}\r\nContent-Disposition: attachment; filename=\"$nome\"\r\nCache-Control: no-store\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n").toByteArray())
+                        out.write(dados); out.flush()
+                    } catch (_: Exception) {}
+                }
+                // ─────────────────────────────────────────────────────────────
                 caminho == "/wa-file" -> {
                     val p = query["p"] ?: ""
                     val base = android.os.Environment.getExternalStorageDirectory().absolutePath

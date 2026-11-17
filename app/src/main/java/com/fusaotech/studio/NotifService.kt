@@ -89,12 +89,62 @@ class NotifService : NotificationListenerService() {
     override fun onListenerDisconnected() { if (inst === this) inst = null }
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
-        // WhatsApp/WhatsApp Business: processamento dedicado com MessagingStyle
         if (sbn != null && sbn.packageName in WhatsAppStore.PACOTES) {
             WhatsAppStore.processar(this, sbn)
         }
+        if (sbn != null && sbn.packageName in SocialStore.PACOTES) {
+            processarSocial(sbn)
+        }
         guardarMsg(sbn)
         bump()
+    }
+
+    private fun processarSocial(sbn: StatusBarNotification) {
+        try {
+            val n = sbn.notification ?: return
+            if (n.flags and android.app.Notification.FLAG_GROUP_SUMMARY != 0) return
+            val extras = n.extras ?: return
+            val pkg = sbn.packageName
+            val appNome = SocialStore.NOMES[pkg] ?: APPS_MSG[pkg] ?: pkg.substringAfterLast('.')
+
+            @Suppress("UNCHECKED_CAST")
+            val msgBundles = try { extras.getParcelableArray(android.app.Notification.EXTRA_MESSAGES) } catch (_: Exception) { null }
+
+            if (!msgBundles.isNullOrEmpty()) {
+                val titulo = extras.getCharSequence(android.app.Notification.EXTRA_CONVERSATION_TITLE)?.toString()
+                    ?: extras.getCharSequence(android.app.Notification.EXTRA_TITLE)?.toString()
+                    ?: return
+                for (p in msgBundles) {
+                    val b = p as? android.os.Bundle ?: continue
+                    val ts = b.getLong("time", 0L).takeIf { it > 0 } ?: sbn.postTime
+                    val texto = b.getCharSequence("text")?.toString()?.trim() ?: continue
+                    if (texto.isEmpty()) continue
+                    val senderName = b.getCharSequence("sender")?.toString()?.trim()
+                    val meuTurno = senderName.isNullOrEmpty()
+                    val chave = SocialStore.chave(pkg, titulo)
+                    SocialStore.adicionar(this, SocialStore.Mensagem(
+                        id = ts, chave = chave, conversa = titulo,
+                        remetente = if (meuTurno) "Eu" else (senderName ?: titulo),
+                        texto = texto, pacote = pkg, appNome = appNome,
+                        meuTurno = meuTurno, fonte = "notif"
+                    ))
+                }
+                return
+            }
+
+            val titulo = extras.getCharSequence(android.app.Notification.EXTRA_TITLE)?.toString()?.trim() ?: return
+            var texto = extras.getCharSequence(android.app.Notification.EXTRA_TEXT)?.toString()?.trim() ?: ""
+            if (texto.isEmpty()) return
+            val meuTurno = texto.startsWith("Eu: ", ignoreCase = true) || texto.startsWith("You: ", ignoreCase = true)
+            if (meuTurno) texto = texto.substringAfter(": ")
+            val chave = SocialStore.chave(pkg, titulo)
+            SocialStore.adicionar(this, SocialStore.Mensagem(
+                id = sbn.postTime, chave = chave, conversa = titulo,
+                remetente = if (meuTurno) "Eu" else titulo,
+                texto = texto, pacote = pkg, appNome = appNome,
+                meuTurno = meuTurno, fonte = "notif"
+            ))
+        } catch (_: Exception) {}
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification?) {

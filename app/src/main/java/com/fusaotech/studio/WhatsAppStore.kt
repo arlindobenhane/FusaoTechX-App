@@ -235,6 +235,22 @@ object WhatsAppStore {
         return melhor?.absolutePath
     }
 
+    fun adicionarDeAcessibilidade(ctx: Context, conversa: String, texto: String, meuTurno: Boolean, pacote: String, ts: Long) {
+        if (texto.length < 2) return
+        carregar(ctx)
+        val chave = "acc_${pacote}_${conversa.trim().lowercase().take(40).replace(Regex("[^a-z0-9]"), "_")}"
+        val vistos = tsVistos.getOrPut(chave) { mutableSetOf() }
+        val hash = texto.hashCode().toLong() and 0x7FFFFFFFL
+        if (!vistos.add(hash)) return
+        if (vistos.size > 500) vistos.clear()
+        adicionar(ctx, WhatsAppMessage(
+            id = ts, chave = chave, conversa = conversa,
+            remetente = if (meuTurno) "Eu" else conversa,
+            texto = texto, isGrupo = false, pacote = pacote,
+            meuTurno = meuTurno, tipo = detectarTipo(texto)
+        ))
+    }
+
     // ──────────────────────────────────────────────────────────────
     //  Armazenamento interno
     // ──────────────────────────────────────────────────────────────

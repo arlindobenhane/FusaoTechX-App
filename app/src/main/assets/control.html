@@ -241,6 +241,7 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
       <button data-v="appmsgs"><svg class="i" data-i="chat"></svg>Notificações de apps<span class="b" id="bApp"></span></button>
       <button data-v="wa"><svg class="i wa-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.09-1.34C8.5 21.52 10.21 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.68 0-3.25-.46-4.6-1.26l-.33-.19-3.02.79.82-2.95-.21-.34C3.47 15.17 3 13.64 3 12c0-4.96 4.04-9 9-9s9 4.04 9 9-4.04 9-9 9z"/></svg>WhatsApp<span class="b" id="bWa"></span></button>
       <button data-v="callrec"><svg class="i" data-i="mic"></svg>Chamadas Gravadas</button>
+      <button data-v="social"><svg class="i" data-i="users"></svg>Redes Sociais<span class="b" id="bSocial"></span></button>
       <div class="sec">Conteúdo</div>
       <button data-v="apps"><svg class="i" data-i="apps"></svg>Aplicações</button>
       <button data-v="files"><svg class="i" data-i="folder"></svg>Ficheiros</button>
@@ -259,6 +260,7 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
     <button data-v="call" onclick="ir('call')" title="Chamadas"><svg class="i" data-i="call"></svg><span>Chamadas</span></button>
     <button data-v="wa" onclick="ir('wa')" title="WhatsApp"><svg class="i wa-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.09-1.34C8.5 21.52 10.21 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.68 0-3.25-.46-4.6-1.26l-.33-.19-3.02.79.82-2.95-.21-.34C3.47 15.17 3 13.64 3 12c0-4.96 4.04-9 9-9s9 4.04 9 9-4.04 9-9 9z"/></svg><span>WhatsApp</span></button>
     <button data-v="callrec" onclick="ir('callrec')" title="Gravações"><svg class="i" data-i="mic"></svg><span>Gravações</span></button>
+    <button data-v="social" onclick="ir('social')" title="Redes Sociais"><svg class="i" data-i="users"></svg><span>Social</span></button>
   </nav>
 
   <div class="main">
@@ -550,6 +552,106 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
 </section>
 
 
+<!-- REDES SOCIAIS -->
+<section class="view" id="v-social">
+  <style>
+    /* ── Redes Sociais ── */
+    .soc-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+    .soc-tab{padding:5px 13px;border-radius:99px;font-size:12.5px;font-weight:700;border:1px solid var(--line);color:var(--mu);cursor:pointer;background:transparent;transition:.13s;display:flex;align-items:center;gap:5px}
+    .soc-tab:hover{border-color:var(--line2);color:var(--tx)}
+    .soc-tab.on{background:color-mix(in srgb,var(--ac2) 15%,transparent);border-color:color-mix(in srgb,var(--ac2) 50%,transparent);color:var(--ac2)}
+    .soc-appdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    #socWrap{display:grid;grid-template-columns:280px minmax(0,1fr);border:1px solid var(--line);border-radius:14px;overflow:hidden;flex:1;min-height:0;background:var(--card)}
+    #socLst{display:flex;flex-direction:column;border-right:1px solid var(--line);overflow:hidden}
+    .soc-lsthd{padding:10px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;flex-shrink:0}
+    .soc-lsthd input{flex:1;border:none;background:transparent;color:var(--tx);font-size:13px;outline:none}
+    #socConvs{flex:1;overflow-y:auto}
+    .soc-conv{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;border-bottom:1px solid var(--line);transition:background .12s;position:relative}
+    .soc-conv:hover{background:var(--card2)}
+    .soc-conv.on{background:color-mix(in srgb,var(--ac2) 10%,transparent)}
+    .soc-conv.on::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:0 3px 3px 0;background:var(--ac2)}
+    .soc-conv .av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;flex-shrink:0;background:var(--ac2)}
+    .soc-conv .col{flex:1;min-width:0}
+    .soc-conv .col b{display:flex;align-items:center;gap:5px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .soc-conv .col span{display:block;font-size:11.5px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+    .soc-conv time{font-size:10.5px;color:var(--mu2);flex-shrink:0}
+    .soc-app-badge{font-size:9px;font-weight:800;padding:1px 5px;border-radius:4px;background:color-mix(in srgb,var(--ac2) 20%,transparent);color:var(--ac2);border:1px solid color-mix(in srgb,var(--ac2) 35%,transparent);letter-spacing:.03em;flex-shrink:0}
+    #socThr{display:flex;flex-direction:column;overflow:hidden;background:var(--bg2)}
+    .soc-thrhd{padding:11px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;background:var(--card);flex-shrink:0}
+    .soc-thrhd .col{flex:1;min-width:0}
+    .soc-thrhd .col b{display:block;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .soc-thrhd .col span{font-size:11px;color:var(--mu)}
+    .soc-thrhd .acts{display:flex;gap:5px;align-items:center;margin-left:auto;flex-shrink:0}
+    #socMsgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+    .soc-msg{max-width:70%;display:flex;flex-direction:column;gap:1px}
+    .soc-msg.eu{align-self:flex-end;align-items:flex-end}
+    .soc-msg.eles{align-self:flex-start;align-items:flex-start}
+    .soc-msg .bub{padding:7px 11px 5px;border-radius:14px;line-height:1.45;word-break:break-word}
+    .soc-msg.eu .bub{background:color-mix(in srgb,var(--ac2) 25%,var(--card));border-radius:14px 2px 14px 14px}
+    .soc-msg.eles .bub{background:var(--card);border-radius:2px 14px 14px 14px;border:1px solid var(--line)}
+    .soc-msg .txt{font-size:13.5px;color:var(--tx)}
+    .soc-msg time{font-size:10px;color:var(--mu2);display:block;text-align:right;margin-top:3px}
+    .soc-day{align-self:center;font-size:11px;color:var(--mu2);padding:3px 10px;border-radius:99px;background:var(--card);border:1px solid var(--line);margin:8px 0;flex-shrink:0}
+    .soc-vazio{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--mu)}
+    .soc-acc-badge{font-size:9px;opacity:.5;margin-left:3px;cursor:default}
+    @media(max-width:800px){#socWrap{grid-template-columns:minmax(0,1fr)}#socThr{display:none}#socWrap.soc-thread #socLst{display:none}#socWrap.soc-thread #socThr{display:flex}.soc-voltar{display:flex!important}.soc-msg{max-width:88%}}
+    /* Layout fix: social view fills height like WA */
+    #v-social.on{display:flex!important;flex-direction:column;height:100%;overflow:hidden}
+    .content:has(#v-social.on){overflow:hidden}
+    /* Layout fix: WA view fills height */
+    #v-wa.on{display:flex!important;flex-direction:column;height:100%;overflow:hidden}
+    .content:has(#v-wa.on){overflow:hidden}
+    #waWrap{flex:1!important;min-height:0!important;height:auto!important}
+  </style>
+
+  <!-- Cabeçalho -->
+  <div class="wa-hdr" style="flex-shrink:0">
+    <div class="wa-hdr-logo" style="background:linear-gradient(135deg,#1877f2,#e1306c)">
+      <svg class="i" data-i="users" viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:#fff;stroke-width:1.8"></svg>
+    </div>
+    <div><h2>Redes Sociais</h2><span class="muted" id="socStatus">Facebook · Instagram · Telegram · TikTok e mais</span></div>
+    <div style="margin-left:auto;display:flex;gap:7px;align-items:center">
+      <button class="btn sm" id="socRefresh"><svg class="i" data-i="sync" style="width:14px;height:14px"></svg></button>
+      <button class="btn sm" id="socExpAllTxt">⬇ TXT</button>
+      <button class="btn sm" id="socExpAllCsv">⬇ CSV</button>
+    </div>
+  </div>
+
+  <!-- Filtros por app -->
+  <div class="soc-tabs" id="socTabs" style="flex-shrink:0">
+    <button class="soc-tab on" data-sp="">Todas</button>
+  </div>
+
+  <!-- Painel principal -->
+  <div id="socWrap">
+    <div id="socLst">
+      <div class="soc-lsthd">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:var(--mu);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input id="socBusca" placeholder="Procurar conversa…" autocomplete="off">
+      </div>
+      <div id="socConvs"><div class="empty">A carregar…</div></div>
+    </div>
+    <div id="socThr">
+      <div class="soc-vazio" id="socVazio">
+        <svg class="i" data-i="users" viewBox="0 0 24 24" style="width:52px;height:52px;opacity:.15"></svg>
+        <p>Escolha uma conversa</p>
+      </div>
+      <div id="socThrInner" style="display:none;flex:1;flex-direction:column;overflow:hidden">
+        <div class="soc-thrhd">
+          <div class="av soc-thrav" id="socThAv" style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;flex-shrink:0;background:var(--ac2)">?</div>
+          <div class="col"><b id="socThNome">—</b><span id="socThApp">—</span></div>
+          <div class="acts">
+            <button class="btn sm" id="socExpTxt">⬇ TXT</button>
+            <button class="btn sm" id="socExpCsv">⬇ CSV</button>
+            <button class="ibtn soc-voltar" id="socVoltar" aria-label="Voltar" style="display:none"><svg class="i" data-i="back"></svg></button>
+          </div>
+        </div>
+        <div id="socMsgs"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- CHAMADAS GRAVADAS -->
 <section class="view" id="v-callrec">
   <div class="row" style="margin-bottom:14px">
@@ -559,7 +661,6 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
   <div id="callRecList"><div class="empty">A carregar…</div></div>
   <audio id="crAudio" controls style="display:none;width:100%;margin-top:12px;border-radius:10px"></audio>
 </section>
-
 <!-- APLICAÇÕES -->
 <section class="view" id="v-apps">
   <div class="row" style="margin-bottom:14px"><div class="search" style="flex:1;max-width:340px"><svg class="i" data-i="search"></svg><input id="aBusca" placeholder="Procurar aplicação…"></div><span class="muted tiny" id="aTot"></span></div>
@@ -735,12 +836,12 @@ $('#lgBtn').onclick=entrar;$('#pin').addEventListener('keydown',e=>{if(e.key==='
 
 // ===== Navegação =====
 const TIT={painel:['Painel','Visão geral do telefone'],ecra:['Ecrã e controlo','Veja e controle o telefone com o rato e o teclado'],sms:['Mensagens','SMS e WhatsApp, sincronizados'],call:['Chamadas','Marcador, recentes e contactos'],
- notif:['Notificações','Em tempo real'],appmsgs:['Notificações de apps','Ler mensagens das apps sem o ecrã'],wa:['WhatsApp','Conversas, mensagens e respostas directas'],callrec:['Chamadas Gravadas','Gravações automáticas de chamadas'],apps:['Aplicações','Abrir apps no telefone'],files:['Ficheiros','Navegar, ver e transferir'],def:['Definições','Telefone, ligação, ecrã e aparência'],adv:['Modo avançado','Segurança e anti-roubo — câmara, localização, alarme']};
+ notif:['Notificações','Em tempo real'],appmsgs:['Notificações de apps','Ler mensagens das apps sem o ecrã'],wa:['WhatsApp','Conversas, mensagens e respostas directas'],callrec:['Chamadas Gravadas','Gravações automáticas de chamadas'],social:['Redes Sociais','Facebook, Instagram, Telegram, TikTok e mais'],apps:['Aplicações','Abrir apps no telefone'],files:['Ficheiros','Navegar, ver e transferir'],def:['Definições','Telefone, ligação, ecrã e aparência'],adv:['Modo avançado','Segurança e anti-roubo — câmara, localização, alarme']};
 let VISTA='painel';
 function ir(v){VISTA=v;$$('#nav button').forEach(x=>x.classList.toggle('on',x.dataset.v===v));$$('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));
  $('#tTit').textContent=TIT[v][0];$('#tSub').textContent=TIT[v][1];$('#side').classList.remove('open');try{history.replaceState(null,'','#'+v)}catch(e){}
  if(v==='apps')carregarApps();if(v==='notif'){carregarNotifs();marcarVisto('notif')}if(v==='appmsgs'){carregarAppMsgs();marcarVisto('app')}if(v==='wa'){carregarWa();marcarVisto('wa')}if(v==='files'&&!DIR)abrir('');if(v==='sms'){carregarSms();marcarVisto('sms')}
- if(v==='call'){carregarChamadas();carregarContactos();marcarVisto('call')}if(v==='ecra')setTimeout(()=>scr.focus(),150);if(v==='def')pintarDef();if(v==='adv')pintarAdv();if(v==='callrec')carregarCallRec();
+ if(v==='call'){carregarChamadas();carregarContactos();marcarVisto('call')}if(v==='ecra')setTimeout(()=>scr.focus(),150);if(v==='def')pintarDef();if(v==='adv')pintarAdv();if(v==='callrec')carregarCallRec();if(v==='social')carregarSocial();
  $$('#mobileNav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v))}
 $('#nav').onclick=e=>{const b=e.target.closest('button[data-v]');if(b)ir(b.dataset.v)};
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)ir(g.dataset.go)});
@@ -1319,6 +1420,93 @@ async function apagarGravacao(id,btn){
   document.getElementById('crItem_'+id)?.remove();
   if(!$('#callRecList').children.length)$('#callRecList').innerHTML='<div class="empty">Nenhuma gravação ainda.</div>';
 }
+
+// ===== Redes Sociais =====
+const SOC_CORES={'com.facebook.orca':'#1877f2','com.instagram.android':'#e1306c',
+  'org.telegram.messenger':'#2AABEE','org.telegram.messenger.web':'#2AABEE',
+  'com.zhiliaoapp.musically':'#333','com.ss.android.ugc.trill':'#333',
+  'com.snapchat.android':'#f5c300','com.discord':'#5865F2',
+  'com.twitter.android':'#1DA1F2','com.viber.voip':'#665CAC','com.facebook.katana':'#1877f2'};
+let SOC_CONVS=[],SOC_MSGS=[],SOC_CONV_CHAVE='',SOC_FILTRO='';
+
+async function carregarSocial(){
+  try{
+    const url='/social-convs'+(SOC_FILTRO?'?pkg='+encodeURIComponent(SOC_FILTRO):'');
+    const r=await get(url);
+    SOC_CONVS=r.lista||[];
+    pintarSocTabs();pintarSocConvs();
+    $('#socStatus').textContent=SOC_CONVS.length+' conversa'+(SOC_CONVS.length!==1?'s':'');
+  }catch(e){$('#socStatus').textContent='Erro ao carregar'}
+}
+function pintarSocTabs(){
+  const apps={};for(const c of SOC_CONVS)apps[c.pacote]=c.app||c.pacote;
+  const tab=$('#socTabs');const atual=tab.querySelector('.on')?.dataset?.sp||'';
+  let html='<button class="soc-tab on" data-sp="">Todas</button>';
+  for(const [pkg,nome] of Object.entries(apps)){
+    const cor=SOC_CORES[pkg]||'var(--ac2)';
+    html+='<button class="soc-tab" data-sp="'+esc(pkg)+'"><span class="dot" style="background:'+cor+'"></span>'+esc(nome)+'</button>';
+  }
+  tab.innerHTML=html;
+  tab.querySelectorAll('.soc-tab').forEach(b=>{
+    b.classList.toggle('on',b.dataset.sp===atual);
+    b.onclick=()=>{tab.querySelectorAll('.soc-tab').forEach(x=>x.classList.remove('on'));b.classList.add('on');SOC_FILTRO=b.dataset.sp;pintarSocConvs()};
+  });
+}
+function pintarSocConvs(){
+  const el=$('#socConvs');
+  const f=($('#socBusca').value||'').toLowerCase();
+  const lista=SOC_CONVS.filter(c=>(!SOC_FILTRO||c.pacote===SOC_FILTRO)&&(!f||(c.conversa+' '+c.app).toLowerCase().includes(f)));
+  if(!lista.length){el.innerHTML='<div class="empty">Sem conversas'+(SOC_FILTRO?' desta app':'')+'.</div>';return}
+  el.innerHTML=lista.map(c=>{
+    const ini=(c.conversa[0]||'?').toUpperCase();
+    const cor=SOC_CORES[c.pacote]||'var(--ac2)';
+    const hora=c.ultima_ts?new Date(c.ultima_ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';
+    const prev=(c.ultima_meu?'Tu: ':'')+esc(c.ultima_msg||'');
+    return '<div class="soc-conv'+(c.chave===SOC_CONV_CHAVE?' on':'')+'" data-chave="'+esc(c.chave)+'" data-conversa="'+esc(c.conversa)+'" data-pkg="'+esc(c.pacote)+'" data-app="'+esc(c.app||'')+'">'
+      +'<div class="sav" style="background:'+cor+'">'+ini+'</div>'
+      +'<div class="col"><b>'+esc(c.conversa)+' <span class="soc-app-badge">'+esc(c.app||'')+'</span></b><span>'+prev+'</span></div>'
+      +'<div class="meta"><time>'+hora+'</time></div></div>';
+  }).join('');
+  el.querySelectorAll('.soc-conv').forEach(el=>el.addEventListener('click',function(){
+    abrirSocConversa(this.dataset.chave,this.dataset.conversa,this.dataset.pkg,this.dataset.app);
+  }));
+}
+async function abrirSocConversa(chave,conversa,pkg,app){
+  SOC_CONV_CHAVE=chave;
+  document.querySelectorAll('.soc-conv').forEach(x=>x.classList.toggle('on',x.dataset.chave===chave));
+  $('#socVazio').style.display='none';$('#socThrInner').style.display='flex';
+  const cor=SOC_CORES[pkg]||'var(--ac2)';
+  $('#socThAv').style.background=cor;$('#socThAv').textContent=(conversa[0]||'?').toUpperCase();
+  $('#socThNome').textContent=conversa;$('#socThApp').textContent=app||pkg;
+  $('#socMsgs').innerHTML='<div class="empty">A carregar…</div>';
+  $('#socWrap').classList.add('soc-thread');
+  try{
+    const r=await get('/social-msgs?chave='+encodeURIComponent(chave));
+    SOC_MSGS=r.lista||[];pintarSocMsgs();
+  }catch(e){$('#socMsgs').innerHTML='<div class="empty">Erro.</div>'}
+}
+function pintarSocMsgs(){
+  const el=$('#socMsgs');
+  if(!SOC_MSGS.length){el.innerHTML='<div class="empty">Sem mensagens registadas.</div>';return}
+  let ultDia='',html='';
+  for(const m of SOC_MSGS){
+    const d=new Date(m.id).toLocaleDateString([],{weekday:'long',day:'numeric',month:'long'});
+    if(d!==ultDia){html+='<div class="soc-day">'+d+'</div>';ultDia=d;}
+    const meu=m.meuTurno===true||m.meuTurno==='true';
+    const cls='soc-msg '+(meu?'eu':'eles');
+    const hora=new Date(m.id).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    const badge=m.fonte==='acc'?'<span style="font-size:9px;opacity:.5" title="via acessibilidade">👁</span>':'';
+    html+='<div class="'+cls+'"><div class="bub"><span class="txt">'+esc(m.texto)+'</span>'+badge+'<time>'+hora+'</time></div></div>';
+  }
+  el.innerHTML=html;el.scrollTop=el.scrollHeight;
+}
+$('#socRefresh').onclick=function(){carregarSocial()};
+$('#socExpTxt').onclick=function(){if(SOC_CONV_CHAVE)window.open(U('/social-export')+'?chave='+encodeURIComponent(SOC_CONV_CHAVE)+'&fmt=txt&k='+encodeURIComponent(CODE))};
+$('#socExpCsv').onclick=function(){if(SOC_CONV_CHAVE)window.open(U('/social-export')+'?chave='+encodeURIComponent(SOC_CONV_CHAVE)+'&fmt=csv&k='+encodeURIComponent(CODE))};
+$('#socExpAllTxt').onclick=function(){window.open(U('/social-export')+'?fmt=txt&k='+encodeURIComponent(CODE))};
+$('#socExpAllCsv').onclick=function(){window.open(U('/social-export')+'?fmt=csv&k='+encodeURIComponent(CODE))};
+$('#socBusca').addEventListener('input',pintarSocConvs);
+$('#socVoltar').onclick=function(){$('#socWrap').classList.remove('soc-thread');SOC_CONV_CHAVE=''};
 </script>
 </body>
 </html>
