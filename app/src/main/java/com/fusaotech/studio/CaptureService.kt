@@ -58,6 +58,7 @@ class CaptureService : Service() {
         }
         // Ligação remota pelo relay (telefone nos dados móveis, PC noutra rede).
         if (Prefs.relayOn(this)) Relay.iniciar(this)
+        CallRecorder.iniciar(this)
         ht = HandlerThread("ftx-cap").also { it.start() }
         handler = Handler(ht!!.looper)
     }

@@ -239,6 +239,18 @@ class Httpd(ctxIn: Context, private val porta: Int) {
                     }
                 }
                 // ─────────────────────────────────────────────────────────────
+                caminho == "/call-recs" -> jsonResp(out, org.json.JSONObject().put("lista", CallRecorder.listar()))
+                caminho == "/call-rec-audio" -> {
+                    val id = query["id"] ?: ""
+                    val p = if (id.isNotEmpty()) CallRecorder.caminho(id) else null
+                    if (p != null) servirFicheiro(out, p, false)
+                    else enviar(out, 404, "application/json", "{\"erro\":\"nao_encontrado\"}".toByteArray())
+                }
+                caminho == "/call-rec-del" && metodo == "POST" -> {
+                    val id = json(corpo).optString("id", "")
+                    val ok = if (id.isNotEmpty()) CallRecorder.apagar(id) else false
+                    jsonResp(out, org.json.JSONObject().put("ok", ok))
+                }
                 caminho == "/files" -> jsonResp(out, Device.listar(query["p"], ctx))
                 caminho == "/file" -> servirFicheiro(out, Device.caminhoReal(query["p"]), query["baixar"] != null)
                 caminho == "/upload" && metodo == "POST" -> jsonResp(out, upload(query["nome"], corpo))

@@ -199,6 +199,20 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
  .ibtn.menuBtn{display:grid}.g2,.g3{grid-template-columns:minmax(0,1fr)}.chat{grid-template-columns:minmax(0,1fr)}.chat .lst{display:none}.chat.lista .lst{display:flex}.chat.lista .thr{display:none}
  .set{grid-template-columns:minmax(0,1fr)}.setnav{flex-direction:row;overflow:auto;position:static}.field{grid-template-columns:minmax(0,1fr)}.top{padding:12px 16px}.content{padding:16px 16px 40px}.top .hidem{display:none}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* Mobile bottom nav */
+#mobileNav{display:none}
+@media(max-width:640px){
+  #mobileNav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:50;background:var(--bg);border-top:1px solid var(--line);padding:4px 0 max(4px,env(safe-area-inset-bottom));gap:0}
+  #mobileNav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;font-size:9.5px;font-weight:700;color:var(--mu);letter-spacing:.01em;border-radius:0;border:none;background:transparent}
+  #mobileNav button .i{width:22px;height:22px}
+  #mobileNav button.on{color:var(--ac)}
+  #mobileNav button.on .i{color:var(--ac)}
+  .app{padding-bottom:60px}
+  .content{padding-bottom:70px}
+  .top{padding:10px 12px}
+  .top .hidem{display:none}
+  .ibtn.menuBtn{display:grid}
+}
 </style>
 </head>
 <body>
@@ -226,6 +240,7 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
       <button data-v="notif"><svg class="i" data-i="bell"></svg>Notificações<span class="b" id="bNotif"></span></button>
       <button data-v="appmsgs"><svg class="i" data-i="chat"></svg>Notificações de apps<span class="b" id="bApp"></span></button>
       <button data-v="wa"><svg class="i wa-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.09-1.34C8.5 21.52 10.21 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.68 0-3.25-.46-4.6-1.26l-.33-.19-3.02.79.82-2.95-.21-.34C3.47 15.17 3 13.64 3 12c0-4.96 4.04-9 9-9s9 4.04 9 9-4.04 9-9 9z"/></svg>WhatsApp<span class="b" id="bWa"></span></button>
+      <button data-v="callrec"><svg class="i" data-i="mic"></svg>Chamadas Gravadas</button>
       <div class="sec">Conteúdo</div>
       <button data-v="apps"><svg class="i" data-i="apps"></svg>Aplicações</button>
       <button data-v="files"><svg class="i" data-i="folder"></svg>Ficheiros</button>
@@ -236,6 +251,15 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
     </nav>
     <div class="foot">Studio <b id="pVer">·</b> · <span id="pVerTag" style="color:var(--ok);font-weight:700">com WhatsApp &amp; apps</span><br><span class="muted">Desenvolvido por FusãoTechX Mz</span></div>
   </aside>
+
+  <!-- Barra de navegação inferior para mobile -->
+  <nav id="mobileNav" aria-label="Navegação rápida">
+    <button data-v="painel" class="on" onclick="ir('painel')" title="Painel"><svg class="i" data-i="grid"></svg><span>Painel</span></button>
+    <button data-v="sms" onclick="ir('sms')" title="SMS"><svg class="i" data-i="msg"></svg><span>SMS</span></button>
+    <button data-v="call" onclick="ir('call')" title="Chamadas"><svg class="i" data-i="call"></svg><span>Chamadas</span></button>
+    <button data-v="wa" onclick="ir('wa')" title="WhatsApp"><svg class="i wa-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.09-1.34C8.5 21.52 10.21 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.68 0-3.25-.46-4.6-1.26l-.33-.19-3.02.79.82-2.95-.21-.34C3.47 15.17 3 13.64 3 12c0-4.96 4.04-9 9-9s9 4.04 9 9-4.04 9-9 9z"/></svg><span>WhatsApp</span></button>
+    <button data-v="callrec" onclick="ir('callrec')" title="Gravações"><svg class="i" data-i="mic"></svg><span>Gravações</span></button>
+  </nav>
 
   <div class="main">
     <header class="top">
@@ -526,6 +550,16 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
 </section>
 
 
+<!-- CHAMADAS GRAVADAS -->
+<section class="view" id="v-callrec">
+  <div class="row" style="margin-bottom:14px">
+    <div style="flex:1"><h3 style="margin:0;font-size:15px">Chamadas Gravadas</h3><div class="muted tiny">Gravações automáticas de chamadas de voz</div></div>
+    <button class="btn sm" onclick="carregarCallRec()"><svg class="i" data-i="refresh"></svg>Atualizar</button>
+  </div>
+  <div id="callRecList"><div class="empty">A carregar…</div></div>
+  <audio id="crAudio" controls style="display:none;width:100%;margin-top:12px;border-radius:10px"></audio>
+</section>
+
 <!-- APLICAÇÕES -->
 <section class="view" id="v-apps">
   <div class="row" style="margin-bottom:14px"><div class="search" style="flex:1;max-width:340px"><svg class="i" data-i="search"></svg><input id="aBusca" placeholder="Procurar aplicação…"></div><span class="muted tiny" id="aTot"></span></div>
@@ -654,7 +688,9 @@ search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',plus:'<path 
 moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
 sync:'<path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 21v-5h5M21 3v5h-5"/>',max:'<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>',clip:'<rect x="8" y="3" width="8" height="4" rx="1"/><path d="M8 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>',
 link:'<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>',file:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',sim:'<path d="M6 3h8l4 4v14H6z"/><rect x="9" y="12" width="6" height="6" rx="1"/>',
-shield:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/>',locate:'<circle cx="12" cy="11" r="3"/><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/>',alarm:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M5 3 2 6M19 3l3 3"/>',image:'<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M4 18l5-5 4 4 3-3 4 4"/>',chat:'<path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 8.6 8.6 0 0 1-4-1L3 21l1.5-5a8.4 8.4 0 0 1-1-4A8.5 8.5 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5z"/>'};
+shield:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/>',locate:'<circle cx="12" cy="11" r="3"/><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/>',alarm:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M5 3 2 6M19 3l3 3"/>',image:'<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M4 18l5-5 4 4 3-3 4 4"/>',chat:'<path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 8.6 8.6 0 0 1-4-1L3 21l1.5-5a8.4 8.4 0 0 1-1-4A8.5 8.5 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5z"/>',
+mic:'<path d="M12 2a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/>',
+trash:'<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/>'};
 function ico(n,st=''){return `<svg class="i" viewBox="0 0 24 24" style="${st}">${ICON[n]||ICON.file}</svg>`}
 function pintarIcones(r=document){r.querySelectorAll('svg[data-i]').forEach(s=>{s.setAttribute('viewBox','0 0 24 24');s.innerHTML=ICON[s.dataset.i]||''})}
 pintarIcones();
@@ -699,12 +735,13 @@ $('#lgBtn').onclick=entrar;$('#pin').addEventListener('keydown',e=>{if(e.key==='
 
 // ===== Navegação =====
 const TIT={painel:['Painel','Visão geral do telefone'],ecra:['Ecrã e controlo','Veja e controle o telefone com o rato e o teclado'],sms:['Mensagens','SMS e WhatsApp, sincronizados'],call:['Chamadas','Marcador, recentes e contactos'],
- notif:['Notificações','Em tempo real'],appmsgs:['Notificações de apps','Ler mensagens das apps sem o ecrã'],wa:['WhatsApp','Conversas, mensagens e respostas directas'],apps:['Aplicações','Abrir apps no telefone'],files:['Ficheiros','Navegar, ver e transferir'],def:['Definições','Telefone, ligação, ecrã e aparência'],adv:['Modo avançado','Segurança e anti-roubo — câmara, localização, alarme']};
+ notif:['Notificações','Em tempo real'],appmsgs:['Notificações de apps','Ler mensagens das apps sem o ecrã'],wa:['WhatsApp','Conversas, mensagens e respostas directas'],callrec:['Chamadas Gravadas','Gravações automáticas de chamadas'],apps:['Aplicações','Abrir apps no telefone'],files:['Ficheiros','Navegar, ver e transferir'],def:['Definições','Telefone, ligação, ecrã e aparência'],adv:['Modo avançado','Segurança e anti-roubo — câmara, localização, alarme']};
 let VISTA='painel';
 function ir(v){VISTA=v;$$('#nav button').forEach(x=>x.classList.toggle('on',x.dataset.v===v));$$('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));
  $('#tTit').textContent=TIT[v][0];$('#tSub').textContent=TIT[v][1];$('#side').classList.remove('open');try{history.replaceState(null,'','#'+v)}catch(e){}
  if(v==='apps')carregarApps();if(v==='notif'){carregarNotifs();marcarVisto('notif')}if(v==='appmsgs'){carregarAppMsgs();marcarVisto('app')}if(v==='wa'){carregarWa();marcarVisto('wa')}if(v==='files'&&!DIR)abrir('');if(v==='sms'){carregarSms();marcarVisto('sms')}
- if(v==='call'){carregarChamadas();carregarContactos();marcarVisto('call')}if(v==='ecra')setTimeout(()=>scr.focus(),150);if(v==='def')pintarDef();if(v==='adv')pintarAdv()}
+ if(v==='call'){carregarChamadas();carregarContactos();marcarVisto('call')}if(v==='ecra')setTimeout(()=>scr.focus(),150);if(v==='def')pintarDef();if(v==='adv')pintarAdv();if(v==='callrec')carregarCallRec();
+ $$('#mobileNav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v))}
 $('#nav').onclick=e=>{const b=e.target.closest('button[data-v]');if(b)ir(b.dataset.v)};
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)ir(g.dataset.go)});
 $('#menuBtn').onclick=()=>$('#side').classList.toggle('open');
@@ -1240,6 +1277,48 @@ function eventos(){if(eventosOn)return;eventosOn=true;let seq=0;
 
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!$('#app').hidden)sincronizar()});
 if(CODE)arrancar();else{$('#login').style.display='grid';setTimeout(()=>$('#pin').focus(),50)}
+
+// ===== Chamadas Gravadas =====
+let crAtual=null;
+async function carregarCallRec(){
+  $('#callRecList').innerHTML='<div class="empty">A carregar…</div>';
+  try{
+    const r=await get('/call-recs');
+    const lista=r.lista||[];
+    if(!lista.length){$('#callRecList').innerHTML='<div class="empty">Nenhuma gravação ainda.<br><span class="muted tiny">As chamadas são gravadas automaticamente quando o serviço está ativo.</span></div>';return}
+    $('#callRecList').innerHTML=lista.map(g=>{
+      const dur=g.duracao?Math.round(g.duracao/1000)+'s':'—';
+      const num=g.numero||'Desconhecido';
+      const data=quando(g.ts);
+      return `<div class="card" style="display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer" id="crItem_${esc(g.id)}">
+        <div style="width:40px;height:40px;border-radius:50%;background:color-mix(in srgb,var(--ac) 15%,transparent);display:flex;align-items:center;justify-content:center;flex-shrink:0">${ico('mic')}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:13px">${esc(num)}</div>
+          <div class="muted tiny">${data} · ${dur}</div>
+        </div>
+        <button class="btn sm" title="Ouvir" onclick="ouvirGravacao('${esc(g.id)}',this)">${ico('circle')}</button>
+        <button class="btn sm" title="Apagar" style="color:var(--er)" onclick="apagarGravacao('${esc(g.id)}',this)">${ico('trash')}</button>
+      </div>`;
+    }).join('');
+  }catch(e){$('#callRecList').innerHTML='<div class="empty">Erro ao carregar gravações.</div>'}
+}
+async function ouvirGravacao(id,btn){
+  const au=$('#crAudio');
+  if(crAtual===id&&!au.paused){au.pause();btn.innerHTML=ico('circle');crAtual=null;return}
+  crAtual=id;
+  $$('#callRecList .btn').forEach(b=>b.innerHTML=ico(b===btn?'square':'circle'));
+  au.style.display='block';
+  au.src=U('/call-rec-audio')+'&id='+encodeURIComponent(id)+'&k='+encodeURIComponent(CODE);
+  au.play().catch(()=>{});
+  au.onended=()=>{btn.innerHTML=ico('circle');crAtual=null};
+}
+async function apagarGravacao(id,btn){
+  if(!confirm('Apagar esta gravação?'))return;
+  btn.disabled=true;
+  await post('/call-rec-del',{id});
+  document.getElementById('crItem_'+id)?.remove();
+  if(!$('#callRecList').children.length)$('#callRecList').innerHTML='<div class="empty">Nenhuma gravação ainda.</div>';
+}
 </script>
 </body>
 </html>
