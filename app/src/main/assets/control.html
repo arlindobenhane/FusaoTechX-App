@@ -224,6 +224,7 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
       <button data-v="sms"><svg class="i" data-i="msg"></svg>Mensagens<span class="b" id="bSms"></span></button>
       <button data-v="call"><svg class="i" data-i="call"></svg>Chamadas<span class="b" id="bCall"></span></button>
       <button data-v="notif"><svg class="i" data-i="bell"></svg>Notificações<span class="b" id="bNotif"></span></button>
+      <button data-v="appmsgs"><svg class="i" data-i="chat"></svg>WhatsApp &amp; apps<span class="b" id="bApp"></span></button>
       <div class="sec">Conteúdo</div>
       <button data-v="apps"><svg class="i" data-i="apps"></svg>Aplicações</button>
       <button data-v="files"><svg class="i" data-i="folder"></svg>Ficheiros</button>
@@ -356,6 +357,13 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
   <div id="notifList"><div class="empty">A carregar…</div></div>
 </section>
 
+<!-- WHATSAPP & APPS (leitura) -->
+<section class="view" id="v-appmsgs">
+  <div class="banner" style="margin-bottom:14px;border-color:color-mix(in srgb,var(--ok) 35%,transparent);background:color-mix(in srgb,var(--ok) 8%,transparent)"><span style="font-size:20px">💬</span><div><b>Leitura sem o ecrã</b>Mensagens que chegam ao telefone (WhatsApp, Messenger, SMS…), lidas pelas notificações. Não precisa do ecrã ao vivo. Acumula a partir de agora. (Para enviar, use Mensagens ou o ecrã.)</div></div>
+  <div class="pl-chips" id="appTabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"></div>
+  <div id="appMsgs"><div class="empty">A carregar…</div></div>
+</section>
+
 <!-- APLICAÇÕES -->
 <section class="view" id="v-apps">
   <div class="row" style="margin-bottom:14px"><div class="search" style="flex:1;max-width:340px"><svg class="i" data-i="search"></svg><input id="aBusca" placeholder="Procurar aplicação…"></div><span class="muted tiny" id="aTot"></span></div>
@@ -484,7 +492,7 @@ search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',plus:'<path 
 moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
 sync:'<path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 21v-5h5M21 3v5h-5"/>',max:'<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>',clip:'<rect x="8" y="3" width="8" height="4" rx="1"/><path d="M8 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>',
 link:'<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>',file:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',sim:'<path d="M6 3h8l4 4v14H6z"/><rect x="9" y="12" width="6" height="6" rx="1"/>',
-shield:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/>',locate:'<circle cx="12" cy="11" r="3"/><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/>',alarm:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M5 3 2 6M19 3l3 3"/>',image:'<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M4 18l5-5 4 4 3-3 4 4"/>'};
+shield:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/>',locate:'<circle cx="12" cy="11" r="3"/><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/>',alarm:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M5 3 2 6M19 3l3 3"/>',image:'<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M4 18l5-5 4 4 3-3 4 4"/>',chat:'<path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 8.6 8.6 0 0 1-4-1L3 21l1.5-5a8.4 8.4 0 0 1-1-4A8.5 8.5 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5z"/>'};
 function ico(n,st=''){return `<svg class="i" viewBox="0 0 24 24" style="${st}">${ICON[n]||ICON.file}</svg>`}
 function pintarIcones(r=document){r.querySelectorAll('svg[data-i]').forEach(s=>{s.setAttribute('viewBox','0 0 24 24');s.innerHTML=ICON[s.dataset.i]||''})}
 pintarIcones();
@@ -529,11 +537,11 @@ $('#lgBtn').onclick=entrar;$('#pin').addEventListener('keydown',e=>{if(e.key==='
 
 // ===== Navegação =====
 const TIT={painel:['Painel','Visão geral do telefone'],ecra:['Ecrã e controlo','Veja e controle o telefone com o rato e o teclado'],sms:['Mensagens','SMS e WhatsApp, sincronizados'],call:['Chamadas','Marcador, recentes e contactos'],
- notif:['Notificações','Em tempo real'],apps:['Aplicações','Abrir apps no telefone'],files:['Ficheiros','Navegar, ver e transferir'],def:['Definições','Telefone, ligação, ecrã e aparência'],adv:['Modo avançado','Segurança e anti-roubo — câmara, localização, alarme']};
+ notif:['Notificações','Em tempo real'],appmsgs:['WhatsApp & apps','Ler mensagens das apps sem o ecrã'],apps:['Aplicações','Abrir apps no telefone'],files:['Ficheiros','Navegar, ver e transferir'],def:['Definições','Telefone, ligação, ecrã e aparência'],adv:['Modo avançado','Segurança e anti-roubo — câmara, localização, alarme']};
 let VISTA='painel';
 function ir(v){VISTA=v;$$('#nav button').forEach(x=>x.classList.toggle('on',x.dataset.v===v));$$('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));
  $('#tTit').textContent=TIT[v][0];$('#tSub').textContent=TIT[v][1];$('#side').classList.remove('open');try{history.replaceState(null,'','#'+v)}catch(e){}
- if(v==='apps')carregarApps();if(v==='notif'){carregarNotifs();marcarVisto('notif')}if(v==='files'&&!DIR)abrir('');if(v==='sms'){carregarSms();marcarVisto('sms')}
+ if(v==='apps')carregarApps();if(v==='notif'){carregarNotifs();marcarVisto('notif')}if(v==='appmsgs'){carregarAppMsgs();marcarVisto('app')}if(v==='files'&&!DIR)abrir('');if(v==='sms'){carregarSms();marcarVisto('sms')}
  if(v==='call'){carregarChamadas();carregarContactos();marcarVisto('call')}if(v==='ecra')setTimeout(()=>scr.focus(),150);if(v==='def')pintarDef();if(v==='adv')pintarAdv()}
 $('#nav').onclick=e=>{const b=e.target.closest('button[data-v]');if(b)ir(b.dataset.v)};
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)ir(g.dataset.go)});
@@ -719,6 +727,25 @@ $('#nBusca').oninput=pintarNotifs;
 document.addEventListener('click',e=>{const b=e.target.closest('[data-key]');if(!b)return;post('/notifdismiss',{key:b.dataset.key}).then(syncNotifs)});
 $('#nLimpar').onclick=()=>{if(confirm('Dispensar todas as notificações do telefone?'))post('/notifdismiss',{key:''}).then(syncNotifs)};
 
+// ===== WhatsApp & apps (leitura pelas notificações) =====
+let APPMSGS={lista:[],apps:[]},APPSEL='';
+async function syncAppMsgs(){try{const r=await get('/appmsgs'+(APPSEL?'?pkg='+encodeURIComponent(APPSEL):''));APPMSGS=r;APPMSGS.ativo=r.ativo;
+ const nt=(r.apps||[]).reduce((a,x)=>a+(x.ultima>VISTO.app?x.n:0),0);badge('app',VISTA==='appmsgs'?0:Math.min(nt,99));
+ if(VISTA==='appmsgs')pintarAppMsgs()}catch(e){}}
+async function carregarAppMsgs(){if(!APPMSGS.lista.length)$('#appMsgs').innerHTML='<div class="empty">A carregar…</div>';await syncAppMsgs();pintarAppMsgs()}
+function pintarAppMsgs(){
+ if(APPMSGS.ativo===false){$('#appMsgs').innerHTML='<div class="empty"><span class="ei">🔕</span>Ative «ler notificações» na app do telefone (Definições › permissões).</div>';$('#appTabs').innerHTML='';return}
+ const apps=APPMSGS.apps||[];
+ $('#appTabs').innerHTML='<button class="pl-chip '+(APPSEL===''?'on':'')+'" data-pkg="">Todas</button>'+apps.map(a=>`<button class="pl-chip ${APPSEL===a.pkg?'on':''}" data-pkg="${esc(a.pkg)}">${esc(a.app)} <small>${a.n}</small></button>`).join('');
+ const l=APPMSGS.lista||[];
+ if(!l.length){$('#appMsgs').innerHTML='<div class="empty"><span class="ei">💬</span>Sem mensagens ainda. Quando chegar uma notificação de mensagem, aparece aqui.</div>';return}
+ // Agrupar por conversa (app + remetente).
+ const g={};for(const m of l){const k=m.pkg+'|'+(m.de||'');(g[k]=g[k]||{app:m.app,de:m.de,pkg:m.pkg,msgs:[]}).msgs.push(m)}
+ const convs=Object.values(g).sort((a,b)=>b.msgs[0].data-a.msgs[0].data);
+ $('#appMsgs').innerHTML=convs.map(c=>`<div class="card" style="margin-bottom:12px"><h3 style="margin-bottom:10px"><span class="av" style="width:30px;height:30px;background:${cor(c.de||c.app)}">${esc(((c.de||c.app||'?')[0]).toUpperCase())}</span> ${esc(c.de||c.app)} <small class="muted" style="font-weight:400">· ${esc(c.app)}</small></h3>`+
+  c.msgs.slice().sort((a,b)=>a.data-b.data).map(m=>`<div class="msg in" style="max-width:85%">${esc(m.texto)}<small>${quando(m.data)}</small></div>`).join('')+`</div>`).join('')}
+$('#appTabs').onclick=e=>{const b=e.target.closest('[data-pkg]');if(!b)return;APPSEL=b.dataset.pkg;carregarAppMsgs()};
+
 // ===== Aplicações =====
 let APPS=[];
 async function carregarApps(){if(APPS.length){pintarApps();return}try{const r=await get('/apps');APPS=(r.lista||[]).sort((a,b)=>a.nome.localeCompare(b.nome));pintarApps()}catch(e){}}
@@ -838,7 +865,7 @@ function eventos(){if(eventosOn)return;eventosOn=true;let seq=0;
  const ciclo=async()=>{if(!pref('sync',true)){setTimeout(ciclo,4000);return}
   try{const r=await fetch(U('/events')+'?k='+encodeURIComponent(CODE)+'&seq='+seq,{cache:'no-store'});
    if(r.status===401){sair();return}
-   if(r.status===200){const o=await r.json();if(o.seq&&o.seq!==seq){seq=o.seq;if(seq>1){await syncNotifs();await syncSms()}}}
+   if(r.status===200){const o=await r.json();if(o.seq&&o.seq!==seq){seq=o.seq;if(seq>1){await syncNotifs();await syncSms();await syncAppMsgs()}}}
    else await new Promise(k=>setTimeout(k,2000));
   }catch(e){await new Promise(k=>setTimeout(k,3000))}
   setTimeout(ciclo,120)};

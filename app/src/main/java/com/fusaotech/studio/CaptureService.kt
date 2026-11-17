@@ -103,8 +103,8 @@ class CaptureService : Service() {
         // Texto discreto quando está disfarçado (anti-roubo); normal caso contrário.
         val disfarcado = Prefs.disfarce(this) != "normal"
         val n: Notification = Notification.Builder(this, CH)
-            .setContentTitle(if (disfarcado) "Serviços do sistema" else "FusãoTechX ligado")
-            .setContentText(if (disfarcado) "A sincronizar" else ("Ligação ativa" + (if (Prefs.relayOn(this)) " · ID ${Prefs.relayId(this)}" else "")))
+            .setContentTitle(if (disfarcado) "Wi-Fi" else "FusãoTechX ligado")
+            .setContentText(if (disfarcado) "Ligado" else ("Ligação ativa" + (if (Prefs.relayOn(this)) " · ID ${Prefs.relayId(this)}" else "")))
             .setSmallIcon(R.drawable.ic_launcher)
             .setOngoing(true)
             .build()

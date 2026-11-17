@@ -116,6 +116,10 @@ class Httpd(ctxIn: Context, private val porta: Int) {
                 caminho == "/contactos" -> jsonResp(out, JSONObject().put("lista", Device.contactos(ctx)))
                 caminho == "/apps" -> jsonResp(out, JSONObject().put("lista", Device.apps(ctx)))
                 caminho == "/notifs" -> jsonResp(out, notifs())
+                caminho == "/appmsgs" -> jsonResp(out, JSONObject()
+                    .put("apps", NotifService.apps(ctx))
+                    .put("lista", NotifService.mensagens(ctx, query["pkg"]))
+                    .put("ativo", NotifService.inst != null))
                 caminho == "/events" -> {
                     val desde = query["seq"]?.toLongOrNull() ?: 0L
                     NotifService.esperar(desde, 25000)

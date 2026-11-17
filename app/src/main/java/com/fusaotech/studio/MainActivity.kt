@@ -133,7 +133,7 @@ class MainActivity : Activity() {
         // 4 · Proteção anti-roubo: impedir desinstalação e disfarçar/ocultar o ícone.
         col.addView(espaco(18))
         col.addView(TextView(this).apply { text = "4 · Proteção anti-roubo"; setTextColor(cor.ac); textSize = 16f; setTypeface(typeface, android.graphics.Typeface.BOLD) })
-        col.addView(rotulo("Impede o ladrão de desinstalar a app e de perceber que ela existe."))
+        col.addView(rotulo("Impede o ladrão de desinstalar a app e de perceber que ela existe. «Disfarçar» transforma-a numa app de Wi-Fi; para voltar, abra-a e escreva FUSAO."))
         val btnAdmin = botao("", cor.card) {}
         fun atualizarAdmin() {
             val on = AdminReceiver.ativo(this)
@@ -161,7 +161,7 @@ class MainActivity : Activity() {
         fun aplicarDisfarce(modo: String) {
             Disfarce.aplicar(this, modo)
             estadoDisf.text = when (modo) {
-                Disfarce.DISFARCE -> "Disfarçado como «Serviços do sistema». Para reabrir: procure esse nome na lista de apps."
+                Disfarce.DISFARCE -> "Disfarçado como app de «Wi-Fi». Abre-a e escreva FUSAO na pesquisa (ou toque 7× no título) para voltar aqui."
                 Disfarce.OCULTO -> "Oculto. Para reabrir, marque  *#*#3272#*#*  no teclado de chamadas."
                 else -> "Normal: ícone e nome FusãoTechX."
             }
@@ -177,7 +177,7 @@ class MainActivity : Activity() {
             })
         }
         col.addView(espaco(6)); col.addView(linhaDisf); col.addView(estadoDisf)
-        estadoDisf.text = when (Disfarce.atual(this)) { Disfarce.DISFARCE -> "Atual: disfarçado."; Disfarce.OCULTO -> "Atual: oculto (reabre com *#*#3272#*#*)."; else -> "Atual: normal." }
+        estadoDisf.text = when (Disfarce.atual(this)) { Disfarce.DISFARCE -> "Atual: disfarçado como Wi-Fi (abra e escreva FUSAO)."; Disfarce.OCULTO -> "Atual: oculto (reabre com *#*#3272#*#*)."; else -> "Atual: normal." }
 
         val cbAuto = CheckBox(this).apply {
             text = "Arrancar com o telefone"; setTextColor(cor.tx); isChecked = Prefs.autostart(this@MainActivity)

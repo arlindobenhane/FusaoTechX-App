@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
@@ -46,6 +47,13 @@
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop" />
+
+        <!-- Ecrã-isco (disfarce de Wi-Fi). Aberto pelo atalho disfarçado. -->
+        <activity
+            android:name=".DecoyActivity"
+            android:exported="true"
+            android:label="@string/disfarce_nome"
+            android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar" />
 
         <!-- Ícone normal (FusãoTechX). -->
         <activity-alias
@@ -126,7 +134,7 @@
         <!-- Ícone/nome discretos quando o disfarce está ligado (desligado por omissão). -->
         <activity-alias
             android:name="com.fusaotech.studio.AliasDisfarce"
-            android:targetActivity=".MainActivity"
+            android:targetActivity=".DecoyActivity"
             android:exported="true"
             android:enabled="false"
             android:icon="@drawable/ic_disfarce"
