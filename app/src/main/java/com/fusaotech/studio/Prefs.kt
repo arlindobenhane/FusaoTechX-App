@@ -26,6 +26,19 @@ object Prefs {
 
     fun setCode(c: Context, v: String) = sp(c).edit().putString("code", v).apply()
 
+    /**
+     * Código do Modo Avançado (anti-roubo): câmara silenciosa, localização, alarme, bloqueio.
+     * É separado e mais sensível do que o código normal. Por omissão é igual ao normal + "00"
+     * até o dono o definir; nunca é mostrado por inteiro no PC.
+     */
+    fun code2(c: Context): String {
+        val sp = sp(c)
+        var v = sp.getString("code2", null)
+        if (v == null) { v = code(c) + "00"; sp.edit().putString("code2", v).apply() }
+        return v
+    }
+    fun setCode2(c: Context, v: String) = sp(c).edit().putString("code2", v).apply()
+
     fun name(c: Context): String {
         val sp = sp(c)
         var v = sp.getString("name", null)

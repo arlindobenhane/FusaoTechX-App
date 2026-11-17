@@ -244,6 +244,81 @@ object Device {
         abrirUrl(c, "https://api.whatsapp.com/send?phone=$n&text=" + Uri.encode(texto))
     }
 
+    // ---------- Modo avançado (anti-roubo) ----------
+
+    /** Última localização conhecida + um pedido rápido de localização atual. Não abre mapas no telefone. */
+    @Suppress("MissingPermission")
+    fun localizacao(c: Context, timeoutMs: Long = 8000): JSONObject {
+        val o = JSONObject()
+        if (c.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED
+            && c.checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            return o.put("erro", "sem_permissao")
+        }
+        val lm = c.getSystemService(Context.LOCATION_SERVICE) as? android.location.LocationManager ?: return o.put("erro", "indisponivel")
+        var melhor: android.location.Location? = null
+        try {
+            for (p in lm.getProviders(true)) {
+                val l = lm.getLastKnownLocation(p) ?: continue
+                if (melhor == null || l.time > melhor!!.time) melhor = l
+            }
+        } catch (_: Exception) {}
+        // Pede uma posição fresca (uma só) e espera um pouco por ela.
+        try {
+            val latch = java.util.concurrent.CountDownLatch(1)
+            val ht = android.os.HandlerThread("ftx-loc").apply { start() }
+            val ouvinte = object : android.location.LocationListener {
+                override fun onLocationChanged(l: android.location.Location) { melhor = l; latch.countDown() }
+                override fun onProviderDisabled(p: String) {}
+                override fun onProviderEnabled(p: String) {}
+                @Deprecated("Deprecated in Java") override fun onStatusChanged(p: String?, s: Int, e: android.os.Bundle?) {}
+            }
+            val prov = when {
+                lm.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER) -> android.location.LocationManager.GPS_PROVIDER
+                lm.isProviderEnabled(android.location.LocationManager.NETWORK_PROVIDER) -> android.location.LocationManager.NETWORK_PROVIDER
+                else -> null
+            }
+            if (prov != null) {
+                lm.requestSingleUpdate(prov, ouvinte, ht.looper)
+                latch.await(timeoutMs, java.util.concurrent.TimeUnit.MILLISECONDS)
+                try { lm.removeUpdates(ouvinte) } catch (_: Exception) {}
+            }
+            ht.quitSafely()
+        } catch (_: Exception) {}
+        val l = melhor ?: return o.put("erro", "sem_sinal")
+        return o.put("lat", l.latitude).put("lng", l.longitude).put("prec", l.accuracy)
+            .put("quando", l.time).put("provider", l.provider ?: "")
+            .put("maps", "https://maps.google.com/?q=" + l.latitude + "," + l.longitude)
+    }
+
+    private var alarme: android.media.MediaPlayer? = null
+    private var volAntes = -1
+
+    /** Alarme alto mesmo em silêncio (ajuda a encontrar o telefone). */
+    fun alarme(c: Context, ligar: Boolean): Boolean {
+        return try {
+            val am = c.getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager
+            if (ligar) {
+                if (alarme != null) return true
+                volAntes = am.getStreamVolume(android.media.AudioManager.STREAM_ALARM)
+                am.setStreamVolume(android.media.AudioManager.STREAM_ALARM, am.getStreamMaxVolume(android.media.AudioManager.STREAM_ALARM), 0)
+                val uri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_ALARM)
+                    ?: android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_RINGTONE)
+                alarme = android.media.MediaPlayer().apply {
+                    setDataSource(c, uri)
+                    setAudioAttributes(android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_ALARM).build())
+                    isLooping = true; prepare(); start()
+                }
+            } else {
+                try { alarme?.stop(); alarme?.release() } catch (_: Exception) {}
+                alarme = null
+                if (volAntes >= 0) { am.setStreamVolume(android.media.AudioManager.STREAM_ALARM, volAntes, 0); volAntes = -1 }
+            }
+            true
+        } catch (_: Exception) { false }
+    }
+
+    fun alarmeLigado(): Boolean = alarme != null
+
     // ---------- Ficheiros ----------
     private fun raiz(): File = Environment.getExternalStorageDirectory()
 

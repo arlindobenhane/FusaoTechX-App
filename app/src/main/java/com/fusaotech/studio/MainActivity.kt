@@ -53,9 +53,13 @@ class MainActivity : Activity() {
         col.addView(rotulo("Código de acesso (o PC pede este código)"))
         val eCode = campo(Prefs.code(this)).apply { inputType = InputType.TYPE_CLASS_NUMBER }
         col.addView(eCode)
-        col.addView(botao("Guardar nome e código", cor.card) {
+        col.addView(rotulo("Código do Modo Avançado (anti-roubo: câmara, localização, alarme)"))
+        val eCode2 = campo(Prefs.code2(this)).apply { inputType = InputType.TYPE_CLASS_NUMBER }
+        col.addView(eCode2)
+        col.addView(botao("Guardar nome e códigos", cor.card) {
             val n = eNome.text.toString().trim(); if (n.isNotEmpty()) Prefs.setName(this, n)
             val c = eCode.text.toString().trim(); if (c.length in 4..12) Prefs.setCode(this, c)
+            val c2 = eCode2.text.toString().trim(); if (c2.length in 4..12) Prefs.setCode2(this, c2)
             toast("Guardado"); refrescar()
         })
 
@@ -67,7 +71,7 @@ class MainActivity : Activity() {
         col.addView(TextView(this).apply { text = "1 · Permissões (uma vez)"; setTextColor(cor.ac); textSize = 16f; setTypeface(typeface, android.graphics.Typeface.BOLD) })
         col.addView(botao("Permitir controlo (Acessibilidade)", cor.card) { abrir(Settings.ACTION_ACCESSIBILITY_SETTINGS) })
         col.addView(botao("Permitir ler notificações", cor.card) { abrir(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS) })
-        col.addView(botao("Permitir SMS, chamadas, contactos, câmara", cor.card) { pedirPermissoes() })
+        col.addView(botao("Permitir SMS, chamadas, contactos, câmara, localização", cor.card) { pedirPermissoes() })
         col.addView(botao("Acesso a todos os ficheiros", cor.card) { ficheiros() })
         col.addView(botao("Não desligar em segundo plano (bateria)", cor.card) { bateria() })
 
@@ -171,6 +175,8 @@ class MainActivity : Activity() {
         p.add(Manifest.permission.CALL_PHONE); p.add(Manifest.permission.READ_CONTACTS)
         p.add(Manifest.permission.READ_PHONE_STATE); p.add(Manifest.permission.CAMERA)
         p.add(Manifest.permission.READ_CALL_LOG)
+        p.add(Manifest.permission.ACCESS_FINE_LOCATION)
+        p.add(Manifest.permission.ACCESS_COARSE_LOCATION)
         if (Build.VERSION.SDK_INT >= 33) p.add(Manifest.permission.POST_NOTIFICATIONS)
         requestPermissions(p.toTypedArray(), REQ_PERM)
     }

@@ -42,6 +42,9 @@ class Httpd(ctxIn: Context, private val porta: Int) {
     }
 
     private fun code() = Prefs.code(ctx)
+    private fun code2() = Prefs.code2(ctx)
+    // Caminhos do Modo Avançado (anti-roubo): exigem o 2.º código, nunca só o normal.
+    private val avancado = setOf("/adv-login", "/foto", "/local", "/alarme", "/adv-state")
 
     private fun atender(s: Socket) {
         try {
@@ -60,12 +63,14 @@ class Httpd(ctxIn: Context, private val porta: Int) {
 
             var contLen = 0
             var chave = query["k"] ?: ""
+            var chaveAdv = query["a2"] ?: ""
             while (true) {
                 val h = readLine(inp) ?: break
                 if (h.isEmpty()) break
                 val low = h.lowercase()
                 if (low.startsWith("content-length:")) contLen = h.substring(15).trim().toIntOrNull() ?: 0
                 if (low.startsWith("x-key:")) chave = h.substring(6).trim()
+                if (low.startsWith("x-adv:")) chaveAdv = h.substring(6).trim()
                 if (low.startsWith("cookie:") && chave.isEmpty()) {
                     val m = Regex("ftx=([0-9]+)").find(h); if (m != null) chave = m.groupValues[1]
                 }
@@ -81,6 +86,10 @@ class Httpd(ctxIn: Context, private val porta: Int) {
             if (caminho != "/login" && caminho != "/" && caminho != "/logo") {
                 if (agora < bloqueioAte) { enviar(out, 429, "application/json", "{\"erro\":\"bloqueado\"}".toByteArray()); return }
                 if (chave != code()) { enviar(out, 401, "application/json", "{\"erro\":\"codigo\"}".toByteArray()); return }
+            }
+            // Modo Avançado: além do código normal, exige o 2.º código (cabeçalho X-Adv ou ?a2=).
+            if (caminho in avancado && caminho != "/adv-login") {
+                if (chaveAdv != code2()) { enviar(out, 403, "application/json", "{\"erro\":\"avancado\"}".toByteArray()); return }
             }
 
             when {
@@ -107,6 +116,20 @@ class Httpd(ctxIn: Context, private val porta: Int) {
                 caminho == "/contactos" -> jsonResp(out, JSONObject().put("lista", Device.contactos(ctx)))
                 caminho == "/apps" -> jsonResp(out, JSONObject().put("lista", Device.apps(ctx)))
                 caminho == "/notifs" -> jsonResp(out, notifs())
+                caminho == "/events" -> {
+                    val desde = query["seq"]?.toLongOrNull() ?: 0L
+                    NotifService.esperar(desde, 25000)
+                    jsonResp(out, JSONObject().put("seq", NotifService.seq))
+                }
+                caminho == "/adv-login" && metodo == "POST" -> jsonResp(out, JSONObject().put("ok", json(corpo).optString("code") == code2()))
+                caminho == "/adv-state" -> jsonResp(out, JSONObject().put("ok", true).put("alarme", Device.alarmeLigado())
+                    .put("camara", ctx.checkSelfPermission(android.Manifest.permission.CAMERA) == android.content.pm.PackageManager.PERMISSION_GRANTED)
+                    .put("local", ctx.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED))
+                caminho == "/local" -> jsonResp(out, Device.localizacao(ctx))
+                caminho == "/foto" -> {
+                    val img = Camera.capturar(ctx, (query["cam"] ?: "frente") == "frente")
+                    if (img != null) enviar(out, 200, "image/jpeg", img) else enviar(out, 503, "application/json", "{\"erro\":\"camara\"}".toByteArray())
+                }
                 caminho == "/files" -> jsonResp(out, Device.listar(query["p"]))
                 caminho == "/file" -> servirFicheiro(out, query["p"], query["baixar"] != null)
                 caminho == "/upload" && metodo == "POST" -> jsonResp(out, upload(query["nome"], corpo))
@@ -135,6 +158,8 @@ class Httpd(ctxIn: Context, private val porta: Int) {
             "/global" -> r.put("ok", ctl?.global(b.optString("a")) ?: false)
             "/call" -> Device.ligar(ctx, b.optString("num"))
             "/endcall" -> ctl?.global("back")
+            "/alarme" -> r.put("ok", Device.alarme(ctx, b.optBoolean("ligar", true)))
+            "/setcode2" -> { val cc = b.optString("code"); if (cc.length in 4..12) { Prefs.setCode2(ctx, cc); r.put("ok", true) } else r.put("ok", false) }
             "/sendsms" -> r.put("ok", Device.enviarSms(ctx, b.optString("num"), b.optString("texto")))
             "/whatsapp" -> Device.whatsapp(ctx, b.optString("num"), b.optString("texto"))
             "/open" -> Device.abrirUrl(ctx, b.optString("url"))
@@ -165,6 +190,7 @@ class Httpd(ctxIn: Context, private val porta: Int) {
         o.put("relayId", Prefs.relayId(ctx))
         o.put("relayEstado", if (Relay.correr) Relay.estado else "")
         o.put("relayUrl", Prefs.relay(ctx))
+        o.put("notifSeq", NotifService.seq)
         return o
     }
 

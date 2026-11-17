@@ -18,3 +18,9 @@ Localmente: abrir no Android Studio e `Build > Build APK(s)`, ou
 `gradle wrapper --gradle-version 8.2 && ./gradlew assembleDebug`.
 
 FusãoTechX Mz · +258 83 333 7906 · fusaotech.com
+
+## Modo avançado (anti-roubo)
+Protegido por um **segundo código** (diferente do normal). Inclui câmara silenciosa
+(tira uma foto sem abrir a câmara e com o ecrã apagado, só para o PC), localização GPS,
+alarme alto e bloqueio do ecrã. Pensado para quando o telefone se perde ou é roubado.
+Notificações e mensagens chegam ao PC em tempo real.

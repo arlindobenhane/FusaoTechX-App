@@ -227,6 +227,8 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
       <div class="sec">Conteúdo</div>
       <button data-v="apps"><svg class="i" data-i="apps"></svg>Aplicações</button>
       <button data-v="files"><svg class="i" data-i="folder"></svg>Ficheiros</button>
+      <div class="sec">Segurança</div>
+      <button data-v="adv"><svg class="i" data-i="shield"></svg>Modo avançado</button>
       <div class="sec">Sistema</div>
       <button data-v="def"><svg class="i" data-i="cog"></svg>Definições</button>
     </nav>
@@ -375,6 +377,44 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
   <div id="fileList"><div class="empty">A carregar…</div></div>
 </section>
 
+<!-- MODO AVANÇADO -->
+<section class="view" id="v-adv">
+  <div id="advLock" class="card" style="max-width:420px;margin:30px auto;text-align:center">
+    <div style="font-size:40px">🛡️</div>
+    <h3 style="justify-content:center">Modo avançado</h3>
+    <p class="tiny muted" style="margin:0 0 16px">Funções sensíveis de segurança e anti-roubo. Escreva o <b>segundo código</b> (diferente do normal).</p>
+    <input id="advPin" type="password" inputmode="numeric" maxlength="12" placeholder="segundo código" style="text-align:center;font-size:22px;letter-spacing:.3em">
+    <button class="btn p" style="width:100%;margin-top:12px" id="advEntrar">Desbloquear</button>
+    <div class="tiny muted" style="margin-top:14px">Por omissão é o código normal com <b>00</b> no fim, até o definir na app do telefone.</div>
+  </div>
+  <div id="advOn" hidden>
+    <div class="banner" style="border-color:color-mix(in srgb,var(--ac2) 40%,transparent);background:color-mix(in srgb,var(--ac2) 10%,transparent)"><span style="font-size:22px">🛡️</span><div><b>Modo avançado ativo</b>Câmara silenciosa, localização e alarme. Use com responsabilidade — é o seu telefone.</div><button class="btn sm x" id="advSair">Sair</button></div>
+    <div class="grid g2" style="align-items:start">
+      <div class="card"><h3><svg class="i" data-i="cam"></svg>Câmara silenciosa</h3>
+        <p class="tiny muted" style="margin:0 0 12px">Tira uma foto sem abrir a câmara e sem a pessoa perceber — mesmo com o ecrã apagado. A imagem vem só para aqui; não fica no telefone.</p>
+        <div class="row"><button class="btn p" id="fotoFrente"><svg class="i" data-i="cam"></svg>Câmara da frente</button><button class="btn" id="fotoTras"><svg class="i" data-i="cam"></svg>Câmara de trás</button></div>
+        <div id="fotoBox" style="margin-top:14px"></div>
+      </div>
+      <div class="card"><h3><svg class="i" data-i="locate"></svg>Localização</h3>
+        <p class="tiny muted" style="margin:0 0 12px">Onde o telefone está agora (GPS). Útil se o perder ou lho tirarem.</p>
+        <button class="btn p" id="btnLocal"><svg class="i" data-i="locate"></svg>Localizar o telefone</button>
+        <div id="localBox" style="margin-top:14px"></div>
+      </div>
+      <div class="card"><h3><svg class="i" data-i="alarm"></svg>Alarme</h3>
+        <p class="tiny muted" style="margin:0 0 12px">Toca bem alto (mesmo em silêncio) para encontrar o telefone por perto.</p>
+        <div class="row"><button class="btn er" id="alarmeOn"><svg class="i" data-i="alarm"></svg>Tocar alarme</button><button class="btn" id="alarmeOff">Parar</button></div>
+      </div>
+      <div class="card"><h3><svg class="i" data-i="lock"></svg>Proteger</h3>
+        <p class="tiny muted" style="margin:0 0 12px">Bloquear já o ecrã do telefone.</p>
+        <div class="row"><button class="btn" data-g="lock"><svg class="i" data-i="lock"></svg>Bloquear ecrã</button><button class="btn" id="advCap"><svg class="i" data-i="shot"></svg>Captura do ecrã</button></div>
+      </div>
+      <div class="card" style="grid-column:1/-1"><h3><svg class="i" data-i="shield"></svg>Segundo código</h3>
+        <div class="field" style="border:0;padding:0"><div><b>Mudar o código do modo avançado</b><span>4 a 12 dígitos. Guarde-o só consigo.</span></div><div class="row"><input id="advNovo" inputmode="numeric" maxlength="12" placeholder="novo código" style="max-width:200px"><button class="btn p" id="advGuardar">Guardar</button></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- DEFINIÇÕES -->
 <section class="view" id="v-def">
   <div class="set">
@@ -438,7 +478,8 @@ users:'<circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M
 search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',plus:'<path d="M12 5v14M5 12h14"/>',send:'<path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
 moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
 sync:'<path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 21v-5h5M21 3v5h-5"/>',max:'<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>',clip:'<rect x="8" y="3" width="8" height="4" rx="1"/><path d="M8 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>',
-link:'<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>',file:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',sim:'<path d="M6 3h8l4 4v14H6z"/><rect x="9" y="12" width="6" height="6" rx="1"/>'};
+link:'<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>',file:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',sim:'<path d="M6 3h8l4 4v14H6z"/><rect x="9" y="12" width="6" height="6" rx="1"/>',
+shield:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/>',locate:'<circle cx="12" cy="11" r="3"/><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/>',alarm:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M5 3 2 6M19 3l3 3"/>'};
 function ico(n,st=''){return `<svg class="i" viewBox="0 0 24 24" style="${st}">${ICON[n]||ICON.file}</svg>`}
 function pintarIcones(r=document){r.querySelectorAll('svg[data-i]').forEach(s=>{s.setAttribute('viewBox','0 0 24 24');s.innerHTML=ICON[s.dataset.i]||''})}
 pintarIcones();
@@ -483,12 +524,12 @@ $('#lgBtn').onclick=entrar;$('#pin').addEventListener('keydown',e=>{if(e.key==='
 
 // ===== Navegação =====
 const TIT={painel:['Painel','Visão geral do telefone'],ecra:['Ecrã e controlo','Veja e controle o telefone com o rato e o teclado'],sms:['Mensagens','SMS e WhatsApp, sincronizados'],call:['Chamadas','Marcador, recentes e contactos'],
- notif:['Notificações','Em tempo real'],apps:['Aplicações','Abrir apps no telefone'],files:['Ficheiros','Navegar, ver e transferir'],def:['Definições','Telefone, ligação, ecrã e aparência']};
+ notif:['Notificações','Em tempo real'],apps:['Aplicações','Abrir apps no telefone'],files:['Ficheiros','Navegar, ver e transferir'],def:['Definições','Telefone, ligação, ecrã e aparência'],adv:['Modo avançado','Segurança e anti-roubo — câmara, localização, alarme']};
 let VISTA='painel';
 function ir(v){VISTA=v;$$('#nav button').forEach(x=>x.classList.toggle('on',x.dataset.v===v));$$('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));
  $('#tTit').textContent=TIT[v][0];$('#tSub').textContent=TIT[v][1];$('#side').classList.remove('open');try{history.replaceState(null,'','#'+v)}catch(e){}
  if(v==='apps')carregarApps();if(v==='notif'){carregarNotifs();marcarVisto('notif')}if(v==='files'&&!DIR)abrir('');if(v==='sms'){carregarSms();marcarVisto('sms')}
- if(v==='call'){carregarChamadas();carregarContactos();marcarVisto('call')}if(v==='ecra')setTimeout(()=>scr.focus(),150);if(v==='def')pintarDef()}
+ if(v==='call'){carregarChamadas();carregarContactos();marcarVisto('call')}if(v==='ecra')setTimeout(()=>scr.focus(),150);if(v==='def')pintarDef();if(v==='adv')pintarAdv()}
 $('#nav').onclick=e=>{const b=e.target.closest('button[data-v]');if(b)ir(b.dataset.v)};
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)ir(g.dataset.go)});
 $('#menuBtn').onclick=()=>$('#side').classList.toggle('open');
@@ -547,7 +588,7 @@ function sincronizar(){clearTimeout(syncTimer);const on=pref('sync',true);
   $('#pSyncT').textContent=on?'Sincronizado':'Sincronização pausada';syncTimer=setTimeout(passo,document.hidden?15000:(RELAY?6000:4000))};
  passo()}
 
-function arrancar(){$('#login').style.display='none';$('#app').hidden=false;montarDial();sincronizar();ecraIniciar();carregarContactos(true);
+function arrancar(){$('#login').style.display='none';$('#app').hidden=false;montarDial();sincronizar();eventos();ecraIniciar();carregarContactos(true);
  const v=(location.hash||'').slice(1);if(TIT[v])ir(v);
  setTimeout(()=>{try{new QRCode($('#qrDl'),{text:'https://github.com/arlindobenhane/FusaoTechX-App/releases/download/apk/FusaoTechX.apk',width:140,height:140})}catch(e){}},800)}
 
@@ -726,6 +767,54 @@ $$('#segQ button').forEach(b=>b.onclick=()=>{$$('#segQ button').forEach(x=>x.cla
 [['optRipple','ripple',true],['optKb','kb',true],['optSom','som',true],['optSync','sync',true],['optDesk','desk',false]].forEach(([id,k,d])=>{const el=$('#'+id);el.checked=pref(k,d);
  el.onchange=async()=>{if(k==='desk'&&el.checked&&'Notification' in window&&Notification.permission!=='granted'){const p=await Notification.requestPermission();if(p!=='granted'){el.checked=false;toast('O navegador bloqueou os avisos');return}}
   guardarPref(k,el.checked);if(k==='sync')sincronizar();toast('Guardado')}});
+
+// ===== Modo avançado (2.º código) =====
+let ADV='';try{ADV=sessionStorage.getItem('ftxadv')||''}catch(e){}
+async function advPost(u,b){const r=await fetch(U(u)+'?k='+encodeURIComponent(CODE)+'&a2='+encodeURIComponent(ADV),{method:'POST',headers:{'Content-Type':'application/json','X-Adv':ADV},body:JSON.stringify(b||{})});if(r.status===403){advSair();throw new Error('adv')}return r.json().catch(()=>({}))}
+function advUrl(u){return U(u)+(u.includes('?')?'&':'?')+'k='+encodeURIComponent(CODE)+'&a2='+encodeURIComponent(ADV)}
+function pintarAdv(){const ok=!!ADV;$('#advLock').hidden=ok;$('#advOn').hidden=!ok;if(ok)advEstado()}
+async function advEntrar(){const c=$('#advPin').value.trim();if(!c)return;$('#advEntrar').disabled=true;
+ const r=await fetch(U('/adv-login')+'?k='+encodeURIComponent(CODE),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:c})}).then(x=>x.json()).catch(()=>({}));
+ $('#advEntrar').disabled=false;
+ if(r.ok){ADV=c;try{sessionStorage.setItem('ftxadv',c)}catch(e){}$('#advPin').value='';pintarAdv();toast('Modo avançado desbloqueado')}else{toast('Segundo código errado');$('#advPin').select()}}
+function advSair(){ADV='';try{sessionStorage.removeItem('ftxadv')}catch(e){}pintarAdv()}
+$('#advEntrar').onclick=advEntrar;$('#advPin').addEventListener('keydown',e=>{if(e.key==='Enter')advEntrar()});
+$('#advSair').onclick=advSair;
+async function advEstado(){try{const s=await (await fetch(advUrl('/adv-state'))).json();
+ $('#alarmeOn').disabled=!!s.alarme;$('#alarmeOff').disabled=!s.alarme;
+ if(s.camara===false)$('#fotoBox').innerHTML='<div class="tiny" style="color:var(--wa)">Dê a permissão de câmara na app do telefone.</div>';
+}catch(e){}}
+async function tirarFoto(frente){const box=$('#fotoBox');box.innerHTML='<div class="empty" style="padding:20px">📸 A tirar foto em silêncio…</div>';
+ try{const r=await fetch(advUrl('/foto&cam='+(frente?'frente':'tras')),{cache:'no-store'});
+  if(r.status===403){advSair();return}
+  if(!r.ok){box.innerHTML='<div class="tiny" style="color:var(--er)">Não foi possível (permissão de câmara? câmara ocupada?).</div>';return}
+  const b=await r.blob(),u=URL.createObjectURL(b);
+  box.innerHTML=`<img src="${u}" style="width:100%;border-radius:12px;border:1px solid var(--line)"><div class="row" style="margin-top:8px"><a class="btn sm" href="${u}" download="foto-${frente?'frente':'tras'}-${Date.now()}.jpg">⬇️ Guardar no PC</a><span class="tiny muted">${new Date().toLocaleTimeString('pt-PT')} · ${frente?'frente':'trás'}</span></div>`;
+ }catch(e){box.innerHTML='<div class="tiny" style="color:var(--er)">Falhou.</div>'}}
+$('#fotoFrente').onclick=()=>tirarFoto(true);$('#fotoTras').onclick=()=>tirarFoto(false);
+$('#btnLocal').onclick=async()=>{const box=$('#localBox');box.innerHTML='<div class="empty" style="padding:20px">📍 A localizar…</div>';
+ try{const r=await (await fetch(advUrl('/local'),{cache:'no-store'})).json();
+  if(r.erro){box.innerHTML='<div class="tiny" style="color:var(--wa)">'+({sem_permissao:'Dê a permissão de localização na app do telefone.',sem_sinal:'Sem sinal de GPS — tente ao ar livre.',indisponivel:'Localização indisponível.'}[r.erro]||'Não obtida.')+'</div>';return}
+  const q=new Date(+r.quando).toLocaleString('pt-PT');
+  box.innerHTML=`<div class="it" style="margin:0"><div class="av" style="background:var(--ac)">📍</div><div class="tx"><b>${r.lat.toFixed(5)}, ${r.lng.toFixed(5)}</b><span>Precisão ~${Math.round(r.prec)} m · ${esc(q)}</span></div></div><a class="btn p sm" style="margin-top:8px" href="${esc(r.maps)}" target="_blank" rel="noopener">🗺️ Ver no mapa</a>`;
+ }catch(e){box.innerHTML='<div class="tiny" style="color:var(--er)">Falhou.</div>'}};
+$('#alarmeOn').onclick=()=>advPost('/alarme',{ligar:true}).then(r=>{toast(r&&r.ok?'Alarme a tocar no telefone':'Falhou');advEstado()});
+$('#alarmeOff').onclick=()=>advPost('/alarme',{ligar:false}).then(()=>{toast('Alarme parado');advEstado()});
+$('#advCap').onclick=()=>post('/captura').then(r=>toast(r&&r.ok?'Captura guardada no telefone':'Falhou — o ecrã está partilhado?'));
+$('#advGuardar').onclick=async()=>{const c=$('#advNovo').value.trim();if(!/^\d{4,12}$/.test(c))return toast('4 a 12 dígitos');
+ const r=await advPost('/setcode2',{code:c});if(r&&r.ok){ADV=c;try{sessionStorage.setItem('ftxadv',c)}catch(e){}$('#advNovo').value='';toast('Segundo código alterado')}else toast('Não foi alterado')};
+
+// ===== Notificações em tempo real (long-poll /events) =====
+let eventosOn=false;
+function eventos(){if(eventosOn)return;eventosOn=true;let seq=0;
+ const ciclo=async()=>{if(!pref('sync',true)){setTimeout(ciclo,4000);return}
+  try{const r=await fetch(U('/events')+'?k='+encodeURIComponent(CODE)+'&seq='+seq,{cache:'no-store'});
+   if(r.status===401){sair();return}
+   if(r.status===200){const o=await r.json();if(o.seq&&o.seq!==seq){seq=o.seq;if(seq>1){await syncNotifs();await syncSms()}}}
+   else await new Promise(k=>setTimeout(k,2000));
+  }catch(e){await new Promise(k=>setTimeout(k,3000))}
+  setTimeout(ciclo,120)};
+ ciclo()}
 
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!$('#app').hidden)sincronizar()});
 if(CODE)arrancar();else{$('#login').style.display='grid';setTimeout(()=>$('#pin').focus(),50)}
