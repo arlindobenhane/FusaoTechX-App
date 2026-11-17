@@ -72,20 +72,28 @@ object WhatsAppStore {
         var novas = false
 
         // ── Caminho 1: MessagingStyle (API 24+) ──
-        val style = try { Notification.MessagingStyle.extractMessagingStyleFromNotification(n) } catch (_: Exception) { null }
-        if (style != null && style.messages.isNotEmpty()) {
-            val tituloConversa = style.conversationTitle?.toString()
+        // A API do sistema não expõe extractMessagingStyleFromNotification (só existe no AndroidX),
+        // por isso lemos directamente os extras que o MessagingStyle grava na notificação.
+        val msgsBrutas = try { extras.getParcelableArray(Notification.EXTRA_MESSAGES) } catch (_: Exception) { null }
+        val msgs = msgsBrutas?.mapNotNull { it as? android.os.Bundle }.orEmpty()
+        if (msgs.isNotEmpty()) {
+            val tituloConversa = extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE)?.toString()
                 ?: extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()
                 ?: sbn.packageName.substringAfterLast('.')
-            val isGrupo = style.isGroupConversation
+            val isGrupo = if (android.os.Build.VERSION.SDK_INT >= 28)
+                extras.getBoolean(Notification.EXTRA_IS_GROUP_CONVERSATION, false)
+            else extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE) != null
 
-            for (m in style.messages) {
-                val ts = m.timestamp
+            for (m in msgs) {
+                val ts = m.getLong("time")
                 if (!vistos.add(ts)) continue               // já processada
-                val texto = m.text?.toString()?.trim() ?: continue
+                val texto = m.getCharSequence("text")?.toString()?.trim() ?: continue
                 if (texto.isEmpty()) continue
-                val remetente = m.senderPerson?.name?.toString()?.trim()
-                    ?: m.sender?.trim()
+                val pessoa = if (android.os.Build.VERSION.SDK_INT >= 28)
+                    (try { m.getParcelable<android.app.Person>("sender_person") } catch (_: Exception) { null })?.name?.toString()?.trim()
+                else null
+                val remetente = pessoa
+                    ?: m.getCharSequence("sender")?.toString()?.trim()
                     ?: tituloConversa
 
                 adicionar(ctx, WhatsAppMessage(
