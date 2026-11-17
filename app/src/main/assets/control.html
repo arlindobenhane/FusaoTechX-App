@@ -457,7 +457,7 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
         <div class="grid g2" style="align-items:center">
           <div><b style="font-size:16px">FusãoTechX Studio</b><div class="tiny muted" id="versao">—</div>
             <p class="tiny muted">App própria da FusãoTechX Mz para usar o telefone no PC. Sem conta e sem anúncios.</p>
-            <a class="btn sm" href="https://github.com/arlindobenhane/FusaoTechX-App/releases/download/apk/FusaoTechX.apk">⬇️ Descarregar a APK</a></div>
+            <a class="btn sm" href="https://studio.fusaotech.com/app">⬇️ Descarregar a APK</a></div>
           <div style="text-align:center"><div class="qrbox"><div id="qrDl"></div></div><div class="tiny muted" style="margin-top:8px">Instalar noutro telefone</div></div>
         </div>
       </div>
@@ -595,7 +595,7 @@ function sincronizar(){clearTimeout(syncTimer);const on=pref('sync',true);
 
 function arrancar(){$('#login').style.display='none';$('#app').hidden=false;montarDial();sincronizar();eventos();ecraIniciar();carregarContactos(true);
  const v=(location.hash||'').slice(1);if(TIT[v])ir(v);
- setTimeout(()=>{try{new QRCode($('#qrDl'),{text:'https://github.com/arlindobenhane/FusaoTechX-App/releases/download/apk/FusaoTechX.apk',width:140,height:140})}catch(e){}},800)}
+ setTimeout(()=>{try{new QRCode($('#qrDl'),{text:'https://studio.fusaotech.com/app',width:140,height:140})}catch(e){}},800)}
 
 // ===== Ecrã ao vivo e controlo =====
 const scr=$('#scr');let SEQ=0,ecraOn=false,frames=0,tf=performance.now();

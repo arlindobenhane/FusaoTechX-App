@@ -63,7 +63,7 @@ footer{text-align:center;color:var(--mu);font-size:12.5px;padding:22px}
             <div>🔔 Notificações em tempo real</div>
             <div>📁 Ficheiros nos dois sentidos</div>
         </div>
-        <a class="dl" href="https://github.com/arlindobenhane/FusaoTechX-App/releases/download/apk/FusaoTechX.apk">⬇️ Descarregar a app Android (APK)</a>
+        <a class="dl" href="https://studio.fusaotech.com/app">⬇️ Descarregar a app Android (APK)</a>
     </section>
     <section class="card">
         <h2>Ligar ao telefone</h2>

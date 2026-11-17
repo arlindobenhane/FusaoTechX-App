@@ -173,7 +173,7 @@ class MainActivity : Activity() {
         col.addView(TextView(this).apply { text = "Instalar noutro telefone"; setTextColor(cor.ac); textSize = 16f; setTypeface(typeface, android.graphics.Typeface.BOLD) })
         col.addView(rotulo("Lê este QR com o outro telefone para descarregar a app:"))
         col.addView(ImageView(this).apply {
-            try { setImageBitmap(qr("https://github.com/arlindobenhane/FusaoTechX-App/releases/download/apk/FusaoTechX.apk", 440)) } catch (_: Exception) {}
+            try { setImageBitmap(qr("https://studio.fusaotech.com/app", 440)) } catch (_: Exception) {}
             layoutParams = LinearLayout.LayoutParams(dp(190), dp(190)).apply { topMargin = dp(6) }
             setBackgroundColor(Color.WHITE); setPadding(dp(8), dp(8), dp(8), dp(8))
         })

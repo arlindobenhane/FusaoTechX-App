@@ -2,6 +2,8 @@
 RewriteEngine On
 RewriteRule ^data(/|$) - [F,L]
 RewriteRule ^lib\.php$ - [F,L]
+RewriteRule ^app/?$ baixar.php [END]
+RewriteRule ^baixar/?$ baixar.php [END]
 RewriteRule ^admin/?$ admin.php [END]
 RewriteRule ^d/[0-9]{9}(/.*)?$ tunel.php [END]
 RewriteRule ^d/[0-9]{9}$ tunel.php [END]
@@ -9,3 +11,9 @@ Options -Indexes
 <IfModule mod_headers.c>
     Header set Cache-Control "no-store"
 </IfModule>
+
+# APK descarrega sempre (não abre no navegador).
+<FilesMatch "\.apk$">
+    ForceType application/vnd.android.package-archive
+    Header set Content-Disposition attachment
+</FilesMatch>
