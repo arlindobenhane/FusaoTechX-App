@@ -182,7 +182,7 @@ class Httpd(ctxIn: Context, private val porta: Int) {
                     .put("ativo", NotifService.inst != null))
                 caminho == "/wa-msgs" -> {
                     val chave = query["chave"]
-                    val limite = (query["n"]?.toIntOrNull() ?: 100).coerceIn(10, 500)
+                    val limite = (query["n"]?.toIntOrNull() ?: 100).coerceIn(10, 1000)
                     if (chave != null) {
                         jsonResp(out, JSONObject()
                             .put("lista", WhatsAppStore.mensagensConversa(chave, limite))

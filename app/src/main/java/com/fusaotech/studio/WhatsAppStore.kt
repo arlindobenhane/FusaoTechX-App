@@ -20,6 +20,8 @@ import java.util.concurrent.ConcurrentHashMap
  *  - Deduplicação por (chave de conversa + timestamp de mensagem).
  *  - Persistência em JSON (wa_msgs.json) — sobrevive a reinicializações.
  *  - Resposta direta via RemoteInput sem abrir o WhatsApp.
+ *  - Tipo de cada mensagem (foto, áudio, vídeo, documento, autocolante, localização…).
+ *  - Chamadas de voz/vídeo (recebidas e perdidas) numa conversa própria («Chamadas do WhatsApp»).
  *  - Máximo de MAX_TOTAL mensagens no histórico geral; MAX_POR_CONVERSA por conversa.
  */
 object WhatsAppStore {
@@ -30,6 +32,10 @@ object WhatsAppStore {
     private const val MAX_POR_CONVERSA = 200
     private const val FICHEIRO = "wa_msgs.json"
 
+    /** Conversa virtual onde ficam todas as chamadas do WhatsApp (recebidas, em curso e perdidas). */
+    const val CHAVE_CHAMADAS = "wa-chamadas"
+    private const val NOME_CHAMADAS = "📞 Chamadas do WhatsApp"
+
     // chave-da-conversa → lista de mensagens ordenada por timestamp
     private val conversas = ConcurrentHashMap<String, ArrayDeque<WhatsAppMessage>>()
 
@@ -38,6 +44,9 @@ object WhatsAppStore {
 
     // timestamps já processados por conversa (evita duplicados quando WA reposta a notificação)
     private val tsVistos = ConcurrentHashMap<String, MutableSet<Long>>()
+
+    // chave da notificação de chamada → último texto registado (evita repetir a mesma chamada)
+    private val chamadasVistas = ConcurrentHashMap<String, String>()
 
     @Volatile private var carregado = false
     private val travoFicheiro = Any()
@@ -53,6 +62,7 @@ object WhatsAppStore {
         if (n.flags and Notification.FLAG_GROUP_SUMMARY != 0) return false
 
         carregar(ctx)
+        if (eChamada(n)) return registarChamada(ctx, sbn, n)
         sbnAtivas[sbn.key] = sbn
         return extrairMensagens(ctx, sbn, n)
     }
@@ -60,6 +70,7 @@ object WhatsAppStore {
     fun notificacaoRemovida(chave: String) {
         sbnAtivas.remove(chave)
         tsVistos.remove(chave)
+        chamadasVistas.remove(chave)
     }
 
     // ──────────────────────────────────────────────────────────────
@@ -87,8 +98,10 @@ object WhatsAppStore {
             for (m in msgs) {
                 val ts = m.getLong("time")
                 if (!vistos.add(ts)) continue               // já processada
-                val texto = m.getCharSequence("text")?.toString()?.trim() ?: continue
-                if (texto.isEmpty()) continue
+                val mime = m.getString("type")
+                val textoBruto = m.getCharSequence("text")?.toString()?.trim().orEmpty()
+                if (textoBruto.isEmpty() && mime == null) continue
+                val (tipo, texto) = classificar(textoBruto, mime)
                 val pessoa = if (android.os.Build.VERSION.SDK_INT >= 28)
                     (try { m.getParcelable<android.app.Person>("sender_person") } catch (_: Exception) { null })?.name?.toString()?.trim()
                 else null
@@ -103,7 +116,8 @@ object WhatsAppStore {
                     remetente = remetente ?: tituloConversa,
                     texto = texto,
                     isGrupo = isGrupo,
-                    pacote = sbn.packageName
+                    pacote = sbn.packageName,
+                    tipo = tipo
                 ))
                 novas = true
             }
@@ -120,14 +134,112 @@ object WhatsAppStore {
         // Ignora contadores como "3 mensagens não lidas"
         if (titulo.isEmpty() && texto.matches(Regex("^\\d+ .*mensagens.*", RegexOption.IGNORE_CASE))) return false
 
+        val (tipo, textoFinal) = classificar(texto, null)
         adicionar(ctx, WhatsAppMessage(
             id = ts,
             chave = sbn.key,
             conversa = titulo,
             remetente = titulo,
-            texto = texto,
+            texto = textoFinal,
             isGrupo = extras.getBoolean(Notification.EXTRA_IS_GROUP_CONVERSATION, false),
-            pacote = sbn.packageName
+            pacote = sbn.packageName,
+            tipo = tipo
+        ))
+        return true
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    //  Fotos, áudios, vídeos, documentos… (o conteúdo fica no telefone;
+    //  a notificação só diz o tipo e, às vezes, a legenda)
+    // ──────────────────────────────────────────────────────────────
+
+    private val ROTULOS = mapOf(
+        "foto" to "📷 Foto", "video" to "🎥 Vídeo", "audio" to "🎤 Áudio",
+        "documento" to "📄 Documento", "sticker" to "💟 Autocolante", "gif" to "GIF",
+        "localizacao" to "📍 Localização", "contacto" to "👤 Contacto", "sondagem" to "📊 Sondagem"
+    )
+
+    private val RX_STICKER = Regex("^(💟\\s*)?(sticker|figurinha|autocolante|adesivo)\\b", RegexOption.IGNORE_CASE)
+    private val RX_GIF = Regex("^(👾\\s*)?gif\\b", RegexOption.IGNORE_CASE)
+
+    /** Devolve (tipo, texto a mostrar). Mensagens só com anexo recebem um rótulo («📷 Foto»). */
+    fun classificar(texto: String, mime: String?): Pair<String, String> {
+        val t = texto.trim()
+        val tipo = when {
+            mime != null && mime.startsWith("image/webp") -> "sticker"
+            mime != null && mime.startsWith("image/gif") -> "gif"
+            mime != null && mime.startsWith("image/") -> "foto"
+            mime != null && mime.startsWith("video/") -> "video"
+            mime != null && mime.startsWith("audio/") -> "audio"
+            mime != null -> "documento"
+            t.startsWith("📷") || t.startsWith("📸") -> "foto"
+            t.startsWith("🎥") || t.startsWith("📹") -> "video"
+            t.startsWith("🎤") || t.startsWith("🎵") || t.startsWith("🎧") -> "audio"
+            t.startsWith("📄") || t.startsWith("📎") || t.startsWith("📃") -> "documento"
+            t.startsWith("📍") -> "localizacao"
+            t.startsWith("👤") -> "contacto"
+            t.startsWith("📊") -> "sondagem"
+            RX_STICKER.containsMatchIn(t) -> "sticker"
+            RX_GIF.containsMatchIn(t) -> "gif"
+            else -> "texto"
+        }
+        val final = if (t.isEmpty()) ROTULOS[tipo] ?: "📎 Anexo" else t
+        return tipo to final
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    //  Chamadas do WhatsApp (voz e vídeo; recebidas, em curso e perdidas)
+    // ──────────────────────────────────────────────────────────────
+
+    private val RX_PERDIDA = Regex(
+        "^(\\d+\\s+)?(chamadas?\\s+(de\\s+voz\\s+|de\\s+v[ií]deo\\s+)?(perdidas?|n[aã]o\\s+atendidas?)" +
+        "|missed\\s+(voice\\s+|video\\s+)?calls?|llamadas?\\s+(de\\s+voz\\s+|de\\s+v[ií]deo\\s+)?perdidas?|appels?\\s+(vocaux\\s+|vid[ée]o\\s+)?manqu[ée]s?)",
+        RegexOption.IGNORE_CASE)
+    private val RX_CHAMADA = Regex(
+        "^(chamada\\s+(de\\s+voz|de\\s+v[ií]deo)(\\s+(recebida|em\\s+curso|a\\s+decorrer|a\\s+tocar))?" +
+        "|(a\\s+receber|recebendo)\\s+(uma\\s+)?chamada|(incoming|ongoing)\\s+(voice|video)\\s+call" +
+        "|(voice|video)\\s+call|llamada\\s+(de\\s+voz|de\\s+v[ií]deo)\\s+entrante)",
+        RegexOption.IGNORE_CASE)
+
+    private fun textoNotif(n: Notification): String =
+        n.extras?.getCharSequence(Notification.EXTRA_TEXT)?.toString()?.trim().orEmpty()
+
+    private fun eChamada(n: Notification): Boolean {
+        if (n.category == Notification.CATEGORY_CALL || n.category == "missed_call") return true
+        // Notificações de conversa (MessagingStyle) nunca são chamadas, mesmo que o texto fale em «chamada».
+        if (n.extras?.containsKey(Notification.EXTRA_MESSAGES) == true) return false
+        val txt = textoNotif(n)
+        return RX_PERDIDA.containsMatchIn(txt) || RX_CHAMADA.containsMatchIn(txt)
+    }
+
+    private fun registarChamada(ctx: Context, sbn: StatusBarNotification, n: Notification): Boolean {
+        val extras = n.extras ?: return false
+        val quem = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()?.trim()
+            .takeUnless { it.isNullOrEmpty() } ?: "Desconhecido"
+        val txt = textoNotif(n)
+        val perdida = n.category == "missed_call" || RX_PERDIDA.containsMatchIn(txt)
+        val video = Regex("v[ií]deo|video", RegexOption.IGNORE_CASE).containsMatchIn(txt)
+        // Chamada a tocar/em curso: o WhatsApp atualiza a notificação várias vezes — regista uma vez.
+        // Chamada perdida: regista de novo só quando o texto muda (ex.: «2 chamadas perdidas»).
+        val anterior = chamadasVistas[sbn.key]
+        if (anterior != null && (!perdida || anterior == txt)) return false
+        chamadasVistas[sbn.key] = txt
+        val rotulo = when {
+            perdida && video -> "📵 Chamada de vídeo perdida"
+            perdida -> "📵 Chamada de voz perdida"
+            video -> "📹 Chamada de vídeo"
+            else -> "📞 Chamada de voz"
+        }
+        val detalhe = if (txt.isNotEmpty() && !txt.equals(rotulo.drop(2).trim(), ignoreCase = true)) " · $txt" else ""
+        adicionar(ctx, WhatsAppMessage(
+            id = sbn.postTime.coerceAtLeast(System.currentTimeMillis() - 5000),
+            chave = CHAVE_CHAMADAS,
+            conversa = NOME_CHAMADAS,
+            remetente = quem,
+            texto = rotulo + detalhe,
+            isGrupo = false,
+            pacote = sbn.packageName,
+            tipo = if (perdida) "chamada_perdida" else "chamada"
         ))
         return true
     }
@@ -174,6 +286,7 @@ object WhatsAppStore {
                     .put("n", fila.size)
                     .put("ultima_msg", ultima.texto)
                     .put("ultima_ts", ultima.id)
+                    .put("ultima_tipo", ultima.tipo)
                     .put("pode_responder", sbnAtivas.containsKey(chave) && temAcaoResposta(chave))
                 )
             }
@@ -210,6 +323,7 @@ object WhatsAppStore {
         .put("texto", m.texto)
         .put("isGrupo", m.isGrupo)
         .put("pacote", m.pacote)
+        .put("tipo", m.tipo)
 
     // ──────────────────────────────────────────────────────────────
     //  Resposta via RemoteInput
@@ -253,14 +367,17 @@ object WhatsAppStore {
                 val arr = JSONArray(f.readText())
                 for (i in 0 until arr.length()) {
                     val o = arr.getJSONObject(i)
+                    val texto = o.getString("texto")
                     val msg = WhatsAppMessage(
                         id = o.getLong("id"),
                         chave = o.getString("chave"),
                         conversa = o.optString("conversa", "?"),
                         remetente = o.optString("remetente", "?"),
-                        texto = o.getString("texto"),
+                        texto = texto,
                         isGrupo = o.optBoolean("isGrupo", false),
-                        pacote = o.optString("pacote", "com.whatsapp")
+                        pacote = o.optString("pacote", "com.whatsapp"),
+                        // mensagens guardadas antes desta versão não tinham tipo: classifica agora
+                        tipo = o.optString("tipo").ifEmpty { classificar(texto, null).first }
                     )
                     val fila = conversas.getOrPut(msg.chave) { ArrayDeque() }
                     fila.addLast(msg)

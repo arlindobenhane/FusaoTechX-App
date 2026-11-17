@@ -417,13 +417,27 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
     .wa-reply .btn-send{width:38px;height:38px;border-radius:50%;background:#25d366;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s}
     .wa-reply .btn-send:hover{opacity:.85}
     .wa-reply .btn-send svg{width:18px;height:18px;color:#fff}
+    .wa-media{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;margin:2px 0 3px;border-radius:8px;background:color-mix(in srgb,var(--tx) 7%,transparent);font-size:13px;font-weight:650}
+    .wa-media small{font-weight:500;color:var(--mu);font-size:11px}
+    .wa-msg.sis{align-self:center;max-width:90%;text-align:center;background:color-mix(in srgb,var(--ac2) 12%,var(--card));border-radius:10px;padding:6px 12px}
+    .wa-msg.sis.perdida{background:color-mix(in srgb,var(--er) 14%,var(--card))}
+    .wa-msg.sis .rem{color:var(--tx)}
+    .wa-msg.sis time{float:none;display:block;margin:2px 0 0}
+    .wa-thrhd .wa-exp{margin-left:auto}
+    .wa-thrhd #waVoltar{margin-left:0}
+    .wa-expmenu{position:fixed;z-index:60;min-width:210px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--sh);padding:6px;display:flex;flex-direction:column}
+    .wa-expmenu[hidden]{display:none}
+    .wa-expmenu b{font-size:11.5px;color:var(--mu);padding:6px 10px 4px;font-weight:700}
+    .wa-expmenu button{text-align:left;padding:9px 10px;border-radius:8px;background:none;border:0;color:var(--tx);font-size:13.5px;cursor:pointer}
+    .wa-expmenu button:hover{background:var(--hover)}
     .wa-noreply{padding:9px 14px;border-top:1px solid var(--bd);text-align:center;font-size:12px;color:var(--mu)}
   </style>
 
   <div class="wa-hdr">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.09-1.34C8.5 21.52 10.21 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.68 0-3.25-.46-4.6-1.26l-.33-.19-3.02.79.82-2.95-.21-.34C3.47 15.17 3 13.64 3 12c0-4.96 4.04-9 9-9s9 4.04 9 9-4.04 9-9 9z"/></svg>
     <div><h2>WhatsApp</h2><span class="muted" id="waStatus">A carregar…</span></div>
-    <button class="btn sm" id="waRefresh" title="Atualizar" style="margin-left:auto"><svg class="i" data-i="sync" style="width:14px;height:14px"></svg></button>
+    <button class="btn sm wa-expbtn" data-exp="tudo" title="Exportar todas as conversas" style="margin-left:auto">⬇️ Exportar</button>
+    <button class="btn sm" id="waRefresh" title="Atualizar"><svg class="i" data-i="sync" style="width:14px;height:14px"></svg></button>
   </div>
   <div class="wa-perm" id="waPerm" hidden>
     <span>🔔</span>
@@ -446,6 +460,7 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
         <div class="wa-thrhd">
           <div class="av" id="waThAv">?</div>
           <div class="col"><b id="waThNome">—</b><span id="waThSub">—</span></div>
+          <button class="btn sm wa-expbtn wa-exp" data-exp="conversa" title="Exportar esta conversa">⬇️ Exportar</button>
           <button class="ibtn" id="waVoltar" aria-label="Voltar" style="display:none"><svg class="i" data-i="back"></svg></button>
         </div>
         <div id="waMsgs"></div>
@@ -458,6 +473,11 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
         <div class="wa-noreply" id="waNoReply" hidden>Esta conversa não suporta resposta direta (a notificação já foi dispensada).</div>
       </div>
     </div>
+  </div>
+  <div class="wa-expmenu" id="waExpMenu" hidden role="menu">
+    <b id="waExpTit">Exportar</b>
+    <button data-fmt="txt" role="menuitem">📝 Texto (.txt) — fácil de ler</button>
+    <button data-fmt="csv" role="menuitem">📊 Folha de cálculo (.csv) — Excel</button>
   </div>
 </section>
 
@@ -720,7 +740,7 @@ function pintarWaConvs(){
     const on=WA_CONV_CHAVE===c.chave?'on':'';
     return '<div class="wa-conv '+on+'" data-chave="'+esc(c.chave)+'" data-conv="'+esc(c.conversa||'')+'" data-grp="'+(c.isGrupo?1:0)+'" data-rep="'+(c.pode_responder?1:0)+'">'
       +'<div class="av'+(c.isGrupo?' grp':'')+'">'+ini+'</div>'
-      +'<div class="col"><b>'+esc(c.conversa||'?')+'</b><span>'+esc(c.ultima_msg||'')+'</span></div>'
+      +'<div class="col"><b>'+esc(c.conversa||'?')+'</b><span>'+esc(waResumoTipo(c))+'</span></div>'
       +'<div class="meta"><time>'+ts+'</time>'+(c.n>0?'<span class="nb">'+(c.n>99?'99+':c.n)+'</span>':'')+'</div>'
       +'</div>';
   }).join('');
@@ -741,8 +761,10 @@ document.getElementById('waConvs').addEventListener('click',function(e){
   document.getElementById('waVoltar').style.display='';
   document.getElementById('waVazio').style.display='none';
   document.getElementById('waThrInner').style.display='flex';
-  document.getElementById('waReplyBox').hidden=!podeResp;
-  document.getElementById('waNoReply').hidden=podeResp;
+  const ehChamadas=WA_CONV_CHAVE==='wa-chamadas';
+  if(ehChamadas)document.getElementById('waThSub').textContent='Chamadas de voz e vídeo recebidas e perdidas';
+  document.getElementById('waReplyBox').hidden=!podeResp||ehChamadas;
+  document.getElementById('waNoReply').hidden=podeResp||ehChamadas;
   carregarWaMsgs(WA_CONV_CHAVE);
 });
 
@@ -765,8 +787,19 @@ function pintarWaMsgs(){
   const conv=WA_CONVS.find(c=>c.chave===WA_CONV_CHAVE);
   const isGrp=conv?conv.isGrupo:false;
   el.innerHTML=WA_MSGS.map(function(m){
+    const tipo=m.tipo||'texto';
+    if(tipo==='chamada'||tipo==='chamada_perdida'){
+      return '<div class="wa-msg sis'+(tipo==='chamada_perdida'?' perdida':'')+'"><div class="rem">'+esc(m.remetente||'')+'</div>'
+        +'<div class="txt">'+esc(m.texto)+'</div><time>'+horaWa(m.id)+'</time></div>';
+    }
     const rem=isGrp&&m.remetente?'<div class="rem">'+esc(m.remetente)+'</div>':'';
-    return '<div class="wa-msg eles">'+rem+'<div class="txt">'+esc(m.texto)+'</div><time>'+horaWa(m.id)+'</time></div>';
+    let corpo='<div class="txt">'+esc(m.texto)+'</div>';
+    const rot=WA_TIPOS[tipo];
+    if(rot){
+      const legenda=waLegenda(m.texto);
+      corpo='<div class="wa-media">'+rot+' <small>· no telefone</small></div>'+(legenda?'<div class="txt">'+esc(legenda)+'</div>':'');
+    }
+    return '<div class="wa-msg eles">'+rem+corpo+'<time>'+horaWa(m.id)+'</time></div>';
   }).join('');
   el.scrollTop=el.scrollHeight;
 }
@@ -801,10 +834,85 @@ async function syncWa(){
     if(VISTA==='wa'){pintarWaConvs();if(WA_CONV_CHAVE)carregarWaMsgs(WA_CONV_CHAVE)}
     for(const c of WA_CONVS){
       if(c.ultima_ts>Date.now()-120000&&c.ultima_ts>VISTO.wa){
-        avisoPC('WhatsApp · '+c.conversa,c.ultima_msg||'','wa-'+c.chave);break;
+        avisoPC('WhatsApp · '+c.conversa,waResumoTipo(c),'wa-'+c.chave);break;
       }
     }
   }catch(e){}
+}
+
+// Tipos de mensagem (o conteúdo da foto/áudio fica no telefone; a notificação só diz o tipo e a legenda)
+const WA_TIPOS={foto:'📷 Foto',video:'🎥 Vídeo',audio:'🎤 Áudio',documento:'📄 Documento',sticker:'💟 Autocolante',gif:'👾 GIF',localizacao:'📍 Localização',contacto:'👤 Contacto',sondagem:'📊 Sondagem'};
+const WA_NOMES_TIPO={texto:'Texto',foto:'Foto',video:'Vídeo',audio:'Áudio',documento:'Documento',sticker:'Autocolante',gif:'GIF',localizacao:'Localização',contacto:'Contacto',sondagem:'Sondagem',chamada:'Chamada',chamada_perdida:'Chamada perdida'};
+// Tira o emoji inicial e devolve só a legenda (ou nada, se for só «Foto», «Voice message (0:12)»…)
+function waLegenda(t){
+  let s=String(t||'').replace(/^[\u{1F000}-\u{1FAFF}\u2600-\u27BF\uFE0F\s]+/u,'').trim();
+  if(/^(foto|photo|imagem|image|v[ií]deo|video|[áa]udio|audio|mensagem de voz|nota de voz|voice message|documento|document|sticker|figurinha|autocolante|adesivo|gif|localiza[çc][ãa]o( em tempo real)?|(live )?location|contacto|contato|contact|sondagem|enquete|poll|anexo)(\s*\(\d+:\d+\))?$/i.test(s))return '';
+  return s;
+}
+function waResumoTipo(c){const r=WA_TIPOS[c.ultima_tipo];if(!r)return c.ultima_msg||'';const l=waLegenda(c.ultima_msg);return r+(l?' · '+l:'')}
+
+// ===== Exportar conversas (gerado no navegador: funciona em Wi‑Fi e pela ligação remota) =====
+let WA_EXP_ALVO='tudo';
+document.querySelectorAll('.wa-expbtn').forEach(function(b){b.addEventListener('click',function(e){
+  e.stopPropagation();
+  WA_EXP_ALVO=b.dataset.exp;
+  const m=document.getElementById('waExpMenu');
+  document.getElementById('waExpTit').textContent=WA_EXP_ALVO==='tudo'?'Exportar todas as conversas':'Exportar esta conversa';
+  const r=b.getBoundingClientRect();
+  m.hidden=false;
+  m.style.top=Math.min(r.bottom+6,window.innerHeight-m.offsetHeight-8)+'px';
+  m.style.left=Math.max(8,Math.min(r.right-m.offsetWidth,window.innerWidth-m.offsetWidth-8))+'px';
+})});
+document.addEventListener('click',function(e){const m=document.getElementById('waExpMenu');if(!m.hidden&&!m.contains(e.target))m.hidden=true});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')document.getElementById('waExpMenu').hidden=true});
+document.querySelectorAll('#waExpMenu button').forEach(function(b){b.addEventListener('click',function(){
+  document.getElementById('waExpMenu').hidden=true;
+  waExportar(WA_EXP_ALVO,b.dataset.fmt);
+})});
+
+function waData(ts){const d=new Date(ts),p=n=>String(n).padStart(2,'0');return p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear()}
+function waHora(ts){const d=new Date(ts),p=n=>String(n).padStart(2,'0');return p(d.getHours())+':'+p(d.getMinutes())}
+function waNomeFicheiro(s){return String(s||'conversa').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\w\-]+/g,'_').replace(/^_+|_+$/g,'').slice(0,40)||'conversa'}
+
+async function waExportar(alvo,fmt){
+  let msgs=[],titulo='';
+  try{
+    if(alvo==='conversa'){
+      if(!WA_CONV_CHAVE)return toast('Escolha uma conversa');
+      const r=await get('/wa-msgs?chave='+encodeURIComponent(WA_CONV_CHAVE)+'&n=1000');
+      msgs=r.lista||[];
+      const c=WA_CONVS.find(x=>x.chave===WA_CONV_CHAVE);titulo=c?c.conversa:'conversa';
+    }else{
+      const r=await get('/wa-msgs?n=1000');
+      msgs=r.lista||[];titulo='todas';
+    }
+  }catch(e){return toast('Erro ao obter as mensagens')}
+  if(!msgs.length)return toast('Não há mensagens para exportar');
+  // Ordena por conversa e depois por hora (mais antigas primeiro)
+  msgs.sort((a,b)=>(a.conversa||'').localeCompare(b.conversa||'')||a.id-b.id);
+  const app=m=>m.pacote==='com.whatsapp.w4b'?'WhatsApp Business':'WhatsApp';
+  const tipo=m=>WA_NOMES_TIPO[m.tipo||'texto']||m.tipo;
+  let conteudo,mime,ext;
+  if(fmt==='csv'){
+    const q=v=>'"'+String(v??'').replace(/"/g,'""').replace(/\r?\n/g,' ')+'"';
+    const linhas=[['Data','Hora','Conversa','Remetente','Tipo','Mensagem','Grupo','App'].map(q).join(';')];
+    msgs.forEach(m=>linhas.push([waData(m.id),waHora(m.id),m.conversa,m.remetente,tipo(m),m.texto,m.isGrupo?'Sim':'Não',app(m)].map(q).join(';')));
+    conteudo='\uFEFF'+linhas.join('\r\n');mime='text/csv;charset=utf-8';ext='csv';
+  }else{
+    const out=['Conversas do WhatsApp — exportado pelo FusãoTechX Studio em '+waData(Date.now())+' '+waHora(Date.now()),
+      'Nota: só inclui mensagens que chegaram por notificação; fotos, áudios e vídeos aparecem indicados mas o ficheiro fica no telefone.',''];
+    let atual=null;
+    msgs.forEach(m=>{
+      if(m.conversa!==atual){atual=m.conversa;out.push('','===== '+(m.conversa||'?')+(m.isGrupo?' (grupo)':'')+' · '+app(m)+' =====')}
+      out.push(waData(m.id)+' '+waHora(m.id)+' - '+(m.remetente||m.conversa||'?')+': '+(m.texto||''));
+    });
+    conteudo='\uFEFF'+out.join('\r\n');mime='text/plain;charset=utf-8';ext='txt';
+  }
+  const nome='WhatsApp_'+waNomeFicheiro(titulo)+'_'+waData(Date.now()).split('/').reverse().join('-')+'.'+ext;
+  const url=URL.createObjectURL(new Blob([conteudo],{type:mime}));
+  const a=document.createElement('a');a.href=url;a.download=nome;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),4000);
+  toast(msgs.length+' mensage'+(msgs.length===1?'m':'ns')+' exportada'+(msgs.length===1?'':'s')+' ✓');
 }
 
 function horaWa(ts){
