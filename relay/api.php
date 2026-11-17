@@ -54,7 +54,7 @@ switch ($a) {
         } while (microtime(true) < $fim);
         $lic = lic_estado($id);
         relay_json(['reqs' => $lista, 'want' => $want(), 'sal' => $m['sal'],
-                    'licenca' => ['ok' => $lic['ok'], 'motivo' => $lic['motivo'], 'ate' => $lic['ate'], 'nome' => $lic['nome']]]);
+                    'licenca' => ['ok' => $lic['ok'], 'motivo' => $lic['motivo'], 'ate' => $lic['ate'], 'nome' => $lic['nome'], 'galeria_antiga' => (bool)($lic['galeria_antiga'] ?? false)]]);
 
     case 'body':
         $rid = (string)($_GET['rid'] ?? '');

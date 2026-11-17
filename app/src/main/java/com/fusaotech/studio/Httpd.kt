@@ -44,7 +44,7 @@ class Httpd(ctxIn: Context, private val porta: Int) {
     private fun code() = Prefs.code(ctx)
     private fun code2() = Prefs.code2(ctx)
     // Caminhos do Modo Avançado (anti-roubo): exigem o 2.º código, nunca só o normal.
-    private val avancado = setOf("/adv-login", "/foto", "/local", "/alarme", "/adv-state")
+    private val avancado = setOf("/adv-login", "/foto", "/local", "/alarme", "/adv-state", "/galeria", "/media")
 
     private fun atender(s: Socket) {
         try {
@@ -124,14 +124,56 @@ class Httpd(ctxIn: Context, private val porta: Int) {
                 caminho == "/adv-login" && metodo == "POST" -> jsonResp(out, JSONObject().put("ok", json(corpo).optString("code") == code2()))
                 caminho == "/adv-state" -> jsonResp(out, JSONObject().put("ok", true).put("alarme", Device.alarmeLigado())
                     .put("camara", ctx.checkSelfPermission(android.Manifest.permission.CAMERA) == android.content.pm.PackageManager.PERMISSION_GRANTED)
-                    .put("local", ctx.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED))
+                    .put("local", ctx.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED)
+                    .put("fotos", Device.temAcessoFotos(ctx))
+                    .put("ficheiros", Device.temAcessoFicheiros(ctx))
+                    .put("galeria_antiga", Relay.galeriaAntiga).put("ultima_foto", Device.ultimaFoto ?: ""))
                 caminho == "/local" -> jsonResp(out, Device.localizacao(ctx))
                 caminho == "/foto" -> {
-                    val img = Camera.capturar(ctx, (query["cam"] ?: "frente") == "frente")
-                    if (img != null) enviar(out, 200, "image/jpeg", img) else enviar(out, 503, "application/json", "{\"erro\":\"camara\"}".toByteArray())
+                    if (ctx.checkSelfPermission(android.Manifest.permission.CAMERA) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                        enviar(out, 503, "application/json", "{\"erro\":\"sem_permissao\"}".toByteArray())
+                    } else {
+                        val frente = (query["cam"] ?: "frente") == "frente"
+                        val img = Camera.capturar(ctx, frente)
+                        if (img != null) {
+                            // Guarda uma cópia no telefone (Imagens/FusaoTechX) e indica o caminho ao PC.
+                            val nome = "FTX_" + (if (frente) "frente_" else "tras_") + System.currentTimeMillis() + ".jpg"
+                            val caminhoFoto = Device.guardarImagemCaminho(ctx, img, nome); Device.ultimaFoto = caminhoFoto
+                            val extra = if (caminhoFoto != null) "X-Path: " + enc(caminhoFoto) + "\r\n" else ""
+                            try {
+                                out.write(("HTTP/1.1 200 OK\r\nContent-Type: image/jpeg\r\nContent-Length: " + img.size + "\r\n" + extra + "Cache-Control: no-store\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n").toByteArray())
+                                out.write(img); out.flush()
+                            } catch (_: Exception) {}
+                        } else enviar(out, 503, "application/json", "{\"erro\":\"falhou\"}".toByteArray())
+                    }
                 }
-                caminho == "/files" -> jsonResp(out, Device.listar(query["p"]))
-                caminho == "/file" -> servirFicheiro(out, query["p"], query["baixar"] != null)
+                caminho == "/galeria" -> {
+                    if (!Device.temAcessoFotos(ctx)) { enviar(out, 503, "application/json", "{\"erro\":\"sem_permissao\"}".toByteArray()) }
+                    else {
+                        val antigas = query["antigas"] == "1"
+                        if (antigas && !Relay.galeriaAntiga) enviar(out, 403, "application/json", "{\"erro\":\"bloqueado\"}".toByteArray())
+                        else {
+                            val agora = System.currentTimeMillis() / 1000
+                            val desde = if (antigas) agora - 30L * 86400 else agora - 2L * 86400
+                            jsonResp(out, JSONObject().put("lista", Device.galeria(ctx, desde, (query["n"]?.toIntOrNull() ?: 200).coerceIn(10, 500))).put("antiga", Relay.galeriaAntiga))
+                        }
+                    }
+                }
+                caminho == "/media" -> {
+                    val id = query["id"]?.toLongOrNull()
+                    val ins = if (id != null) Device.abrirFoto(ctx, id) else null
+                    if (ins != null) {
+                        try {
+                            val bos = ByteArrayOutputStream(); ins.use { it.copyTo(bos) }
+                            val baixar = query["baixar"] != null
+                            val disp = if (baixar) "attachment; filename=\"foto_" + id + ".jpg\"" else "inline"
+                            out.write(("HTTP/1.1 200 OK\r\nContent-Type: image/jpeg\r\nContent-Disposition: " + disp + "\r\nContent-Length: " + bos.size() + "\r\nCache-Control: no-store\r\nConnection: close\r\n\r\n").toByteArray())
+                            out.write(bos.toByteArray()); out.flush()
+                        } catch (_: Exception) {}
+                    } else enviar(out, 404, "application/json", "{\"erro\":\"nao_encontrada\"}".toByteArray())
+                }
+                caminho == "/files" -> jsonResp(out, Device.listar(query["p"], ctx))
+                caminho == "/file" -> servirFicheiro(out, Device.caminhoReal(query["p"]), query["baixar"] != null)
                 caminho == "/upload" && metodo == "POST" -> jsonResp(out, upload(query["nome"], corpo))
                 metodo == "POST" -> jsonResp(out, acao(caminho, json(corpo)))
                 else -> enviar(out, 404, "text/plain", "404".toByteArray())

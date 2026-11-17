@@ -388,7 +388,8 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
     <div class="tiny muted" style="margin-top:14px">Por omissão é o código normal com <b>00</b> no fim, até o definir na app do telefone.</div>
   </div>
   <div id="advOn" hidden>
-    <div class="banner" style="border-color:color-mix(in srgb,var(--ac2) 40%,transparent);background:color-mix(in srgb,var(--ac2) 10%,transparent)"><span style="font-size:22px">🛡️</span><div><b>Modo avançado ativo</b>Câmara silenciosa, localização e alarme. Use com responsabilidade — é o seu telefone.</div><button class="btn sm x" id="advSair">Sair</button></div>
+    <div class="banner" style="border-color:color-mix(in srgb,var(--ac2) 40%,transparent);background:color-mix(in srgb,var(--ac2) 10%,transparent)"><span style="font-size:22px">🛡️</span><div><b>Modo avançado ativo</b>Câmara silenciosa, localização, galeria e alarme. Use com responsabilidade — é o seu telefone.</div><button class="btn sm x" id="advSair">Sair</button></div>
+    <div class="card" id="advPermBox" style="margin-bottom:16px"><h3><svg class="i" data-i="shield"></svg>Permissões necessárias</h3><div id="advPerm" class="tiny muted">A verificar…</div></div>
     <div class="grid g2" style="align-items:start">
       <div class="card"><h3><svg class="i" data-i="cam"></svg>Câmara silenciosa</h3>
         <p class="tiny muted" style="margin:0 0 12px">Tira uma foto sem abrir a câmara e sem a pessoa perceber — mesmo com o ecrã apagado. A imagem vem só para aqui; não fica no telefone.</p>
@@ -407,6 +408,10 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
       <div class="card"><h3><svg class="i" data-i="lock"></svg>Proteger</h3>
         <p class="tiny muted" style="margin:0 0 12px">Bloquear já o ecrã do telefone.</p>
         <div class="row"><button class="btn" data-g="lock"><svg class="i" data-i="lock"></svg>Bloquear ecrã</button><button class="btn" id="advCap"><svg class="i" data-i="shot"></svg>Captura do ecrã</button></div>
+      </div>
+      <div class="card" style="grid-column:1/-1"><h3><svg class="i" data-i="image"></svg>Galeria<span class="r"><button class="btn sm" id="galRef" aria-label="Atualizar">↻</button><button class="btn sm" id="galAntigas" hidden>Sincronizar últimos 30 dias</button></span></h3>
+        <p class="tiny muted" style="margin:0 0 12px">Mostra as fotos recentes do telefone. As antigas (até 30 dias) só com autorização do administrador.</p>
+        <div id="galBox"><div class="empty">A carregar…</div></div>
       </div>
       <div class="card" style="grid-column:1/-1"><h3><svg class="i" data-i="shield"></svg>Segundo código</h3>
         <div class="field" style="border:0;padding:0"><div><b>Mudar o código do modo avançado</b><span>4 a 12 dígitos. Guarde-o só consigo.</span></div><div class="row"><input id="advNovo" inputmode="numeric" maxlength="12" placeholder="novo código" style="max-width:200px"><button class="btn p" id="advGuardar">Guardar</button></div></div>
@@ -479,7 +484,7 @@ search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',plus:'<path 
 moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
 sync:'<path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 21v-5h5M21 3v5h-5"/>',max:'<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>',clip:'<rect x="8" y="3" width="8" height="4" rx="1"/><path d="M8 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>',
 link:'<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>',file:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',sim:'<path d="M6 3h8l4 4v14H6z"/><rect x="9" y="12" width="6" height="6" rx="1"/>',
-shield:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/>',locate:'<circle cx="12" cy="11" r="3"/><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/>',alarm:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M5 3 2 6M19 3l3 3"/>'};
+shield:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/>',locate:'<circle cx="12" cy="11" r="3"/><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/>',alarm:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M5 3 2 6M19 3l3 3"/>',image:'<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M4 18l5-5 4 4 3-3 4 4"/>'};
 function ico(n,st=''){return `<svg class="i" viewBox="0 0 24 24" style="${st}">${ICON[n]||ICON.file}</svg>`}
 function pintarIcones(r=document){r.querySelectorAll('svg[data-i]').forEach(s=>{s.setAttribute('viewBox','0 0 24 24');s.innerHTML=ICON[s.dataset.i]||''})}
 pintarIcones();
@@ -733,7 +738,9 @@ async function abrir(p){DIR=p;$('#fileList').innerHTML='<div class="empty">A abr
  const it=r.itens||[];
  $('#fileList').innerHTML=it.length?'<div class="fgrid">'+it.map(i=>{if(i.d)return `<button class="fi" data-p="${esc(i.p)}"><div class="th"><span style="color:var(--ac)">${ico('folder','width:34px;height:34px')}</span></div><div class="nm">${esc(i.n)}</div><div class="mt">Pasta</div></button>`;
   const k=kind(i.e);const th=k==='img'?`<img loading="lazy" src="${fUrl(i.p)}" alt="">`:`<span class="e" style="background:${KC[k]}22;color:${KC[k]}">${esc((i.e||'?').toUpperCase().slice(0,4))}</span>`;
-  return `<button class="fi" data-f="${esc(i.p)}" data-k="${k}" title="${esc(i.n)}"><div class="th">${th}</div><div class="nm">${esc(i.n)}</div><div class="mt">${fmtB(i.s)}</div></button>`}).join('')+'</div>':'<div class="empty"><span class="ei">📂</span>Pasta vazia (ou permissão de ficheiros por dar)</div>'}catch(e){}}
+  return `<button class="fi" data-f="${esc(i.p)}" data-k="${k}" title="${esc(i.n)}"><div class="th">${th}</div><div class="nm">${esc(i.n)}</div><div class="mt">${fmtB(i.s)}</div></button>`}).join('')+'</div>':'<div class="empty"><span class="ei">📂</span>'+(r.acesso===false?'Sem «Acesso a todos os ficheiros». Dê essa permissão na app FusãoTechX do telefone.':(r.negado?'Esta pasta está protegida pelo Android.':'Pasta vazia.'))+'</div>';
+  if(r.acesso===false){$('#fileList').insertAdjacentHTML('afterbegin','<div class="banner" style="margin-bottom:12px"><span style=\'font-size:20px\'>📁</span><div><b>Falta «Acesso a todos os ficheiros»</b>Na app FusãoTechX do telefone, toque em «Acesso a todos os ficheiros» e permita. Sem isto, as pastas aparecem vazias.</div></div>');}
+ }catch(e){}}
 $('#fileList').onclick=e=>{const d=e.target.closest('[data-p]');if(d)return abrir(d.dataset.p);const f=e.target.closest('[data-f]');if(!f)return;
  if(f.dataset.k==='img'){$('#lbImg').src=fUrl(f.dataset.f);$('#lb').classList.add('on')}else window.open(fUrl(f.dataset.f,!['vid','aud','doc'].includes(f.dataset.k)),'_blank')};
 $('#crumb').onclick=e=>{const b=e.target.closest('[data-p]');if(b)abrir(b.dataset.p)};
@@ -781,21 +788,38 @@ async function advEntrar(){const c=$('#advPin').value.trim();if(!c)return;$('#ad
 function advSair(){ADV='';try{sessionStorage.removeItem('ftxadv')}catch(e){}pintarAdv()}
 $('#advEntrar').onclick=advEntrar;$('#advPin').addEventListener('keydown',e=>{if(e.key==='Enter')advEntrar()});
 $('#advSair').onclick=advSair;
-async function advEstado(){try{const s=await (await fetch(advUrl('/adv-state'))).json();
+let ADVS={};
+async function advEstado(){try{const s=await (await fetch(advUrl('/adv-state'))).json();ADVS=s;
  $('#alarmeOn').disabled=!!s.alarme;$('#alarmeOff').disabled=!s.alarme;
- if(s.camara===false)$('#fotoBox').innerHTML='<div class="tiny" style="color:var(--wa)">Dê a permissão de câmara na app do telefone.</div>';
+ const linha=(ok,nome,ajuda)=>`<div class="perm"><span class="s ${ok?'ok':'no'}">${ok?'✓':'!'}</span><div><b>${nome}</b><span>${ok?'Concedida':('Em falta — '+ajuda)}</span></div></div>`;
+ $('#advPerm').innerHTML=linha(s.camara,'Câmara','app FusãoTechX › «Permitir câmara»')+linha(s.local,'Localização','app FusãoTechX › permissões › Localização (e ligue o GPS)')+linha(s.fotos,'Fotos / galeria','app FusãoTechX › permissões › Fotos')+linha(s.ficheiros,'Todos os ficheiros','app FusãoTechX › «Acesso a todos os ficheiros»');
+ if(s.camara===false)$('#fotoBox').innerHTML='<div class="tiny" style="color:var(--wa)">Dê a permissão de câmara na app do telefone (ver lista acima).</div>';
+ $('#galAntigas').hidden=!s.galeria_antiga;
+ carregarGaleria(false);
 }catch(e){}}
+async function carregarGaleria(antigas){const box=$('#galBox');box.innerHTML='<div class="empty" style="padding:20px">🖼️ A carregar fotos…</div>';
+ try{const r=await (await fetch(advUrl('/galeria'+(antigas?'&antigas=1':'')),{cache:'no-store'})).json();
+  const l=r.lista||[];
+  if(!l.length){box.innerHTML='<div class="empty"><span class="ei">🖼️</span>Sem fotos'+(antigas?'':' recentes')+(ADVS.fotos===false?' (dê a permissão de fotos)':'')+'.</div>';return}
+  box.innerHTML='<div class="fgrid">'+l.map(ft=>`<button class="fi" data-id="${ft.id}" title="${esc(ft.nome)}"><div class="th"><img loading="lazy" src="${advUrl('/media&id='+ft.id)}" alt=""></div><div class="nm">${esc(ft.nome)}</div><div class="mt">${new Date(+ft.data).toLocaleDateString('pt-PT')} · ${fmtB(ft.s)}</div></button>`).join('')+'</div>';
+ }catch(e){box.innerHTML='<div class="tiny" style="color:var(--er)">Falhou.</div>'}}
+$('#galRef').onclick=()=>carregarGaleria(false);
+$('#galAntigas').onclick=()=>carregarGaleria(true);
+$('#galBox').onclick=e=>{const b=e.target.closest('[data-id]');if(!b)return;$('#lbImg').src=advUrl('/media&id='+b.dataset.id);$('#lb').classList.add('on')};
 async function tirarFoto(frente){const box=$('#fotoBox');box.innerHTML='<div class="empty" style="padding:20px">📸 A tirar foto em silêncio…</div>';
  try{const r=await fetch(advUrl('/foto&cam='+(frente?'frente':'tras')),{cache:'no-store'});
   if(r.status===403){advSair();return}
-  if(!r.ok){box.innerHTML='<div class="tiny" style="color:var(--er)">Não foi possível (permissão de câmara? câmara ocupada?).</div>';return}
+  if(!r.ok){let m='Não foi possível.';try{const j=await r.json();m={sem_permissao:'Falta a permissão de câmara (ver lista de permissões acima).',falhou:'A câmara não respondeu (ocupada por outra app?). Tente de novo.'}[j.erro]||m;}catch(x){}box.innerHTML='<div class="tiny" style="color:var(--er)">'+m+'</div>';return}
+  let cam=decodeURIComponent(r.headers.get('X-Path')||'');
   const b=await r.blob(),u=URL.createObjectURL(b);
-  box.innerHTML=`<img src="${u}" style="width:100%;border-radius:12px;border:1px solid var(--line)"><div class="row" style="margin-top:8px"><a class="btn sm" href="${u}" download="foto-${frente?'frente':'tras'}-${Date.now()}.jpg">⬇️ Guardar no PC</a><span class="tiny muted">${new Date().toLocaleTimeString('pt-PT')} · ${frente?'frente':'trás'}</span></div>`;
+  box.innerHTML=`<img src="${u}" style="width:100%;border-radius:12px;border:1px solid var(--line)"><div class="row" style="margin-top:8px"><a class="btn sm" href="${u}" download="foto-${frente?'frente':'tras'}-${Date.now()}.jpg">⬇️ Guardar no PC</a><span class="tiny muted">${new Date().toLocaleTimeString('pt-PT')} · ${frente?'frente':'trás'}</span></div><div class="tiny muted" id="fotoPath" style="margin-top:6px"></div>`;
+  if(!cam){try{const st=await (await fetch(advUrl('/adv-state'))).json();cam=st.ultima_foto||''}catch(e){}}
+  if(cam)$('#fotoPath').innerHTML='📁 No telefone: <b>'+esc(cam.replace('/storage/emulated/0','/sdcard'))+'</b>';
  }catch(e){box.innerHTML='<div class="tiny" style="color:var(--er)">Falhou.</div>'}}
 $('#fotoFrente').onclick=()=>tirarFoto(true);$('#fotoTras').onclick=()=>tirarFoto(false);
 $('#btnLocal').onclick=async()=>{const box=$('#localBox');box.innerHTML='<div class="empty" style="padding:20px">📍 A localizar…</div>';
  try{const r=await (await fetch(advUrl('/local'),{cache:'no-store'})).json();
-  if(r.erro){box.innerHTML='<div class="tiny" style="color:var(--wa)">'+({sem_permissao:'Dê a permissão de localização na app do telefone.',sem_sinal:'Sem sinal de GPS — tente ao ar livre.',indisponivel:'Localização indisponível.'}[r.erro]||'Não obtida.')+'</div>';return}
+  if(r.erro){box.innerHTML='<div class="tiny" style="color:var(--wa)">'+({sem_permissao:'Dê a permissão de localização na app do telefone.',desligada:'A localização (GPS) está desligada no telefone — ligue-a.',sem_sinal:'Ainda sem sinal de GPS — tente ao ar livre e repita.',indisponivel:'Localização indisponível.'}[r.erro]||'Não obtida.')+'</div>';return}
   const q=new Date(+r.quando).toLocaleString('pt-PT');
   box.innerHTML=`<div class="it" style="margin:0"><div class="av" style="background:var(--ac)">📍</div><div class="tx"><b>${r.lat.toFixed(5)}, ${r.lng.toFixed(5)}</b><span>Precisão ~${Math.round(r.prec)} m · ${esc(q)}</span></div></div><a class="btn p sm" style="margin-top:8px" href="${esc(r.maps)}" target="_blank" rel="noopener">🗺️ Ver no mapa</a>`;
  }catch(e){box.innerHTML='<div class="tiny" style="color:var(--er)">Falhou.</div>'}};

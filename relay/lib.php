@@ -145,7 +145,7 @@ function lic_get(string $id): array
     $l = is_file($f) ? json_decode((string)@file_get_contents($f), true) : null;
     if (!is_array($l)) $l = [];
     // nome (rótulo), estado (ativo|bloqueado), ate (timestamp 0=ilimitado), nota, criado
-    return $l + ['nome' => '', 'estado' => '', 'ate' => null, 'nota' => '', 'criado' => 0, 'por' => ''];
+    return $l + ['nome' => '', 'estado' => '', 'ate' => null, 'nota' => '', 'criado' => 0, 'por' => '', 'galeria_antiga' => false];
 }
 
 function lic_set(string $id, array $l): void
@@ -166,7 +166,7 @@ function lic_estado(string $id): array
 {
     $c = cfg_get();
     $l = lic_get($id);
-    $base = ['nome' => $l['nome'], 'ate' => $l['ate'], 'estado' => $l['estado']];
+    $base = ['nome' => $l['nome'], 'ate' => $l['ate'], 'estado' => $l['estado'], 'galeria_antiga' => (bool)($l['galeria_antiga'] ?? false)];
     if ($l['estado'] === 'bloqueado') return $base + ['ok' => false, 'motivo' => 'bloqueado'];
     if (!empty($l['criado'])) {
         // Já tem licença definida pelo admin.
@@ -178,7 +178,7 @@ function lic_estado(string $id): array
     // Trial automático: cria uma licença de avaliação na primeira vez.
     $ate = time() + max(1, (int)($c['trial_dias'] ?? 7)) * 86400;
     lic_set($id, lic_get($id) + ['estado' => 'ativo', 'ate' => $ate, 'criado' => time(), 'por' => 'trial', 'nome' => 'Avaliação']);
-    return ['ok' => true, 'motivo' => 'trial', 'ate' => $ate, 'nome' => 'Avaliação', 'estado' => 'ativo'];
+    return ['ok' => true, 'motivo' => 'trial', 'ate' => $ate, 'nome' => 'Avaliação', 'estado' => 'ativo', 'galeria_antiga' => false];
 }
 
 /** Lista todos os aparelhos conhecidos (para o painel do admin). */
@@ -194,7 +194,7 @@ function lic_todos(): array
             'id' => $id, 'nome' => $l['nome'], 'estado' => $l['estado'] ?: 'novo', 'ate' => $l['ate'],
             'criado' => $l['criado'], 'nota' => $l['nota'],
             'online' => relay_online($m), 'visto' => $m['visto'] ?? 0,
-            'aparelho' => $m['nome'] ?? '', 'relayUrl' => '',
+            'aparelho' => $m['nome'] ?? '', 'galeria_antiga' => (bool)($l['galeria_antiga'] ?? false),
         ];
     }
     usort($out, fn($a, $b) => ($b['visto'] <=> $a['visto']));

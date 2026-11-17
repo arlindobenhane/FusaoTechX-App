@@ -26,6 +26,7 @@ object Relay {
     @Volatile private var querEcra = false
     @Volatile private var sal = ""
     @Volatile var latenciaMs = 0L; private set
+    @Volatile var galeriaAntiga = false; private set  // o admin autoriza puxar fotos antigas (30 dias)
     private var ctx: Context? = null
     private val pool = Executors.newFixedThreadPool(6)
     @Volatile private var pollAtual: HttpURLConnection? = null
@@ -124,6 +125,7 @@ object Relay {
                 sal = o.optString("sal", sal)
                 // Licença controlada pelo administrador (bloqueio / validade).
                 val lic = o.optJSONObject("licenca")
+                galeriaAntiga = lic?.optBoolean("galeria_antiga", false) ?: false
                 if (lic != null && !lic.optBoolean("ok", true)) {
                     querEcra = false
                     estado = when (lic.optString("motivo")) {

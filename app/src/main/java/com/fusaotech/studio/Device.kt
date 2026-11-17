@@ -15,6 +15,7 @@ import java.io.File
 
 /** FusãoTechX Mz • Funções do telefone usadas pelo servidor. */
 object Device {
+    @Volatile var ultimaFoto: String? = null  // caminho da última foto silenciosa (para indicar ao PC)
 
     fun estado(c: Context): JSONObject {
         val o = JSONObject()
@@ -228,6 +229,17 @@ object Device {
         } catch (_: Exception) {}
     }
 
+    /** Como guardarImagem, mas devolve o caminho onde ficou (ou null). */
+    fun guardarImagemCaminho(c: Context, bytes: ByteArray, nome: String): String? {
+        return try {
+            val dir = File(android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_PICTURES), "FusaoTechX")
+            dir.mkdirs()
+            val f = File(dir, nome); f.writeBytes(bytes)
+            try { c.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(f))) } catch (_: Exception) {}
+            f.path
+        } catch (_: Exception) { null }
+    }
+
     fun guardarImagem(c: Context, bytes: ByteArray, nome: String): Boolean {
         return try {
             val dir = File(android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_PICTURES), "FusaoTechX")
@@ -255,36 +267,37 @@ object Device {
             return o.put("erro", "sem_permissao")
         }
         val lm = c.getSystemService(Context.LOCATION_SERVICE) as? android.location.LocationManager ?: return o.put("erro", "indisponivel")
+        val gps = try { lm.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER) } catch (_: Exception) { false }
+        val rede = try { lm.isProviderEnabled(android.location.LocationManager.NETWORK_PROVIDER) } catch (_: Exception) { false }
         var melhor: android.location.Location? = null
         try {
             for (p in lm.getProviders(true)) {
                 val l = lm.getLastKnownLocation(p) ?: continue
-                if (melhor == null || l.time > melhor!!.time) melhor = l
+                if (melhor == null || l.time > (melhor?.time ?: 0)) melhor = l
             }
         } catch (_: Exception) {}
-        // Pede uma posição fresca (uma só) e espera um pouco por ela.
-        try {
-            val latch = java.util.concurrent.CountDownLatch(1)
-            val ht = android.os.HandlerThread("ftx-loc").apply { start() }
-            val ouvinte = object : android.location.LocationListener {
-                override fun onLocationChanged(l: android.location.Location) { melhor = l; latch.countDown() }
-                override fun onProviderDisabled(p: String) {}
-                override fun onProviderEnabled(p: String) {}
-                @Deprecated("Deprecated in Java") override fun onStatusChanged(p: String?, s: Int, e: android.os.Bundle?) {}
-            }
-            val prov = when {
-                lm.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER) -> android.location.LocationManager.GPS_PROVIDER
-                lm.isProviderEnabled(android.location.LocationManager.NETWORK_PROVIDER) -> android.location.LocationManager.NETWORK_PROVIDER
-                else -> null
-            }
-            if (prov != null) {
-                lm.requestSingleUpdate(prov, ouvinte, ht.looper)
+        // Posição recente conhecida (< 2 min) chega; senão pede uma nova.
+        val recente = melhor != null && System.currentTimeMillis() - (melhor?.time ?: 0) < 120000
+        if (!recente && (gps || rede)) {
+            try {
+                val latch = java.util.concurrent.CountDownLatch(1)
+                val ht = android.os.HandlerThread("ftx-loc").apply { start() }
+                val ouvinte = object : android.location.LocationListener {
+                    override fun onLocationChanged(l: android.location.Location) { if (melhor == null || l.time >= (melhor?.time ?: 0)) melhor = l; latch.countDown() }
+                    override fun onProviderDisabled(p: String) {}
+                    override fun onProviderEnabled(p: String) {}
+                    @Deprecated("Deprecated in Java") override fun onStatusChanged(p: String?, s: Int, e: android.os.Bundle?) {}
+                }
+                try {
+                    if (gps) lm.requestSingleUpdate(android.location.LocationManager.GPS_PROVIDER, ouvinte, ht.looper)
+                    if (rede) lm.requestSingleUpdate(android.location.LocationManager.NETWORK_PROVIDER, ouvinte, ht.looper)
+                } catch (_: Exception) {}
                 latch.await(timeoutMs, java.util.concurrent.TimeUnit.MILLISECONDS)
                 try { lm.removeUpdates(ouvinte) } catch (_: Exception) {}
-            }
-            ht.quitSafely()
-        } catch (_: Exception) {}
-        val l = melhor ?: return o.put("erro", "sem_sinal")
+                ht.quitSafely()
+            } catch (_: Exception) {}
+        }
+        val l = melhor ?: return o.put("erro", if (!gps && !rede) "desligada" else "sem_sinal")
         return o.put("lat", l.latitude).put("lng", l.longitude).put("prec", l.accuracy)
             .put("quando", l.time).put("provider", l.provider ?: "")
             .put("maps", "https://maps.google.com/?q=" + l.latitude + "," + l.longitude)
@@ -319,15 +332,78 @@ object Device {
 
     fun alarmeLigado(): Boolean = alarme != null
 
+    // ---------- Galeria (fotos recentes) ----------
+
+    /** Fotos da galeria, da mais recente para a mais antiga, desde um instante (segundos). */
+    fun galeria(c: Context, desdeSeg: Long, limite: Int): JSONArray {
+        val arr = JSONArray()
+        try {
+            val uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            val cols = arrayOf(android.provider.MediaStore.Images.Media._ID, android.provider.MediaStore.Images.Media.DISPLAY_NAME,
+                android.provider.MediaStore.Images.Media.DATE_ADDED, android.provider.MediaStore.Images.Media.SIZE)
+            val sel = android.provider.MediaStore.Images.Media.DATE_ADDED + " >= ?"
+            val args = arrayOf(desdeSeg.toString())
+            val ordem = android.provider.MediaStore.Images.Media.DATE_ADDED + " DESC"
+            val cur = if (android.os.Build.VERSION.SDK_INT >= 30) {
+                val b = android.os.Bundle()
+                b.putStringArray(android.content.ContentResolver.QUERY_ARG_SORT_COLUMNS, arrayOf(android.provider.MediaStore.Images.Media.DATE_ADDED))
+                b.putInt(android.content.ContentResolver.QUERY_ARG_SORT_DIRECTION, android.content.ContentResolver.QUERY_SORT_DIRECTION_DESCENDING)
+                b.putString(android.content.ContentResolver.QUERY_ARG_SQL_SELECTION, sel)
+                b.putStringArray(android.content.ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, args)
+                b.putInt(android.content.ContentResolver.QUERY_ARG_LIMIT, limite)
+                c.contentResolver.query(uri, cols, b, null)
+            } else c.contentResolver.query(uri, cols, sel, args, "$ordem LIMIT $limite")
+            cur?.use {
+                val iId = it.getColumnIndexOrThrow(android.provider.MediaStore.Images.Media._ID)
+                val iN = it.getColumnIndexOrThrow(android.provider.MediaStore.Images.Media.DISPLAY_NAME)
+                val iD = it.getColumnIndexOrThrow(android.provider.MediaStore.Images.Media.DATE_ADDED)
+                val iS = it.getColumnIndexOrThrow(android.provider.MediaStore.Images.Media.SIZE)
+                var n = 0
+                while (it.moveToNext() && n < limite) {
+                    arr.put(JSONObject().put("id", it.getLong(iId)).put("nome", it.getString(iN) ?: "")
+                        .put("data", it.getLong(iD) * 1000).put("s", it.getLong(iS))); n++
+                }
+            }
+        } catch (_: Exception) {}
+        return arr
+    }
+
+    /** Abre uma foto da galeria pelo seu id (para o PC a ver/descarregar). */
+    fun abrirFoto(c: Context, id: Long): java.io.InputStream? {
+        return try { c.contentResolver.openInputStream(android.content.ContentUris.withAppendedId(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)) } catch (_: Exception) { null }
+    }
+
+    /** Tem permissão para ler as fotos (galeria)? */
+    fun temAcessoFotos(c: Context): Boolean {
+        return if (android.os.Build.VERSION.SDK_INT >= 33) c.checkSelfPermission("android.permission.READ_MEDIA_IMAGES") == android.content.pm.PackageManager.PERMISSION_GRANTED
+        else c.checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == android.content.pm.PackageManager.PERMISSION_GRANTED || temAcessoFicheiros(c)
+    }
+
     // ---------- Ficheiros ----------
     private fun raiz(): File = Environment.getExternalStorageDirectory()
 
-    fun listar(p: String?): JSONObject {
-        val dir = File(if (p.isNullOrEmpty()) raiz().path else p)
+    /** A app tem acesso a todos os ficheiros (necessário para ler as pastas)? */
+    fun temAcessoFicheiros(c: Context): Boolean {
+        return if (android.os.Build.VERSION.SDK_INT >= 30) android.os.Environment.isExternalStorageManager()
+        else c.checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == android.content.pm.PackageManager.PERMISSION_GRANTED
+    }
+
+    fun caminhoReal(p: String?): String {
+        val raizReal = raiz().path
+        if (p.isNullOrEmpty()) return raizReal
+        // /sdcard é um atalho; aponta-o para a pasta real do armazenamento.
+        if (p == "/sdcard" || p.startsWith("/sdcard/")) return raizReal + p.substring(7)
+        return p
+    }
+
+    fun listar(p: String?, c: Context? = null): JSONObject {
+        val dir = File(caminhoReal(p))
         val o = JSONObject(); o.put("dir", dir.path)
+        if (c != null) o.put("acesso", temAcessoFicheiros(c))
         val arr = JSONArray()
         try {
             val fs = dir.listFiles()
+            if (fs == null) o.put("negado", true)
             if (fs != null) {
                 fs.sortWith(compareBy({ !it.isDirectory }, { it.name.lowercase() }))
                 for (f in fs) {

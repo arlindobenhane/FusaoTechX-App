@@ -267,7 +267,7 @@ class MainActivity : Activity() {
         p.add(Manifest.permission.READ_CALL_LOG)
         p.add(Manifest.permission.ACCESS_FINE_LOCATION)
         p.add(Manifest.permission.ACCESS_COARSE_LOCATION)
-        if (Build.VERSION.SDK_INT >= 33) p.add(Manifest.permission.POST_NOTIFICATIONS)
+        if (Build.VERSION.SDK_INT >= 33) { p.add(Manifest.permission.POST_NOTIFICATIONS); p.add("android.permission.READ_MEDIA_IMAGES") }
         requestPermissions(p.toTypedArray(), REQ_PERM)
     }
 

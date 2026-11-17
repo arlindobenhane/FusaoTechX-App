@@ -52,6 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $dd = RELAY_DATA . '/' . $id;
             if (is_dir($dd)) { $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dd, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST); foreach ($it as $f) $f->isDir() ? @rmdir($f->getPathname()) : @unlink($f->getPathname()); @rmdir($dd); }
             $ok = 'Aparelho ' . $id . ' removido.';
+        } elseif ($acao === 'galeria' && relay_id_ok($id)) {
+            $l = lic_get($id); $l['galeria_antiga'] = !empty($_POST['ligar']); if (!$l['criado']) { $l['criado'] = time(); $l['por'] = $_SESSION['ftx_admin']; } lic_set($id, $l);
+            $ok = 'Galeria antiga ' . ($l['galeria_antiga'] ? 'autorizada' : 'bloqueada') . ' para ' . $id . '.';
         } elseif ($acao === 'politica') {
             $c = cfg_get(); $c['politica_novos'] = ($_POST['politica'] ?? 'trial') === 'bloquear' ? 'bloquear' : 'trial';
             $c['trial_dias'] = max(1, min(60, (int)($_POST['trial_dias'] ?? 7))); cfg_set($c); $ok = 'Política guardada.';
@@ -198,6 +201,11 @@ label.l{display:block;text-align:left;font-size:12.5px;color:var(--mu);font-weig
           <input type="date" name="data" style="max-width:160px" title="Usado com «Até data…»">
           <input name="nota" placeholder="Nota interna" value="<?php echo $h($d['nota']); ?>" style="max-width:200px">
           <button class="btn p sm">💾 Guardar</button>
+        </form>
+        <form method="post" style="margin-top:0;border:0;padding-top:4px">
+          <input type="hidden" name="csrf" value="<?php echo $h($csrf); ?>"><input type="hidden" name="acao" value="galeria"><input type="hidden" name="id" value="<?php echo $h($d['id']); ?>">
+          <input type="hidden" name="ligar" value="<?php echo $d['galeria_antiga'] ? '' : '1'; ?>">
+          <button class="btn sm <?php echo $d['galeria_antiga'] ? 'ok' : ''; ?>">🖼️ Galeria antiga (30 dias): <?php echo $d['galeria_antiga'] ? 'AUTORIZADA — tocar p/ bloquear' : 'bloqueada — tocar p/ autorizar'; ?></button>
         </form>
       </div>
     <?php endforeach; ?>
