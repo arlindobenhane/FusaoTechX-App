@@ -84,18 +84,23 @@ object WhatsAppStore {
                 if (!vistos.add(ts)) continue               // já processada
                 val texto = m.text?.toString()?.trim() ?: continue
                 if (texto.isEmpty()) continue
-                val remetente = m.senderPerson?.name?.toString()?.trim()
+
+                // sender == null significa mensagem enviada pelo próprio utilizador
+                val senderName = m.senderPerson?.name?.toString()?.trim()
                     ?: m.sender?.trim()
-                    ?: tituloConversa
+                val meuTurno = senderName.isNullOrEmpty()
+                val remetente = if (meuTurno) "Eu" else (senderName ?: tituloConversa)
 
                 adicionar(ctx, WhatsAppMessage(
                     id = ts,
                     chave = sbn.key,
                     conversa = tituloConversa,
-                    remetente = remetente ?: tituloConversa,
+                    remetente = remetente,
                     texto = texto,
                     isGrupo = isGrupo,
-                    pacote = sbn.packageName
+                    pacote = sbn.packageName,
+                    meuTurno = meuTurno,
+                    tipo = detectarTipo(texto)
                 ))
                 novas = true
             }
@@ -112,16 +117,60 @@ object WhatsAppStore {
         // Ignora contadores como "3 mensagens não lidas"
         if (titulo.isEmpty() && texto.matches(Regex("^\\d+ .*mensagens.*", RegexOption.IGNORE_CASE))) return false
 
+        // No fallback, detetar mensagens saídas via prefixo "Eu:" ou "You:"
+        val meuTurnoFallback = texto.startsWith("Eu: ", ignoreCase = true) || texto.startsWith("You: ", ignoreCase = true)
+        val textoLimpo = when {
+            meuTurnoFallback -> texto.substringAfter(": ")
+            else -> texto
+        }
+
         adicionar(ctx, WhatsAppMessage(
             id = ts,
             chave = sbn.key,
             conversa = titulo,
-            remetente = titulo,
-            texto = texto,
+            remetente = if (meuTurnoFallback) "Eu" else titulo,
+            texto = textoLimpo,
             isGrupo = extras.getBoolean(Notification.EXTRA_IS_GROUP_CONVERSATION, false),
-            pacote = sbn.packageName
+            pacote = sbn.packageName,
+            meuTurno = meuTurnoFallback,
+            tipo = detectarTipo(textoLimpo)
         ))
         return true
+    }
+
+    /** Detetar tipo de media a partir do texto da notificação do WhatsApp. */
+    private fun detectarTipo(texto: String): String {
+        val t = texto.trim()
+        return when {
+            t.matches(Regex("(?i)(📷|🖼️|📸).*|(foto|photo|image|imagem).*", RegexOption.IGNORE_CASE)) ||
+            t.equals("📷 Photo", ignoreCase = true) || t.equals("📷 Foto", ignoreCase = true) ||
+            t.startsWith("📷") || t.startsWith("🖼") || t.startsWith("📸") -> "imagem"
+
+            t.matches(Regex("(?i)(🎵|🎶|🔊).*|(áudio|audio|voice message|mensagem de voz).*")) ||
+            t.startsWith("🎵") || t.startsWith("🎶") || t.startsWith("🔊") ||
+            t.equals("🎤 Voice message", ignoreCase = true) || t.equals("🎤 Mensagem de voz", ignoreCase = true) ||
+            t.startsWith("🎤") -> "audio"
+
+            t.matches(Regex("(?i)(🎬|📹).*|(vídeo|video|gif).*")) ||
+            t.startsWith("🎬") || t.startsWith("📹") -> "video"
+
+            t.matches(Regex("(?i)(📄|📎|📃|📑).*|(documento|document|file|ficheiro).*")) ||
+            t.startsWith("📄") || t.startsWith("📎") || t.startsWith("📃") -> "documento"
+
+            t.matches(Regex("(?i)(📞|☎️|📱).*|(chamada|call|missed call|chamada perdida|chamada recebida|chamada realizada).*")) ||
+            t.startsWith("📞") || t.startsWith("☎") ||
+            t.contains("chamada", ignoreCase = true) || t.contains("call", ignoreCase = true) -> "chamada"
+
+            t.matches(Regex("(?i)(😊|😀|🙂).*|(sticker|stickers).*")) ||
+            t.equals("Sticker", ignoreCase = true) -> "sticker"
+
+            t.matches(Regex("(?i)(📍|🗺️).*|(localização|location).*")) ||
+            t.startsWith("📍") || t.startsWith("🗺") -> "localizacao"
+
+            t.startsWith("🎤") || t.contains("voice note", ignoreCase = true) -> "voz"
+
+            else -> "texto"
+        }
     }
 
     // ──────────────────────────────────────────────────────────────
@@ -165,6 +214,8 @@ object WhatsAppStore {
                     .put("pacote", ultima.pacote)
                     .put("n", fila.size)
                     .put("ultima_msg", ultima.texto)
+                    .put("ultima_tipo", ultima.tipo)
+                    .put("ultima_meu", ultima.meuTurno)
                     .put("ultima_ts", ultima.id)
                     .put("pode_responder", sbnAtivas.containsKey(chave) && temAcaoResposta(chave))
                 )
@@ -202,6 +253,59 @@ object WhatsAppStore {
         .put("texto", m.texto)
         .put("isGrupo", m.isGrupo)
         .put("pacote", m.pacote)
+        .put("meuTurno", m.meuTurno)
+        .put("tipo", m.tipo)
+
+    // ──────────────────────────────────────────────────────────────
+    //  Exportação
+    // ──────────────────────────────────────────────────────────────
+
+    /** Exporta uma conversa ou todas como TXT ou CSV. */
+    fun exportar(chave: String?, formato: String): ByteArray {
+        val msgs = mutableListOf<WhatsAppMessage>()
+        if (chave != null) {
+            conversas[chave]?.let { fila -> synchronized(fila) { msgs.addAll(fila) } }
+        } else {
+            conversas.values.forEach { fila -> synchronized(fila) { msgs.addAll(fila) } }
+            msgs.sortBy { it.id }
+        }
+        return when (formato.lowercase()) {
+            "csv" -> exportarCsv(msgs)
+            else  -> exportarTxt(msgs)
+        }
+    }
+
+    private fun exportarTxt(msgs: List<WhatsAppMessage>): ByteArray {
+        val sb = StringBuilder()
+        var ultimaConversa = ""
+        for (m in msgs) {
+            if (m.conversa != ultimaConversa) {
+                sb.append("\n── ${m.conversa} (${if (m.pacote == "com.whatsapp.w4b") "Business" else "Messenger"}) ──\n\n")
+                ultimaConversa = m.conversa
+            }
+            val hora = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault())
+                .format(java.util.Date(m.id))
+            val dir = if (m.meuTurno) "→" else "←"
+            val rem = if (m.meuTurno) "Eu" else m.remetente
+            val tipoLabel = if (m.tipo != "texto") "[${m.tipo}] " else ""
+            sb.append("[$hora] $dir $rem: $tipoLabel${m.texto}\n")
+        }
+        return sb.toString().trimStart().toByteArray(Charsets.UTF_8)
+    }
+
+    private fun exportarCsv(msgs: List<WhatsAppMessage>): ByteArray {
+        val sb = StringBuilder()
+        sb.append("timestamp,conversa,app,remetente,direcao,tipo,mensagem\n")
+        for (m in msgs) {
+            val hora = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault())
+                .format(java.util.Date(m.id))
+            val app = if (m.pacote == "com.whatsapp.w4b") "Business" else "Messenger"
+            val dir = if (m.meuTurno) "saida" else "entrada"
+            fun esc(s: String) = "\"${s.replace("\"", "\"\"")}\""
+            sb.append("${esc(hora)},${esc(m.conversa)},${esc(app)},${esc(m.remetente)},${esc(dir)},${esc(m.tipo)},${esc(m.texto)}\n")
+        }
+        return sb.toString().toByteArray(Charsets.UTF_8)
+    }
 
     // ──────────────────────────────────────────────────────────────
     //  Resposta via RemoteInput
@@ -252,7 +356,9 @@ object WhatsAppStore {
                         remetente = o.optString("remetente", "?"),
                         texto = o.getString("texto"),
                         isGrupo = o.optBoolean("isGrupo", false),
-                        pacote = o.optString("pacote", "com.whatsapp")
+                        pacote = o.optString("pacote", "com.whatsapp"),
+                        meuTurno = o.optBoolean("meuTurno", false),
+                        tipo = o.optString("tipo", "texto")
                     )
                     val fila = conversas.getOrPut(msg.chave) { ArrayDeque() }
                     fila.addLast(msg)

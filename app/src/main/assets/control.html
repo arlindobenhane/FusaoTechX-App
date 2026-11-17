@@ -368,67 +368,122 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
 <!-- WHATSAPP -->
 <section class="view" id="v-wa">
   <style>
+    /* ── WhatsApp panel ── */
     .wa-icon path{fill:currentColor}
-    .wa-hdr{display:flex;align-items:center;gap:10px;margin-bottom:16px}
-    .wa-hdr svg{width:28px;height:28px;color:#25d366}
-    .wa-hdr h2{margin:0;font-size:17px}
-    .wa-hdr .muted{font-size:12px;color:var(--mu)}
-    .wa-perm{display:flex;align-items:center;gap:12px;background:color-mix(in srgb,#25d366 10%,var(--bg));border:1px solid color-mix(in srgb,#25d366 30%,transparent);border-radius:12px;padding:14px 16px;margin-bottom:16px}
-    .wa-perm span{font-size:26px}
-    .wa-perm b{display:block;margin-bottom:2px}
+    /* header */
+    .wa-hdr{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+    .wa-hdr-logo{width:34px;height:34px;border-radius:10px;background:#25d366;display:grid;place-items:center;flex-shrink:0}
+    .wa-hdr-logo svg{width:20px;height:20px;fill:#fff}
+    .wa-hdr-logo.biz{background:#1a4a3c}
+    .wa-hdr h2{margin:0;font-size:17px;font-weight:800}
+    .wa-hdr .muted{font-size:11.5px;color:var(--mu)}
+    /* permissão */
+    .wa-perm{display:flex;align-items:center;gap:12px;background:color-mix(in srgb,#25d366 10%,transparent);border:1px solid color-mix(in srgb,#25d366 30%,transparent);border-radius:12px;padding:13px 16px;margin-bottom:14px}
+    .wa-perm span{font-size:24px}
+    .wa-perm b{display:block;margin-bottom:2px;font-size:13.5px}
     .wa-perm .muted{font-size:12px;color:var(--mu)}
-    #waWrap{display:grid;grid-template-columns:280px 1fr;gap:0;border:1px solid var(--bd);border-radius:12px;overflow:hidden;height:calc(100vh - 220px);min-height:400px}
-    @media(max-width:640px){#waWrap{grid-template-columns:minmax(0,1fr)}#waThr{display:none}#waWrap.conv #waLst{display:none}#waWrap.conv #waThr{display:flex}}
-    #waLst{display:flex;flex-direction:column;border-right:1px solid var(--bd);overflow:hidden}
-    .wa-lsthd{padding:12px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px}
-    .wa-lsthd svg{width:16px;height:16px;color:#25d366;flex-shrink:0}
+    /* filtros */
+    .wa-filters{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+    .wa-filters .wf{padding:5px 12px;border-radius:99px;font-size:12.5px;font-weight:700;border:1px solid var(--line);color:var(--mu);cursor:pointer;transition:.13s;background:transparent}
+    .wa-filters .wf:hover{border-color:var(--line2);color:var(--tx)}
+    .wa-filters .wf.on{background:color-mix(in srgb,#25d366 15%,transparent);border-color:color-mix(in srgb,#25d366 50%,transparent);color:#1aad53}
+    html[data-theme=claro] .wa-filters .wf.on{color:#0d7a3a}
+    .wa-exp-all{margin-left:auto;display:flex;gap:6px}
+    /* layout principal */
+    #waWrap{display:grid;grid-template-columns:290px 1fr;gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;height:calc(100vh - 230px);min-height:420px;background:var(--card)}
+    @media(max-width:680px){#waWrap{grid-template-columns:minmax(0,1fr)}#waThr{display:none}#waWrap.conv #waLst{display:none}#waWrap.conv #waThr{display:flex}}
+    /* lista de conversas */
+    #waLst{display:flex;flex-direction:column;border-right:1px solid var(--line);overflow:hidden;background:var(--card)}
+    .wa-lsthd{padding:10px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+    .wa-lsthd svg{width:14px;height:14px;color:var(--mu);flex-shrink:0}
     .wa-lsthd input{flex:1;border:none;background:transparent;color:var(--tx);font-size:13px;outline:none}
     #waConvs{flex:1;overflow-y:auto}
-    .wa-conv{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;border-bottom:1px solid var(--bd);transition:background .12s}
-    .wa-conv:hover,.wa-conv.on{background:var(--hover)}
-    .wa-conv .av{width:38px;height:38px;border-radius:50%;background:var(--ac2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#fff;flex-shrink:0}
-    .wa-conv .av.grp{background:color-mix(in srgb,#25d366 70%,#000)}
+    .wa-conv{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;border-bottom:1px solid var(--line);transition:background .12s;position:relative}
+    .wa-conv:hover{background:var(--card2)}
+    .wa-conv.on{background:color-mix(in srgb,#25d366 10%,transparent)}
+    .wa-conv.on::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:0 3px 3px 0;background:#25d366}
+    .wa-conv .av{width:38px;height:38px;border-radius:50%;background:var(--ac2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;flex-shrink:0}
+    .wa-conv .av.grp{background:linear-gradient(135deg,#25d366,#128c7e)}
+    .wa-conv .av.biz{background:linear-gradient(135deg,#1a4a3c,#25d366)}
     .wa-conv .col{flex:1;min-width:0}
-    .wa-conv .col b{display:block;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .wa-conv .col span{display:block;font-size:12px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+    .wa-conv .col b{display:flex;align-items:center;gap:5px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .wa-conv .col span{display:block;font-size:11.5px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
     .wa-conv .meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
-    .wa-conv .meta time{font-size:11px;color:var(--mu)}
-    .wa-conv .meta .nb{background:#25d366;color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700}
-    #waThr{display:flex;flex-direction:column;overflow:hidden}
-    .wa-thrhd{padding:12px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
-    .wa-thrhd .av{width:36px;height:36px;border-radius:50%;background:var(--ac2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;flex-shrink:0}
-    .wa-thrhd .av.grp{background:color-mix(in srgb,#25d366 70%,#000)}
-    .wa-thrhd .col b{display:block;font-size:14px}
+    .wa-conv .meta time{font-size:10.5px;color:var(--mu2)}
+    .wa-conv .meta .nb{background:#25d366;color:#fff;border-radius:99px;min-width:18px;height:18px;padding:0 5px;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:800}
+    .wa-biz-badge{font-size:9px;font-weight:800;padding:1px 5px;border-radius:4px;background:color-mix(in srgb,#25d366 20%,transparent);color:#1aad53;border:1px solid color-mix(in srgb,#25d366 35%,transparent);letter-spacing:.03em;flex-shrink:0}
+    html[data-theme=claro] .wa-biz-badge{color:#0d7a3a}
+    /* painel de thread */
+    #waThr{display:flex;flex-direction:column;overflow:hidden;background:var(--bg2)}
+    .wa-thrhd{padding:11px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;background:var(--card)}
+    .wa-thrhd .av{width:36px;height:36px;border-radius:50%;background:var(--ac2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;flex-shrink:0}
+    .wa-thrhd .av.grp{background:linear-gradient(135deg,#25d366,#128c7e)}
+    .wa-thrhd .av.biz{background:linear-gradient(135deg,#1a4a3c,#25d366)}
+    .wa-thrhd .col{flex:1;min-width:0}
+    .wa-thrhd .col b{display:block;font-size:14px;font-weight:700}
     .wa-thrhd .col span{font-size:11px;color:var(--mu)}
-    .wa-thrhd .ibtn{margin-left:auto}
-    #waMsgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
-    .wa-msg{max-width:72%;padding:7px 11px 4px;border-radius:10px;position:relative;line-height:1.45}
-    .wa-msg.eu{align-self:flex-end;background:color-mix(in srgb,#25d366 22%,var(--card));border-radius:10px 2px 10px 10px}
-    .wa-msg.eles{align-self:flex-start;background:var(--card);border-radius:2px 10px 10px 10px}
-    .wa-msg .rem{font-size:11px;font-weight:700;color:#25d366;margin-bottom:2px}
-    .wa-msg .txt{font-size:13.5px;word-break:break-word}
-    .wa-msg time{font-size:10px;color:var(--mu);float:right;margin-left:8px;margin-top:3px}
+    .wa-thrhd .acts{display:flex;gap:5px;align-items:center;margin-left:auto}
+    .wa-exp-btn{padding:5px 10px;border-radius:8px;font-size:11.5px;font-weight:700;border:1px solid var(--line);color:var(--mu2);cursor:pointer;background:transparent;white-space:nowrap;transition:.13s}
+    .wa-exp-btn:hover{border-color:var(--line2);color:var(--tx)}
+    /* mensagens */
+    #waMsgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+    .wa-day{align-self:center;font-size:11px;color:var(--mu2);padding:3px 10px;border-radius:99px;background:var(--card);border:1px solid var(--line);margin:8px 0;flex-shrink:0}
+    .wa-msg{max-width:70%;display:flex;flex-direction:column;gap:1px}
+    .wa-msg.eu{align-self:flex-end;align-items:flex-end}
+    .wa-msg.eles{align-self:flex-start;align-items:flex-start}
+    .wa-msg .rem{font-size:10.5px;font-weight:700;color:#25d366;margin-bottom:1px;padding:0 2px}
+    .wa-msg .bub{padding:7px 11px 5px;border-radius:14px;line-height:1.45;word-break:break-word;position:relative}
+    .wa-msg.eu .bub{background:color-mix(in srgb,#25d366 25%,var(--card));border-radius:14px 2px 14px 14px}
+    .wa-msg.eles .bub{background:var(--card);border-radius:2px 14px 14px 14px;border:1px solid var(--line)}
+    html[data-theme=claro] .wa-msg.eles .bub{background:#fff}
+    .wa-msg .txt{font-size:13.5px;color:var(--tx)}
+    .wa-msg .media-ic{font-size:16px;margin-right:4px;vertical-align:middle}
+    .wa-msg .media-lbl{font-size:12.5px;color:var(--mu);font-style:italic}
+    .wa-msg time{font-size:10px;color:var(--mu2);display:block;text-align:right;margin-top:3px;padding:0 2px}
+    .wa-msg.eu time{color:color-mix(in srgb,#25d366 70%,var(--mu))}
+    /* estado vazio */
     .wa-vazio{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--mu)}
-    .wa-vazio svg{width:48px;height:48px;opacity:.25}
+    .wa-vazio svg{width:52px;height:52px;opacity:.18}
     .wa-vazio p{margin:0;font-size:14px}
-    .wa-reply{padding:10px 12px;border-top:1px solid var(--bd);display:flex;gap:8px;align-items:flex-end}
-    .wa-reply textarea{flex:1;border:1px solid var(--bd);border-radius:20px;padding:9px 14px;font-size:13.5px;resize:none;background:var(--inp);color:var(--tx);outline:none;max-height:120px;min-height:38px;line-height:1.4}
+    /* caixa de resposta */
+    .wa-reply{padding:10px 12px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:flex-end;background:var(--card)}
+    .wa-reply textarea{flex:1;border:1px solid var(--line);border-radius:22px;padding:9px 14px;font-size:13.5px;resize:none;background:var(--in);color:var(--tx);outline:none;max-height:120px;min-height:38px;line-height:1.4;transition:border-color .15s}
     .wa-reply textarea:focus{border-color:#25d366}
-    .wa-reply .btn-send{width:38px;height:38px;border-radius:50%;background:#25d366;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s}
-    .wa-reply .btn-send:hover{opacity:.85}
-    .wa-reply .btn-send svg{width:18px;height:18px;color:#fff}
-    .wa-noreply{padding:9px 14px;border-top:1px solid var(--bd);text-align:center;font-size:12px;color:var(--mu)}
+    .wa-reply .btn-send{width:38px;height:38px;border-radius:50%;background:#25d366;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s,transform .1s}
+    .wa-reply .btn-send:hover{opacity:.85}.wa-reply .btn-send:active{transform:scale(.92)}
+    .wa-reply .btn-send svg{width:18px;height:18px;fill:#fff}
+    .wa-noreply{padding:9px 14px;border-top:1px solid var(--line);text-align:center;font-size:12px;color:var(--mu);background:var(--card)}
   </style>
 
+  <!-- Cabeçalho -->
   <div class="wa-hdr">
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.09-1.34C8.5 21.52 10.21 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.68 0-3.25-.46-4.6-1.26l-.33-.19-3.02.79.82-2.95-.21-.34C3.47 15.17 3 13.64 3 12c0-4.96 4.04-9 9-9s9 4.04 9 9-4.04 9-9 9z"/></svg>
+    <div class="wa-hdr-logo">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.09-1.34C8.5 21.52 10.21 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.68 0-3.25-.46-4.6-1.26l-.33-.19-3.02.79.82-2.95-.21-.34C3.47 15.17 3 13.64 3 12c0-4.96 4.04-9 9-9s9 4.04 9 9-4.04 9-9 9z"/></svg>
+    </div>
     <div><h2>WhatsApp</h2><span class="muted" id="waStatus">A carregar…</span></div>
-    <button class="btn sm" id="waRefresh" title="Atualizar" style="margin-left:auto"><svg class="i" data-i="sync" style="width:14px;height:14px"></svg></button>
+    <div style="margin-left:auto;display:flex;gap:7px;align-items:center">
+      <button class="btn sm" id="waRefresh" title="Atualizar"><svg class="i" data-i="sync" style="width:14px;height:14px"></svg></button>
+    </div>
   </div>
+
+  <!-- Aviso de permissão -->
   <div class="wa-perm" id="waPerm" hidden>
     <span>🔔</span>
     <div><b>Permissão de notificações necessária</b><span class="muted">No telefone: Definições › Apps › Acesso a notificações › ative FusãoTechX.</span></div>
   </div>
+
+  <!-- Filtros + exportar todas -->
+  <div class="wa-filters">
+    <button class="wf on" data-wf="todos">Todas</button>
+    <button class="wf" data-wf="messenger">Messenger</button>
+    <button class="wf" data-wf="business">Business</button>
+    <div class="wa-exp-all">
+      <button class="btn sm" id="waExpAllTxt" title="Exportar todas as conversas como TXT">⬇ TXT</button>
+      <button class="btn sm" id="waExpAllCsv" title="Exportar todas as conversas como CSV">⬇ CSV</button>
+    </div>
+  </div>
+
+  <!-- Painel principal -->
   <div id="waWrap">
     <div id="waLst">
       <div class="wa-lsthd">
@@ -439,20 +494,24 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
     </div>
     <div id="waThr">
       <div class="wa-vazio" id="waVazio">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.09-1.34C8.5 21.52 10.21 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.68 0-3.25-.46-4.6-1.26l-.33-.19-3.02.79.82-2.95-.21-.34C3.47 15.17 3 13.64 3 12c0-4.96 4.04-9 9-9s9 4.04 9 9-4.04 9-9 9z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.09-1.34C8.5 21.52 10.21 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.68 0-3.25-.46-4.6-1.26l-.33-.19-3.02.79.82-2.95-.21-.34C3.47 15.17 3 13.64 3 12c0-4.96 4.04-9 9-9s9 4.04 9 9-4.04 9-9 9z"/></svg>
         <p>Escolha uma conversa</p>
       </div>
       <div id="waThrInner" style="display:none;flex:1;flex-direction:column;overflow:hidden">
         <div class="wa-thrhd">
           <div class="av" id="waThAv">?</div>
           <div class="col"><b id="waThNome">—</b><span id="waThSub">—</span></div>
-          <button class="ibtn" id="waVoltar" aria-label="Voltar" style="display:none"><svg class="i" data-i="back"></svg></button>
+          <div class="acts">
+            <button class="wa-exp-btn" id="waExpTxt">⬇ TXT</button>
+            <button class="wa-exp-btn" id="waExpCsv">⬇ CSV</button>
+            <button class="ibtn" id="waVoltar" aria-label="Voltar" style="display:none"><svg class="i" data-i="back"></svg></button>
+          </div>
         </div>
         <div id="waMsgs"></div>
         <div class="wa-reply" id="waReplyBox">
           <textarea id="waTxt" rows="1" placeholder="Responder…" maxlength="4096"></textarea>
           <button class="btn-send" id="waEnviar" title="Enviar resposta">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
           </button>
         </div>
         <div class="wa-noreply" id="waNoReply" hidden>Esta conversa não suporta resposta direta (a notificação já foi dispensada).</div>
@@ -694,7 +753,11 @@ async function syncSms(){try{const r=await get('/sms?n=400');const novo=r.lista|
 async function syncCalls(){try{const r=await get('/calls');CALLS=r.lista||[];badge('call',VISTA==='call'?0:CALLS.filter(c=>c.tipo==='perdida'&&c.data>VISTO.call).length);if(VISTA==='call')pintarChamadas()}catch(e){}}
 
 // ===== WhatsApp =====
-let WA_CONVS=[], WA_CONV_CHAVE=null, WA_MSGS=[];
+let WA_CONVS=[], WA_CONV_CHAVE=null, WA_MSGS=[], WA_FILTRO='todos';
+
+// Ícones por tipo de media
+const WA_TIPO_IC={imagem:'📷',audio:'🎵',video:'🎬',documento:'📄',chamada:'📞',sticker:'😊',localizacao:'📍',voz:'🎤',texto:''};
+const WA_TIPO_LBL={imagem:'Foto',audio:'Áudio',video:'Vídeo',documento:'Documento',chamada:'Chamada',sticker:'Sticker',localizacao:'Localização',voz:'Mensagem de voz'};
 
 async function carregarWa(){
   try{
@@ -702,25 +765,42 @@ async function carregarWa(){
     WA_CONVS=r.lista||[];
     const ativo=r.ativo;
     document.getElementById('waPerm').hidden=ativo;
-    document.getElementById('waStatus').textContent=ativo
-      ?(WA_CONVS.length?WA_CONVS.length+' conversa'+(WA_CONVS.length===1?'':'s'):'Sem conversas ainda — aguarda uma notificação do WhatsApp.')
-      :'Permissão de notificações não ativa';
+    const nMsng=WA_CONVS.filter(c=>c.pacote==='com.whatsapp').length;
+    const nBiz=WA_CONVS.filter(c=>c.pacote==='com.whatsapp.w4b').length;
+    let st='';
+    if(!ativo){st='Permissão de notificações não ativa';}
+    else if(!WA_CONVS.length){st='Aguarda a chegada de uma notificação do WhatsApp.';}
+    else{st=(nMsng?nMsng+' Messenger':'')+(nMsng&&nBiz?' · ':'')+(nBiz?nBiz+' Business':'');}
+    document.getElementById('waStatus').textContent=st;
     pintarWaConvs();
   }catch(e){document.getElementById('waStatus').textContent='Erro ao carregar'}
 }
 
+function wafiltrarLista(){
+  if(WA_FILTRO==='messenger') return WA_CONVS.filter(c=>c.pacote==='com.whatsapp');
+  if(WA_FILTRO==='business')  return WA_CONVS.filter(c=>c.pacote==='com.whatsapp.w4b');
+  return WA_CONVS;
+}
+
 function pintarWaConvs(){
   const busca=(document.getElementById('waBusca').value||'').toLowerCase().trim();
-  const lista=busca?WA_CONVS.filter(c=>(c.conversa||'').toLowerCase().includes(busca)):WA_CONVS;
+  let lista=wafiltrarLista();
+  if(busca) lista=lista.filter(c=>(c.conversa||'').toLowerCase().includes(busca));
   const el=document.getElementById('waConvs');
-  if(!lista.length){el.innerHTML='<div class="empty">'+(busca?'Sem resultados.':'Sem conversas. As mensagens aparecem quando chegar uma notificação do WhatsApp.')+'</div>';return}
+  if(!lista.length){el.innerHTML='<div class="empty">'+(busca?'Sem resultados.':'Sem conversas nesta categoria.')+'</div>';return}
   el.innerHTML=lista.map(c=>{
     const ini=(c.conversa||'?')[0].toUpperCase();
     const ts=c.ultima_ts?horaWa(c.ultima_ts):'';
     const on=WA_CONV_CHAVE===c.chave?'on':'';
-    return '<div class="wa-conv '+on+'" data-chave="'+esc(c.chave)+'" data-conv="'+esc(c.conversa||'')+'" data-grp="'+(c.isGrupo?1:0)+'" data-rep="'+(c.pode_responder?1:0)+'">'
-      +'<div class="av'+(c.isGrupo?' grp':'')+'">'+ini+'</div>'
-      +'<div class="col"><b>'+esc(c.conversa||'?')+'</b><span>'+esc(c.ultima_msg||'')+'</span></div>'
+    const isBiz=c.pacote==='com.whatsapp.w4b';
+    const avCls='av'+(c.isGrupo?' grp':'')+(isBiz?' biz':'');
+    const bizBadge=isBiz?'<span class="wa-biz-badge">BIZ</span>':'';
+    const ic=WA_TIPO_IC[c.ultima_tipo||'texto']||'';
+    const dirPrefix=c.ultima_meu?'<span style="color:var(--ok);font-size:10px;font-weight:700">Tu: </span>':'';
+    const prevTexto=ic?(ic+' '+(WA_TIPO_LBL[c.ultima_tipo||'texto']||c.ultima_msg||'')):esc(c.ultima_msg||'');
+    return '<div class="wa-conv '+on+'" data-chave="'+esc(c.chave)+'" data-conv="'+esc(c.conversa||'')+'" data-grp="'+(c.isGrupo?1:0)+'" data-rep="'+(c.pode_responder?1:0)+'" data-biz="'+(isBiz?1:0)+'">'
+      +'<div class="'+avCls+'">'+ini+'</div>'
+      +'<div class="col"><b>'+esc(c.conversa||'?')+bizBadge+'</b><span>'+dirPrefix+prevTexto+'</span></div>'
       +'<div class="meta"><time>'+ts+'</time>'+(c.n>0?'<span class="nb">'+(c.n>99?'99+':c.n)+'</span>':'')+'</div>'
       +'</div>';
   }).join('');
@@ -731,13 +811,14 @@ document.getElementById('waConvs').addEventListener('click',function(e){
   WA_CONV_CHAVE=item.dataset.chave;
   const nome=item.dataset.conv||'?';
   const isGrp=item.dataset.grp==='1';
+  const isBiz=item.dataset.biz==='1';
   const podeResp=item.dataset.rep==='1';
   document.getElementById('waWrap').classList.add('conv');
   Array.from(document.querySelectorAll('#waConvs .wa-conv')).forEach(x=>x.classList.toggle('on',x.dataset.chave===WA_CONV_CHAVE));
   document.getElementById('waThAv').textContent=nome[0].toUpperCase();
-  document.getElementById('waThAv').className='av'+(isGrp?' grp':'');
+  document.getElementById('waThAv').className='av'+(isGrp?' grp':'')+(isBiz?' biz':'');
   document.getElementById('waThNome').textContent=nome;
-  document.getElementById('waThSub').textContent=isGrp?'Grupo':'Conversa individual';
+  document.getElementById('waThSub').textContent=(isBiz?'WhatsApp Business · ':'WhatsApp Messenger · ')+(isGrp?'Grupo':'Conversa individual');
   document.getElementById('waVoltar').style.display='';
   document.getElementById('waVazio').style.display='none';
   document.getElementById('waThrInner').style.display='flex';
@@ -749,6 +830,31 @@ document.getElementById('waConvs').addEventListener('click',function(e){
 document.getElementById('waVoltar').onclick=function(){document.getElementById('waWrap').classList.remove('conv');WA_CONV_CHAVE=null};
 document.getElementById('waRefresh').onclick=function(){carregarWa()};
 document.getElementById('waBusca').oninput=function(){pintarWaConvs()};
+
+// Filtros Messenger / Business
+document.querySelectorAll('.wa-filters .wf').forEach(btn=>{
+  btn.onclick=function(){
+    WA_FILTRO=this.dataset.wf;
+    document.querySelectorAll('.wa-filters .wf').forEach(x=>x.classList.toggle('on',x===this));
+    pintarWaConvs();
+  };
+});
+
+// Exportar conversa
+document.getElementById('waExpTxt').onclick=function(){waExportar('txt')};
+document.getElementById('waExpCsv').onclick=function(){waExportar('csv')};
+document.getElementById('waExpAllTxt').onclick=function(){waExportarTodas('txt')};
+document.getElementById('waExpAllCsv').onclick=function(){waExportarTodas('csv')};
+
+function waExportar(fmt){
+  if(!WA_CONV_CHAVE)return;
+  const url=U('/wa-export?chave='+encodeURIComponent(WA_CONV_CHAVE)+'&fmt='+fmt+'&k='+CODE);
+  const a=document.createElement('a');a.href=url;a.download='conversa.'+fmt;a.click();
+}
+function waExportarTodas(fmt){
+  const url=U('/wa-export?fmt='+fmt+'&k='+CODE);
+  const a=document.createElement('a');a.href=url;a.download='whatsapp_todas.'+fmt;a.click();
+}
 
 async function carregarWaMsgs(chave){
   document.getElementById('waMsgs').innerHTML='<div class="empty">A carregar…</div>';
@@ -764,10 +870,30 @@ function pintarWaMsgs(){
   if(!WA_MSGS.length){el.innerHTML='<div class="empty">Sem mensagens registadas nesta conversa.</div>';return}
   const conv=WA_CONVS.find(c=>c.chave===WA_CONV_CHAVE);
   const isGrp=conv?conv.isGrupo:false;
-  el.innerHTML=WA_MSGS.map(function(m){
-    const rem=isGrp&&m.remetente?'<div class="rem">'+esc(m.remetente)+'</div>':'';
-    return '<div class="wa-msg eles">'+rem+'<div class="txt">'+esc(m.texto)+'</div><time>'+horaWa(m.id)+'</time></div>';
-  }).join('');
+  let ultDia='', html='';
+  for(const m of WA_MSGS){
+    // separador de dia
+    const dia=new Date(m.id).toLocaleDateString([],{weekday:'long',day:'numeric',month:'long'});
+    if(dia!==ultDia){html+='<div class="wa-day">'+dia+'</div>';ultDia=dia;}
+    const meuTurno=m.meuTurno===true||m.meuTurno==='true';
+    const cls='wa-msg '+(meuTurno?'eu':'eles');
+    // remetente em grupos (só para mensagens dos outros)
+    const rem=isGrp&&!meuTurno&&m.remetente?'<div class="rem">'+esc(m.remetente)+'</div>':'';
+    // conteúdo por tipo
+    const tipo=m.tipo||'texto';
+    let conteudo;
+    if(tipo==='texto'){
+      conteudo='<span class="txt">'+esc(m.texto)+'</span>';
+    } else {
+      const ic=WA_TIPO_IC[tipo]||'📎';
+      const lbl=WA_TIPO_LBL[tipo]||tipo;
+      const extra=m.texto&&m.texto!==lbl?'<br><span class="txt" style="font-size:12px;color:var(--mu)">'+esc(m.texto)+'</span>':'';
+      conteudo='<span class="media-ic">'+ic+'</span><span class="media-lbl">'+lbl+'</span>'+extra;
+    }
+    const hora=new Date(m.id).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    html+='<div class="'+cls+'">'+rem+'<div class="bub">'+conteudo+'<time>'+hora+'</time></div></div>';
+  }
+  el.innerHTML=html;
   el.scrollTop=el.scrollHeight;
 }
 
@@ -801,7 +927,8 @@ async function syncWa(){
     if(VISTA==='wa'){pintarWaConvs();if(WA_CONV_CHAVE)carregarWaMsgs(WA_CONV_CHAVE)}
     for(const c of WA_CONVS){
       if(c.ultima_ts>Date.now()-120000&&c.ultima_ts>VISTO.wa){
-        avisoPC('WhatsApp · '+c.conversa,c.ultima_msg||'','wa-'+c.chave);break;
+        const app=c.pacote==='com.whatsapp.w4b'?'WA Business':'WhatsApp';
+        avisoPC(app+' · '+c.conversa,c.ultima_msg||'','wa-'+c.chave);break;
       }
     }
   }catch(e){}

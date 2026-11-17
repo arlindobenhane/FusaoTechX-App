@@ -177,9 +177,18 @@ class Httpd(ctxIn: Context, private val porta: Int) {
                     } else enviar(out, 404, "application/json", "{\"erro\":\"nao_encontrada\"}".toByteArray())
                 }
                 // ── WhatsApp ──────────────────────────────────────────────────
-                caminho == "/wa-convs" -> jsonResp(out, JSONObject()
-                    .put("lista", WhatsAppStore.resumoConversas())
-                    .put("ativo", NotifService.inst != null))
+                caminho == "/wa-convs" -> {
+                    // "ativo" = verdadeiro se o serviço está a correr OU se a permissão foi concedida
+                    // (a permissão pode estar ativa mas o serviço ainda não ligou após reinício)
+                    val permConcedida = try {
+                        val enabled = android.provider.Settings.Secure.getString(ctx.contentResolver, "enabled_notification_listeners") ?: ""
+                        enabled.contains(ctx.packageName, ignoreCase = true)
+                    } catch (_: Exception) { false }
+                    jsonResp(out, JSONObject()
+                        .put("lista", WhatsAppStore.resumoConversas())
+                        .put("ativo", NotifService.inst != null || permConcedida)
+                        .put("servico_ligado", NotifService.inst != null))
+                }
                 caminho == "/wa-msgs" -> {
                     val chave = query["chave"]
                     val limite = (query["n"]?.toIntOrNull() ?: 100).coerceIn(10, 500)
@@ -202,6 +211,17 @@ class Httpd(ctxIn: Context, private val porta: Int) {
                         val resultado = WhatsAppStore.responder(ctx, chave, texto)
                         jsonResp(out, JSONObject().put("ok", resultado == "ok").put("estado", resultado))
                     }
+                }
+                caminho == "/wa-export" -> {
+                    val chave = query["chave"]  // null = exportar todas
+                    val fmt = query["fmt"] ?: "txt"
+                    val dados = WhatsAppStore.exportar(chave, fmt)
+                    val ct = if (fmt == "csv") "text/csv; charset=utf-8" else "text/plain; charset=utf-8"
+                    val nome = if (chave != null) "conversa.$fmt" else "whatsapp_todas.$fmt"
+                    try {
+                        out.write(("HTTP/1.1 200 OK\r\nContent-Type: $ct\r\nContent-Length: ${dados.size}\r\nContent-Disposition: attachment; filename=\"$nome\"\r\nCache-Control: no-store\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n").toByteArray())
+                        out.write(dados); out.flush()
+                    } catch (_: Exception) {}
                 }
                 // ─────────────────────────────────────────────────────────────
                 caminho == "/files" -> jsonResp(out, Device.listar(query["p"], ctx))
