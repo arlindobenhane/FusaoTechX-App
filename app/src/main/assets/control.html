@@ -233,7 +233,7 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
       <div class="sec">Sistema</div>
       <button data-v="def"><svg class="i" data-i="cog"></svg>Definições</button>
     </nav>
-    <div class="foot">Desenvolvido por <b>FusãoTechX Mz</b><br>+258 83 333 7906 · fusaotech.com</div>
+    <div class="foot">Studio <b id="pVer">·</b> · <span id="pVerTag" style="color:var(--ok);font-weight:700">com WhatsApp &amp; apps</span><br><span class="muted">Desenvolvido por FusãoTechX Mz</span></div>
   </aside>
 
   <div class="main">
@@ -563,7 +563,7 @@ async function estado(){try{S=await get('/state');}catch(e){if(e.message!=='codi
  $('#pBat').textContent=(S.carregar?'⚡ ':'🔋 ')+(S.bateria??'—')+'%';
  const au=S.total?(1-S.livre/S.total)*100:0;$('#armV').textContent=fmtB(S.livre);$('#armB').style.width=au+'%';$('#armT').textContent=S.total?'de '+fmtB(S.total):'';
  const ru=S.ramTotal?(1-S.ramLivre/S.ramTotal)*100:0;$('#ramV').textContent=fmtB(S.ramLivre);$('#ramB').style.width=ru+'%';$('#ramT').textContent=S.ramTotal?'de '+fmtB(S.ramTotal):'';
- $('#andV').textContent=((S.marca||'')+' '+(S.modelo||'')).trim()||'—';$('#modV').textContent='Android '+(S.android||'—')+(S.versao?' · app '+S.versao:'');
+ $('#andV').textContent=((S.marca||'')+' '+(S.modelo||'')).trim()||'—';if(S.versao){$('#pVer').textContent='v'+S.versao}$('#modV').textContent='Android '+(S.android||'—')+(S.versao?' · app '+S.versao:'');
  pintarSims(S.sims||[]);pintarPermissoes();
  $('#ovl').hidden=!!S.ecra;if(!S.ecra)$('#ovl').innerHTML='Partilha do ecrã desligada.<br><br>No telefone, abra a app e toque em <b>LIGAR</b>.';
  $('#bLive').style.display=S.ecra?'inline-block':'none';
