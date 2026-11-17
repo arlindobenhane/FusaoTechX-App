@@ -10,8 +10,8 @@ class BootReceiver : BroadcastReceiver() {
         val arrancar = i?.action == Intent.ACTION_BOOT_COMPLETED ||
             i?.action == "android.intent.action.QUICKBOOT_POWERON" ||
             i?.action == Intent.ACTION_MY_PACKAGE_REPLACED // depois de atualizar a app
-        if (arrancar && (Prefs.relayOn(c) || Prefs.autostart(c))) {
-            // Liga a ligação remota permanente logo no arranque (sem ecrã, que precisa de toque).
+        if (arrancar) {
+            // Arranca sempre — acesso permanente sem precisar tocar no telefone.
             Watchdog.garantirServico(c)
             Watchdog.agendar(c)
         }

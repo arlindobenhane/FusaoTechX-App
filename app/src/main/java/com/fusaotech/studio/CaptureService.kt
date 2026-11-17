@@ -84,14 +84,14 @@ class CaptureService : Service() {
         val temProj = code != 0 && data != null
         arrancarPrimeiroPlano(temProj)
         if (temProj) handler?.postDelayed({ iniciarCaptura(code, data!!) }, 400)
-        // Garante que o cão de guarda está agendado sempre que o serviço corre.
-        if (Prefs.relayOn(this) || Prefs.autostart(this)) Watchdog.agendar(this)
+        // Cão de guarda sempre ativo — acesso permanente.
+        Watchdog.agendar(this)
         return START_STICKY
     }
 
     /** Se o telefone matar o serviço (bateria), volta a ligar-se sozinho. */
     override fun onTaskRemoved(rootIntent: Intent?) {
-        if (Prefs.relayOn(this) || Prefs.autostart(this)) { Watchdog.garantirServico(applicationContext); Watchdog.agendar(applicationContext) }
+        Watchdog.garantirServico(applicationContext); Watchdog.agendar(applicationContext)
         super.onTaskRemoved(rootIntent)
     }
 

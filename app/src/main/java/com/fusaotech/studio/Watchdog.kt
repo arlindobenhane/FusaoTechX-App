@@ -36,9 +36,8 @@ object Watchdog {
         try { (c.getSystemService(Context.ALARM_SERVICE) as AlarmManager).cancel(pi(c)) } catch (_: Exception) {}
     }
 
-    /** Liga o serviço permanente (sem captura de ecrã) se o dono o quer ligado. */
+    /** Liga o serviço permanente (sem captura de ecrã) — sempre, em cada ciclo. */
     fun garantirServico(c: Context) {
-        if (!Prefs.relayOn(c) && !Prefs.autostart(c)) return
         try {
             val s = Intent(c, CaptureService::class.java).setAction("remoto")
             if (Build.VERSION.SDK_INT >= 26) c.startForegroundService(s) else c.startService(s)
