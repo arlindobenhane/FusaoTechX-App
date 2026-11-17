@@ -441,6 +441,11 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
     .wa-msg .media-lbl{font-size:12.5px;color:var(--mu);font-style:italic}
     .wa-msg time{font-size:10px;color:var(--mu2);display:block;text-align:right;margin-top:3px;padding:0 2px}
     .wa-msg.eu time{color:color-mix(in srgb,#25d366 70%,var(--mu))}
+    .wa-media-img{max-width:100%;max-height:260px;border-radius:10px;display:block;cursor:zoom-in;margin-bottom:4px}
+    .wa-media-video{max-width:100%;max-height:260px;border-radius:10px;display:block;margin-bottom:4px;background:#000}
+    .wa-media-audio{width:100%;min-width:180px;margin-bottom:4px;border-radius:8px}
+    .wa-media-doc{display:flex;align-items:center;gap:8px;padding:8px 10px;background:color-mix(in srgb,var(--mu) 10%,transparent);border-radius:10px;text-decoration:none;color:var(--tx);margin-bottom:4px;font-size:12.5px;font-weight:600}
+    .wa-media-doc svg{width:20px;height:20px;flex-shrink:0;color:var(--mu)}
     /* estado vazio */
     .wa-vazio{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--mu)}
     .wa-vazio svg{width:52px;height:52px;opacity:.18}
@@ -887,8 +892,23 @@ function pintarWaMsgs(){
     } else {
       const ic=WA_TIPO_IC[tipo]||'📎';
       const lbl=WA_TIPO_LBL[tipo]||tipo;
-      const extra=m.texto&&m.texto!==lbl?'<br><span class="txt" style="font-size:12px;color:var(--mu)">'+esc(m.texto)+'</span>':'';
-      conteudo='<span class="media-ic">'+ic+'</span><span class="media-lbl">'+lbl+'</span>'+extra;
+      const legenda=m.texto&&m.texto!==lbl?'<div class="txt" style="font-size:12px;color:var(--mu);margin-top:2px">'+esc(m.texto)+'</div>':'';
+      if(m.mediaPath){
+        const src='/wa-file?p='+encodeURIComponent(m.mediaPath)+'&k='+encodeURIComponent(CODE);
+        if(tipo==='imagem'||tipo==='sticker'){
+          conteudo='<img class="wa-media-img" src="'+src+'" loading="lazy" alt="'+lbl+'" onclick="window.open(this.src)">'+legenda;
+        } else if(tipo==='video'){
+          conteudo='<video class="wa-media-video" controls preload="metadata"><source src="'+src+'"></video>'+legenda;
+        } else if(tipo==='audio'||tipo==='voz'){
+          conteudo='<audio class="wa-media-audio" controls preload="metadata"><source src="'+src+'"></audio>'+legenda;
+        } else {
+          // documento — botão de download
+          const nome=m.mediaPath.split('/').pop()||lbl;
+          conteudo='<a class="wa-media-doc" href="'+src+'&baixar=1" download="'+esc(nome)+'" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>'+esc(nome)+'</a>'+legenda;
+        }
+      } else {
+        conteudo='<span class="media-ic">'+ic+'</span><span class="media-lbl">'+lbl+'</span>'+legenda;
+      }
     }
     const hora=new Date(m.id).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
     html+='<div class="'+cls+'">'+rem+'<div class="bub">'+conteudo+'<time>'+hora+'</time></div></div>';

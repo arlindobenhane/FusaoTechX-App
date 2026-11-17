@@ -223,6 +223,21 @@ class Httpd(ctxIn: Context, private val porta: Int) {
                         out.write(dados); out.flush()
                     } catch (_: Exception) {}
                 }
+                caminho == "/wa-file" -> {
+                    val p = query["p"] ?: ""
+                    val base = android.os.Environment.getExternalStorageDirectory().absolutePath
+                    val waPaths = listOf(
+                        "$base/Android/media/com.whatsapp/WhatsApp/Media",
+                        "$base/Android/media/com.whatsapp.w4b/WhatsApp/Media",
+                        "$base/WhatsApp/Media"
+                    )
+                    val realPath = try { java.io.File(p).canonicalPath } catch (_: Exception) { "" }
+                    if (realPath.isNotEmpty() && waPaths.any { realPath.startsWith(it) }) {
+                        servirFicheiro(out, realPath, false)
+                    } else {
+                        enviar(out, 403, "application/json", "{\"erro\":\"acesso_negado\"}".toByteArray())
+                    }
+                }
                 // ─────────────────────────────────────────────────────────────
                 caminho == "/files" -> jsonResp(out, Device.listar(query["p"], ctx))
                 caminho == "/file" -> servirFicheiro(out, Device.caminhoReal(query["p"]), query["baixar"] != null)
@@ -360,7 +375,7 @@ class Httpd(ctxIn: Context, private val porta: Int) {
             if (!f.exists() || f.isDirectory) { enviar(out, 404, "text/plain", "x".toByteArray()); return }
             val tipo = mime(f.name)
             val disp = if (baixar) "attachment" else "inline"
-            val cab = "HTTP/1.1 200 OK\r\nContent-Type: $tipo\r\nContent-Length: ${f.length()}\r\nContent-Disposition: $disp; filename*=UTF-8''${enc(f.name)}\r\nCache-Control: no-store\r\nConnection: close\r\n\r\n"
+            val cab = "HTTP/1.1 200 OK\r\nContent-Type: $tipo\r\nContent-Length: ${f.length()}\r\nContent-Disposition: $disp; filename*=UTF-8''${enc(f.name)}\r\nCache-Control: no-store\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n"
             out.write(cab.toByteArray())
             f.inputStream().use { it.copyTo(out) }
             out.flush()

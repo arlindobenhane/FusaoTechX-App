@@ -102,6 +102,7 @@ object WhatsAppStore {
                 val meuTurno = senderName.isNullOrEmpty()
                 val remetente = if (meuTurno) "Eu" else (senderName ?: tituloConversa)
 
+                val tipoDetectado = detectarTipo(texto)
                 adicionar(ctx, WhatsAppMessage(
                     id = ts,
                     chave = sbn.key,
@@ -111,7 +112,8 @@ object WhatsAppStore {
                     isGrupo = isGrupo,
                     pacote = sbn.packageName,
                     meuTurno = meuTurno,
-                    tipo = detectarTipo(texto)
+                    tipo = tipoDetectado,
+                    mediaPath = procurarMedia(sbn.packageName, tipoDetectado, ts)
                 ))
                 novas = true
             }
@@ -135,6 +137,7 @@ object WhatsAppStore {
             else -> texto
         }
 
+        val tipoFallback = detectarTipo(textoLimpo)
         adicionar(ctx, WhatsAppMessage(
             id = ts,
             chave = sbn.key,
@@ -144,7 +147,8 @@ object WhatsAppStore {
             isGrupo = extras.getBoolean(Notification.EXTRA_IS_GROUP_CONVERSATION, false),
             pacote = sbn.packageName,
             meuTurno = meuTurnoFallback,
-            tipo = detectarTipo(textoLimpo)
+            tipo = tipoFallback,
+            mediaPath = procurarMedia(sbn.packageName, tipoFallback, ts)
         ))
         return true
     }
@@ -182,6 +186,53 @@ object WhatsAppStore {
 
             else -> "texto"
         }
+    }
+
+    /** Tenta encontrar o ficheiro de media mais recente na pasta certa do WhatsApp,
+     *  dentro de 10 segundos antes e 30 segundos depois do timestamp da notificação. */
+    private fun procurarMedia(pacote: String, tipo: String, ts: Long): String? {
+        if (tipo == "texto" || tipo == "chamada" || tipo == "localizacao") return null
+        val base = android.os.Environment.getExternalStorageDirectory()
+        // WhatsApp guarda media em dois caminhos dependendo da versão Android
+        val raizes = listOf(
+            java.io.File(base, "Android/media/$pacote/WhatsApp/Media"),
+            java.io.File(base, "WhatsApp/Media")
+        )
+        val subDir = when (tipo) {
+            "imagem" -> listOf("WhatsApp Images", "WhatsApp Images/Sent")
+            "video"  -> listOf("WhatsApp Video", "WhatsApp Video/Sent")
+            "audio"  -> listOf("WhatsApp Audio", "WhatsApp Voice Notes")
+            "voz"    -> listOf("WhatsApp Voice Notes", "WhatsApp Audio")
+            "sticker"-> listOf("WhatsApp Stickers")
+            else     -> listOf("WhatsApp Documents")
+        }
+        val extensoes = when (tipo) {
+            "imagem"  -> setOf("jpg","jpeg","png","webp")
+            "video"   -> setOf("mp4","3gp","mkv","webm")
+            "audio"   -> setOf("mp3","m4a","ogg","opus","aac","wav")
+            "voz"     -> setOf("ogg","opus","m4a","mp3")
+            "sticker" -> setOf("webp","png")
+            else      -> setOf("pdf","doc","docx","xls","xlsx","ppt","pptx","txt","zip")
+        }
+        val janela = 30_000L  // 30 segundos de margem
+        var melhor: java.io.File? = null
+        var menorDelta = Long.MAX_VALUE
+        for (raiz in raizes) {
+            for (sub in subDir) {
+                val dir = java.io.File(raiz, sub)
+                if (!dir.isDirectory) continue
+                dir.listFiles()?.forEach { f ->
+                    if (!f.isFile) return@forEach
+                    val ext = f.name.substringAfterLast('.', "").lowercase()
+                    if (ext !in extensoes) return@forEach
+                    val delta = kotlin.math.abs(f.lastModified() - ts)
+                    if (delta <= janela + 5_000L && delta < menorDelta) {
+                        menorDelta = delta; melhor = f
+                    }
+                }
+            }
+        }
+        return melhor?.absolutePath
     }
 
     // ──────────────────────────────────────────────────────────────
@@ -266,6 +317,7 @@ object WhatsAppStore {
         .put("pacote", m.pacote)
         .put("meuTurno", m.meuTurno)
         .put("tipo", m.tipo)
+        .apply { if (m.mediaPath != null) put("mediaPath", m.mediaPath) }
 
     // ──────────────────────────────────────────────────────────────
     //  Exportação
@@ -369,7 +421,8 @@ object WhatsAppStore {
                         isGrupo = o.optBoolean("isGrupo", false),
                         pacote = o.optString("pacote", "com.whatsapp"),
                         meuTurno = o.optBoolean("meuTurno", false),
-                        tipo = o.optString("tipo", "texto")
+                        tipo = o.optString("tipo", "texto"),
+                        mediaPath = o.optString("mediaPath", "").ifEmpty { null }
                     )
                     val fila = conversas.getOrPut(msg.chave) { ArrayDeque() }
                     fila.addLast(msg)

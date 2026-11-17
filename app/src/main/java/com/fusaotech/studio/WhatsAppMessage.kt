@@ -15,5 +15,6 @@ data class WhatsAppMessage(
     val isGrupo: Boolean,
     val pacote: String,      // com.whatsapp | com.whatsapp.w4b
     val meuTurno: Boolean = false,  // true = mensagem enviada pelo utilizador (saída)
-    val tipo: String = "texto"      // texto | imagem | audio | video | documento | chamada | sticker | localizacao | voz
+    val tipo: String = "texto",     // texto | imagem | audio | video | documento | chamada | sticker | localizacao | voz
+    val mediaPath: String? = null   // caminho absoluto do ficheiro de media no dispositivo (se disponível)
 )
