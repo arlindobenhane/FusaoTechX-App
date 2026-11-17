@@ -23,6 +23,7 @@ class MainActivity : Activity() {
 
     private val REQ_PROJ = 101
     private val REQ_PERM = 102
+    private val permRefresh = ArrayList<() -> Unit>()
     private lateinit var info: TextView
     private lateinit var estado: TextView
     private lateinit var remoto: TextView
@@ -68,12 +69,30 @@ class MainActivity : Activity() {
         col.addView(espaco(14)); col.addView(info)
 
         col.addView(espaco(18))
-        col.addView(TextView(this).apply { text = "1 · Permissões (uma vez)"; setTextColor(cor.ac); textSize = 16f; setTypeface(typeface, android.graphics.Typeface.BOLD) })
-        col.addView(botao("Permitir controlo (Acessibilidade)", cor.card) { abrir(Settings.ACTION_ACCESSIBILITY_SETTINGS) })
-        col.addView(botao("Permitir ler notificações", cor.card) { abrir(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS) })
-        col.addView(botao("Permitir SMS, chamadas, contactos, câmara, localização", cor.card) { pedirPermissoes() })
-        col.addView(botao("Acesso a todos os ficheiros", cor.card) { ficheiros() })
-        col.addView(botao("Não desligar em segundo plano (bateria)", cor.card) { bateria() })
+        col.addView(TextView(this).apply { text = "1 · Permissões"; setTextColor(cor.ac); textSize = 16f; setTypeface(typeface, android.graphics.Typeface.BOLD) })
+        col.addView(rotulo("Toque em cada uma até ficar ✔. Sem elas, o controlo, a câmara, a localização e os ficheiros não funcionam."))
+        fun temPerm(vararg ps: String) = ps.all { checkSelfPermission(it) == android.content.pm.PackageManager.PERMISSION_GRANTED }
+        permLinha(col, "Controlo (Acessibilidade)") { ControlService.inst != null }
+            .setOnClickListener { abrir(Settings.ACTION_ACCESSIBILITY_SETTINGS) }
+        permLinha(col, "Ler notificações") { NotifService.inst != null }
+            .setOnClickListener { abrir(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS) }
+        permLinha(col, "Câmara") { temPerm(Manifest.permission.CAMERA) }
+            .setOnClickListener { requestPermissions(arrayOf(Manifest.permission.CAMERA), REQ_PERM) }
+        permLinha(col, "Localização (GPS)") { temPerm(Manifest.permission.ACCESS_FINE_LOCATION) }
+            .setOnClickListener { requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), REQ_PERM); toast("Escolha «Precisa» e «Permitir»") }
+        permLinha(col, "Fotos / galeria") { if (Build.VERSION.SDK_INT >= 33) temPerm("android.permission.READ_MEDIA_IMAGES") else temPerm(Manifest.permission.READ_EXTERNAL_STORAGE) }
+            .setOnClickListener { requestPermissions(if (Build.VERSION.SDK_INT >= 33) arrayOf("android.permission.READ_MEDIA_IMAGES") else arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQ_PERM) }
+        permLinha(col, "SMS") { temPerm(Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS) }
+            .setOnClickListener { requestPermissions(arrayOf(Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS, Manifest.permission.RECEIVE_SMS), REQ_PERM) }
+        permLinha(col, "Chamadas e contactos") { temPerm(Manifest.permission.CALL_PHONE, Manifest.permission.READ_CONTACTS, Manifest.permission.READ_CALL_LOG) }
+            .setOnClickListener { requestPermissions(arrayOf(Manifest.permission.CALL_PHONE, Manifest.permission.READ_CONTACTS, Manifest.permission.READ_CALL_LOG, Manifest.permission.READ_PHONE_STATE), REQ_PERM) }
+        permLinha(col, "Todos os ficheiros") { if (Build.VERSION.SDK_INT >= 30) android.os.Environment.isExternalStorageManager() else temPerm(Manifest.permission.READ_EXTERNAL_STORAGE) }
+            .setOnClickListener { ficheiros() }
+        if (Build.VERSION.SDK_INT >= 33) permLinha(col, "Notificações") { temPerm("android.permission.POST_NOTIFICATIONS") }
+            .setOnClickListener { requestPermissions(arrayOf("android.permission.POST_NOTIFICATIONS"), REQ_PERM) }
+        permLinha(col, "Sem restrições de bateria") { try { (getSystemService(Context.POWER_SERVICE) as android.os.PowerManager).isIgnoringBatteryOptimizations(packageName) } catch (_: Exception) { true } }
+            .setOnClickListener { bateria() }
+        col.addView(botao("✅ Pedir todas de uma vez", cor.card) { pedirPermissoes() })
 
         col.addView(espaco(18))
         col.addView(TextView(this).apply { text = "2 · Ligar"; setTextColor(cor.ac); textSize = 16f; setTypeface(typeface, android.graphics.Typeface.BOLD) })
@@ -191,7 +210,29 @@ class MainActivity : Activity() {
             .show()
     }
 
-    override fun onResume() { super.onResume(); refrescar() }
+    override fun onResume() { super.onResume(); refrescar(); atualizarPerms() }
+
+    override fun onRequestPermissionsResult(req: Int, perms: Array<out String>, res: IntArray) {
+        super.onRequestPermissionsResult(req, perms, res); atualizarPerms()
+    }
+
+    private fun atualizarPerms() { for (r in permRefresh) try { r() } catch (_: Exception) {} }
+
+    /** Uma linha de permissão com estado ✔/✗ que se atualiza; devolve o botão para lhe pôr a ação. */
+    private fun permLinha(col: LinearLayout, nome: String, estado: () -> Boolean): Button {
+        val b = Button(this).apply {
+            setTextColor(Color.WHITE); isAllCaps = false; textSize = 15f; gravity = Gravity.START or Gravity.CENTER_VERTICAL
+            val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); lp.topMargin = dp(6); layoutParams = lp
+        }
+        val refresh = {
+            val ok = estado()
+            b.text = (if (ok) "✔  " else "✗  ") + nome + (if (ok) "  (concedida)" else "  — tocar para permitir")
+            b.setBackgroundColor(if (ok) 0xFF1B5E20.toInt() else cor.card)
+        }
+        refresh(); permRefresh.add(refresh)
+        col.addView(b)
+        return b
+    }
 
     private fun refrescar() {
         val ips = Util.localIps()
@@ -267,7 +308,7 @@ class MainActivity : Activity() {
         p.add(Manifest.permission.READ_CALL_LOG)
         p.add(Manifest.permission.ACCESS_FINE_LOCATION)
         p.add(Manifest.permission.ACCESS_COARSE_LOCATION)
-        if (Build.VERSION.SDK_INT >= 33) { p.add(Manifest.permission.POST_NOTIFICATIONS); p.add("android.permission.READ_MEDIA_IMAGES") }
+        if (Build.VERSION.SDK_INT >= 33) { p.add(Manifest.permission.POST_NOTIFICATIONS); p.add("android.permission.READ_MEDIA_IMAGES") } else { p.add(Manifest.permission.READ_EXTERNAL_STORAGE) }
         requestPermissions(p.toTypedArray(), REQ_PERM)
     }
 

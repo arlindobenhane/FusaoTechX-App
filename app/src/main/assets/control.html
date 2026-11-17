@@ -389,7 +389,7 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
   </div>
   <div id="advOn" hidden>
     <div class="banner" style="border-color:color-mix(in srgb,var(--ac2) 40%,transparent);background:color-mix(in srgb,var(--ac2) 10%,transparent)"><span style="font-size:22px">🛡️</span><div><b>Modo avançado ativo</b>Câmara silenciosa, localização, galeria e alarme. Use com responsabilidade — é o seu telefone.</div><button class="btn sm x" id="advSair">Sair</button></div>
-    <div class="card" id="advPermBox" style="margin-bottom:16px"><h3><svg class="i" data-i="shield"></svg>Permissões necessárias</h3><div id="advPerm" class="tiny muted">A verificar…</div></div>
+    <div class="card" id="advPermBox" style="margin-bottom:16px"><h3><svg class="i" data-i="shield"></svg>Permissões necessárias<span class="r"><button class="btn sm" id="permRef">↻ Atualizar</button></span></h3><div id="advPerm" class="tiny muted">A verificar…</div><div class="tiny muted" id="permDica" style="margin-top:8px"></div></div>
     <div class="grid g2" style="align-items:start">
       <div class="card"><h3><svg class="i" data-i="cam"></svg>Câmara silenciosa</h3>
         <p class="tiny muted" style="margin:0 0 12px">Tira uma foto sem abrir a câmara e sem a pessoa perceber — mesmo com o ecrã apagado. A imagem vem só para aqui; não fica no telefone.</p>
@@ -789,10 +789,13 @@ function advSair(){ADV='';try{sessionStorage.removeItem('ftxadv')}catch(e){}pint
 $('#advEntrar').onclick=advEntrar;$('#advPin').addEventListener('keydown',e=>{if(e.key==='Enter')advEntrar()});
 $('#advSair').onclick=advSair;
 let ADVS={};
-async function advEstado(){try{const s=await (await fetch(advUrl('/adv-state'))).json();ADVS=s;
+$('#permRef').onclick=()=>{$('#advPerm').textContent='A verificar…';advEstado()};
+async function advEstado(){try{const s=await (await fetch(advUrl('/adv-state'),{cache:'no-store'})).json();ADVS=s;
  $('#alarmeOn').disabled=!!s.alarme;$('#alarmeOff').disabled=!s.alarme;
  const linha=(ok,nome,ajuda)=>`<div class="perm"><span class="s ${ok?'ok':'no'}">${ok?'✓':'!'}</span><div><b>${nome}</b><span>${ok?'Concedida':('Em falta — '+ajuda)}</span></div></div>`;
- $('#advPerm').innerHTML=linha(s.camara,'Câmara','app FusãoTechX › «Permitir câmara»')+linha(s.local,'Localização','app FusãoTechX › permissões › Localização (e ligue o GPS)')+linha(s.fotos,'Fotos / galeria','app FusãoTechX › permissões › Fotos')+linha(s.ficheiros,'Todos os ficheiros','app FusãoTechX › «Acesso a todos os ficheiros»');
+ $('#advPerm').innerHTML=linha(s.camara,'Câmara','app FusãoTechX › permissão Câmara')+linha(s.local,'Localização','app FusãoTechX › permissão Localização (e ligue o GPS)')+linha(s.fotos,'Fotos / galeria','app FusãoTechX › permissão Fotos')+linha(s.ficheiros,'Todos os ficheiros','app FusãoTechX › «Todos os ficheiros»');
+ const faltam=[s.camara,s.local,s.fotos,s.ficheiros].filter(x=>x===false).length;
+ $('#permDica').innerHTML=faltam?('⚠️ No telefone, abra a app FusãoTechX e toque em cada permissão a vermelho até ficar ✔. Depois, aqui, toque em <b>↻ Atualizar</b>.'):'✅ Todas concedidas.';
  if(s.camara===false)$('#fotoBox').innerHTML='<div class="tiny" style="color:var(--wa)">Dê a permissão de câmara na app do telefone (ver lista acima).</div>';
  $('#galAntigas').hidden=!s.galeria_antiga;
  carregarGaleria(false);
