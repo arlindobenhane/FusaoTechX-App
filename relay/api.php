@@ -50,7 +50,7 @@ switch ($a) {
             }
             if ($lista || $want() !== $pushing) break;
             if (connection_aborted()) exit;
-            usleep(120000);
+            usleep(50000);
         } while (microtime(true) < $fim);
         relay_json(['reqs' => $lista, 'want' => $want(), 'sal' => $m['sal']]);
 

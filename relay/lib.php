@@ -95,3 +95,19 @@ function relay_codigo_ok(array $m, string $k): bool
 {
     return $k !== '' && !empty($m['ch']) && hash_equals((string)$m['ch'], hash('sha256', $m['sal'] . $k));
 }
+
+/** Uma vez por dia: apaga telefones sem atividade há mais de 30 dias (filas, imagens e dados). */
+function relay_purga(): void
+{
+    $marca = RELAY_DATA . '/.purga';
+    if (is_file($marca) && filemtime($marca) > time() - 86400) return;
+    @touch($marca);
+    foreach ((array)glob(RELAY_DATA . '/[0-9]*', GLOB_ONLYDIR) as $d) {
+        $m = @json_decode((string)@file_get_contents($d . '/meta.json'), true);
+        if (is_array($m) && time() - (int)($m['visto'] ?? 0) < 30 * 86400) continue;
+        if (!is_array($m) && filemtime($d) > time() - 86400) continue;
+        $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($d, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
+        foreach ($it as $f) $f->isDir() ? @rmdir($f->getPathname()) : @unlink($f->getPathname());
+        @rmdir($d);
+    }
+}

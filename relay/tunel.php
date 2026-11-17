@@ -120,7 +120,7 @@ do {
         exit;
     }
     if (connection_aborted()) break;
-    usleep(50000);
+    usleep(25000);
 } while (microtime(true) < $fim);
 @unlink($d . '/req/' . $rid . '.json'); @unlink($d . '/req/' . $rid . '.body');
 relay_json(['erro' => 'sem resposta do telefone'], 504);

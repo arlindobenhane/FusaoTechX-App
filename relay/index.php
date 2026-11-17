@@ -8,6 +8,7 @@ require __DIR__ . '/lib.php';
 $base = rtrim(str_replace('\\', '/', dirname((string)($_SERVER['SCRIPT_NAME'] ?? '/relay/index.php'))), '/');
 $id = preg_replace('/\D/', '', (string)($_GET['id'] ?? ''));
 if (relay_id_ok($id)) { header('Location: ' . $base . '/d/' . $id . '/'); exit; }
+relay_purga();
 header('Content-Type: text/html; charset=utf-8');
 ?><!doctype html>
 <html lang="pt">
