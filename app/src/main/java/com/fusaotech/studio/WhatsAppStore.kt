@@ -71,23 +71,34 @@ object WhatsAppStore {
         val vistos = tsVistos.getOrPut(sbn.key) { mutableSetOf() }
         var novas = false
 
-        // ── Caminho 1: MessagingStyle (API 24+) ──
-        val style = try { Notification.MessagingStyle.extractMessagingStyleFromNotification(n) } catch (_: Exception) { null }
-        if (style != null && style.messages.isNotEmpty()) {
-            val tituloConversa = style.conversationTitle?.toString()
+        // ── Caminho 1: MessagingStyle via extras Android (sem AndroidX) ──
+        // EXTRA_MESSAGES é um array de Bundle: cada bundle = uma mensagem
+        @Suppress("UNCHECKED_CAST")
+        val msgBundles: Array<android.os.Parcelable>? = try {
+            extras.getParcelableArray(Notification.EXTRA_MESSAGES)
+        } catch (_: Exception) { null }
+
+        if (!msgBundles.isNullOrEmpty()) {
+            val tituloConversa = extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE)?.toString()
                 ?: extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()
                 ?: sbn.packageName.substringAfterLast('.')
-            val isGrupo = style.isGroupConversation
+            val isGrupo = extras.getBoolean(Notification.EXTRA_IS_GROUP_CONVERSATION, false)
 
-            for (m in style.messages) {
-                val ts = m.timestamp
-                if (!vistos.add(ts)) continue               // já processada
-                val texto = m.text?.toString()?.trim() ?: continue
+            for (p in msgBundles) {
+                val b = p as? android.os.Bundle ?: continue
+                val ts = b.getLong("time", 0L)
+                if (ts == 0L || !vistos.add(ts)) continue
+                val texto = b.getCharSequence("text")?.toString()?.trim() ?: continue
                 if (texto.isEmpty()) continue
 
-                // sender == null significa mensagem enviada pelo próprio utilizador
-                val senderName = m.senderPerson?.name?.toString()?.trim()
-                    ?: m.sender?.trim()
+                // "sender" nulo/vazio = mensagem enviada pelo próprio utilizador
+                val senderCharSeq = b.getCharSequence("sender")?.toString()?.trim()
+                // API 28+: sender_person é um Person
+                val senderPerson: android.app.Person? = if (android.os.Build.VERSION.SDK_INT >= 28) {
+                    try { b.getParcelable("sender_person") } catch (_: Exception) { null }
+                } else null
+                val senderName = senderPerson?.name?.toString()?.trim()
+                    ?: senderCharSeq
                 val meuTurno = senderName.isNullOrEmpty()
                 val remetente = if (meuTurno) "Eu" else (senderName ?: tituloConversa)
 
