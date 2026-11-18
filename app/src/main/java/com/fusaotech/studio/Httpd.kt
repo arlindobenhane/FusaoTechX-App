@@ -329,7 +329,7 @@ class Httpd(ctxIn: Context, private val porta: Int) {
             }
             "/geofence-remove" -> { GeofenceStore.removerZona(ctx, b.optString("id")); r.put("ok", true) }
             "/geofence-toggle" -> { GeofenceStore.toggleZona(ctx, b.optString("id"), b.optBoolean("ativa", true)); r.put("ok", true) }
-            "/geofence-events" -> r.put("lista", GeofenceStore.eventos(ctx, (query["n"]?.toIntOrNull() ?: 100).coerceIn(10, 500)))
+            "/geofence-events" -> r.put("lista", GeofenceStore.eventos(ctx, b.optInt("n", 100).coerceIn(10, 500)))
             "/screenshot" -> {
                 // Captura de ecrã via AccessibilityService — não precisa de MediaProjection.
                 val ctrl = ControlService.inst

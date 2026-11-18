@@ -104,7 +104,7 @@ object GeofenceStore {
                         .put("zona_nome", z.optString("nome"))
                         .put("tipo", tipo)
                         .put("lat", lat).put("lng", lng)
-                        .put("distancia", dist.roundToInt())
+                        .put("distancia", kotlin.math.roundToInt(dist))
                         .put("ts", ts))
                     // SEM notificação no telefone — evento fica só no log para o admin ler.
                 }
@@ -121,8 +121,4 @@ object GeofenceStore {
         return r * 2 * atan2(sqrt(a), sqrt(1 - a))
     }
 
-    private fun Double.roundToInt() = this.roundToInt()
-    private fun Double.roundToInt2(): Int = kotlin.math.roundToInt(this)
 }
-
-private fun Double.roundToInt(): Int = kotlin.math.roundToInt(this)
