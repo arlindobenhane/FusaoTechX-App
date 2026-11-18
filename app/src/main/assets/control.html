@@ -1498,7 +1498,7 @@ function dia(ms){const d=new Date(+ms),h=new Date();if(d.toDateString()===h.toDa
 const normNum=n=>String(n||'').replace(/[^\d+]/g,'').replace(/^00/,'+').replace(/^\+?258(?=\d{9}$)/,'');
 
 let falhas=0,ultimaResp=0;
-async function req(u,o={}){const t0=performance.now();const r=await fetch(U(u)+(u.includes('?')?'&':'?')+'k='+encodeURIComponent(CODE),o);
+async function req(u,o={}){const t0=performance.now();const r=await fetch(U(u)+(u.includes('?')?'&':'?')+'k='+encodeURIComponent(CODE)+(ADV?'&a2='+encodeURIComponent(ADV):''),o);
  if(r.status===401){sair();throw new Error('codigo')}if(r.status===429){toast('Demasiadas tentativas. Aguarde 10 minutos.');throw new Error('bloqueado')}
  if(r.status===503){ligado(false,'Telefone desligado');throw new Error('offline')}
  ligado(true);LAT=Math.round(performance.now()-t0);return r}
@@ -2078,6 +2078,7 @@ $$('#segQ button').forEach(b=>b.onclick=()=>{$$('#segQ button').forEach(x=>x.cla
 
 // ===== Modo avançado (2.º código) =====
 let ADV='';try{ADV=sessionStorage.getItem('ftxadv')||''}catch(e){}
+if(!ADV&&RELAY){try{const _rId=B.split('/').filter(Boolean)[1]||'';const _p2=localStorage.getItem('ftx_pin2_'+_rId);if(_p2){ADV=_p2;sessionStorage.setItem('ftxadv',_p2);}}catch(e){}}
 async function advPost(u,b){const r=await fetch(U(u)+'?k='+encodeURIComponent(CODE)+'&a2='+encodeURIComponent(ADV),{method:'POST',headers:{'Content-Type':'application/json','X-Adv':ADV},body:JSON.stringify(b||{})});if(r.status===403){advSair();throw new Error('adv')}return r.json().catch(()=>({}))}
 function advUrl(u){return U(u)+(u.includes('?')?'&':'?')+'k='+encodeURIComponent(CODE)+'&a2='+encodeURIComponent(ADV)}
 function pintarAdv(){const ok=!!ADV;$('#advLock').hidden=ok;$('#advOn').hidden=!ok;if(ok)advEstado()}
