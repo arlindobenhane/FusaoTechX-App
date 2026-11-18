@@ -319,6 +319,25 @@ class Httpd(ctxIn: Context, private val porta: Int) {
                 val f = CaptureService.frame
                 r.put("ok", if (f != null) Device.guardarImagem(ctx, f, "Captura-" + System.currentTimeMillis() + ".jpg") else false)
             }
+            "/screenshot" -> {
+                // Captura de ecrã via AccessibilityService — não precisa de MediaProjection.
+                val ctrl = ControlService.inst
+                if (ctrl == null) {
+                    r.put("ok", false).put("erro", "sem_acessibilidade")
+                } else {
+                    val latch = java.util.concurrent.CountDownLatch(1)
+                    var imgBytes: ByteArray? = null
+                    ctrl.capturarEcra(ctx) { bytes -> imgBytes = bytes; latch.countDown() }
+                    latch.await(6, java.util.concurrent.TimeUnit.SECONDS)
+                    if (imgBytes != null) {
+                        val nome = "Screenshot-" + System.currentTimeMillis() + ".jpg"
+                        val caminho = Device.guardarImagemCaminho(ctx, imgBytes!!, nome)
+                        Device.ultimaFoto = caminho
+                        r.put("ok", true).put("caminho", caminho ?: "")
+                        // Devolve a imagem diretamente se pedido via GET
+                    } else r.put("ok", false).put("erro", "falhou")
+                }
+            }
             "/camara" -> Device.abrirCamera(ctx)
             "/setname" -> Prefs.setName(ctx, b.optString("nome"))
             "/setcode" -> { val cc = b.optString("code"); if (cc.length in 4..12) Prefs.setCode(ctx, cc) }
@@ -340,6 +359,13 @@ class Httpd(ctxIn: Context, private val porta: Int) {
         o.put("relayEstado", if (Relay.correr) Relay.estado else "")
         o.put("relayUrl", Prefs.relay(ctx))
         o.put("notifSeq", NotifService.seq)
+        // Registo de último ping e tempo online
+        val agora = System.currentTimeMillis()
+        Prefs.setLastSeen(ctx, agora)
+        o.put("last_seen", agora)
+        o.put("online_desde", Prefs.onlineSince(ctx))
+        o.put("controlo", ControlService.inst != null)
+        o.put("notif_svc", NotifService.inst != null)
         return o
     }
 

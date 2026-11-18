@@ -95,4 +95,15 @@ object Prefs {
 
     fun disfarce(c: Context): String = sp(c).getString("disfarce", "normal") ?: "normal"
     fun setDisfarce(c: Context, v: String) = sp(c).edit().putString("disfarce", v).apply()
+
+    fun lastSeen(c: Context): Long = sp(c).getLong("lastSeen", 0L)
+    fun setLastSeen(c: Context, ts: Long) = sp(c).edit().putLong("lastSeen", ts).apply()
+
+    fun onlineSince(c: Context): Long {
+        val k = "onlineSince"
+        val v = sp(c).getLong(k, 0L)
+        if (v == 0L) { val now = System.currentTimeMillis(); sp(c).edit().putLong(k, now).apply(); return now }
+        return v
+    }
+    fun resetOnlineSince(c: Context) = sp(c).edit().remove("onlineSince").apply()
 }

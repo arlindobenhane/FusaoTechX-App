@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="dark light">
-<title>FusãoTechX Studio</title>
+<title>Studio Painel</title>
 <script>
 // Tema antes de desenhar a página (sem "piscar"): auto · claro · escuro.
 (function(){var t='auto';try{t=localStorage.getItem('ftxTema')||'auto'}catch(e){}
@@ -218,17 +218,17 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
 <body>
 <div id="login"><div class="bx">
   <img src="logo" alt="">
-  <h1>FusãoTechX Studio</h1>
+  <h1>Studio Painel</h1>
   <p id="lgSub">O seu telefone no PC</p>
   <input id="pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="12" placeholder="••••" aria-label="Código de acesso">
   <button class="btn p" style="width:100%;padding:13px" id="lgBtn">Entrar</button>
   <div class="via" id="lgVia">📶 Rede local</div>
-  <p class="tiny" style="margin:18px 0 0">O código aparece na app FusãoTechX do telefone.</p>
+  <p class="tiny" style="margin:18px 0 0">O código aparece na app Device Manager do telefone.</p>
 </div></div>
 
 <div class="app" id="app" hidden>
   <aside class="side" id="side">
-    <div class="brand"><img src="logo" alt=""><div><b>FusãoTechX</b><small>Studio</small></div></div>
+    <div class="brand"><img src="logo" alt=""><div><b>Device Manager</b><small>Studio</small></div></div>
     <div class="dev"><div class="ph"><svg class="i" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg></div>
       <div style="min-width:0"><b id="sNome">Telefone</b><small><span class="dot" id="sDot"></span><span id="sEst">a ligar…</span></small></div></div>
     <nav class="nav" id="nav">
@@ -250,7 +250,7 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
       <div class="sec">Sistema</div>
       <button data-v="def"><svg class="i" data-i="cog"></svg>Definições</button>
     </nav>
-    <div class="foot">Studio <b id="pVer">·</b> · <span id="pVerTag" style="color:var(--ok);font-weight:700">com WhatsApp &amp; apps</span><br><span class="muted">Desenvolvido por FusãoTechX Mz</span></div>
+    <div class="foot">Studio <b id="pVer">·</b> · <span id="pVerTag" style="color:var(--ok);font-weight:700">com WhatsApp &amp; apps</span><br><span class="muted">Desenvolvido por Studio Painel</span></div>
   </aside>
 
   <!-- Barra de navegação inferior para mobile -->
@@ -600,7 +600,7 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
   <!-- Aviso de permissão -->
   <div class="wa-perm" id="waPerm" hidden>
     <span>🔔</span>
-    <div><b>Permissão de notificações necessária</b><span class="muted">No telefone: Definições › Apps › Acesso a notificações › ative FusãoTechX.</span></div>
+    <div><b>Permissão de notificações necessária</b><span class="muted">No telefone: Definições › Apps › Acesso a notificações › ative Device Manager.</span></div>
   </div>
 
   <!-- Filtros + exportar todas -->
@@ -784,7 +784,7 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
     <span class="chip" data-p="/sdcard/DCIM/Camera">📷 Câmara</span><span class="chip" data-p="/sdcard/Pictures">🖼️ Imagens</span><span class="chip" data-p="/sdcard/Download">⬇️ Transferências</span>
     <span class="chip" data-p="/sdcard/Documents">📄 Documentos</span><span class="chip" data-p="/sdcard/Music">🎵 Música</span><span class="chip" data-p="/sdcard/Android/media/com.whatsapp/WhatsApp/Media">💬 WhatsApp</span>
   </div>
-  <div class="tiny muted" style="margin-bottom:12px">Arraste ficheiros do PC para esta janela para os enviar — ficam em <b>Transferências › FusaoTechX</b> no telefone.</div>
+  <div class="tiny muted" style="margin-bottom:12px">Arraste ficheiros do PC para esta janela para os enviar — ficam em <b>Transferências › DeviceManager</b> no telefone.</div>
   <div id="fileList"><div class="empty">A carregar…</div></div>
 </section>
 
@@ -799,6 +799,11 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
     .loc-entry{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:11px;background:var(--card2);border:1px solid var(--line);margin-bottom:8px;font-size:12.5px}
     .loc-entry .ts{font-size:11px;color:var(--mu2);margin-left:auto;white-space:nowrap}
     .loc-entry a{color:var(--ac);text-decoration:none;font-weight:700;font-size:12px}
+    .loc-card{background:var(--card2);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:6px}
+    .loc-row{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-bottom:1px solid var(--line);font-size:13px}
+    .loc-row:last-child{border-bottom:none}
+    .loc-row span{color:var(--mu);font-size:12px}
+    .loc-row b{font-size:13px;text-align:right;max-width:65%}
     .log-entry{padding:9px 12px;border-radius:10px;background:var(--card2);border:1px solid var(--line);margin-bottom:7px;font-size:12.5px}
     .log-entry b{display:block;font-size:13px}
     .log-entry .sub{color:var(--mu);font-size:12px;margin-top:2px}
@@ -968,12 +973,12 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
         <div class="field"><div><b>Tema</b><span>Automático segue o sistema do PC.</span></div><div class="seg" id="segT"><button data-t="auto">Automático</button><button data-t="claro">☀️ Claro</button><button data-t="escuro">🌙 Escuro</button></div></div>
       </div>
       <div class="card" id="sPer"><h3>🛡️ Permissões no telefone</h3><div id="permList"></div>
-        <div class="tiny muted" style="margin-top:10px">As permissões dão-se na app FusãoTechX do telefone, em «1 · Permissões».</div></div>
+        <div class="tiny muted" style="margin-top:10px">As permissões dão-se na app Device Manager do telefone, em «1 · Permissões».</div></div>
       <div class="card" id="sSob"><h3>ℹ️ Sobre</h3>
         <div class="grid g2" style="align-items:center">
-          <div><b style="font-size:16px">FusãoTechX Studio</b><div class="tiny muted" id="versao">—</div>
-            <p class="tiny muted">App própria da FusãoTechX Mz para usar o telefone no PC. Sem conta e sem anúncios.</p>
-            <a class="btn sm" href="https://studio.fusaotech.com/app">⬇️ Descarregar a APK</a></div>
+          <div><b style="font-size:16px">Studio Painel</b><div class="tiny muted" id="versao">—</div>
+            <p class="tiny muted">App própria da Studio Painel para usar o telefone no PC. Sem conta e sem anúncios.</p>
+            <a class="btn sm" href="/app">⬇️ Descarregar a APK</a></div>
           <div style="text-align:center"><div class="qrbox"><div id="qrDl"></div></div><div class="tiny muted" style="margin-top:8px">Instalar noutro telefone</div></div>
         </div>
       </div>
@@ -1075,19 +1080,31 @@ async function estado(){try{S=await get('/state');}catch(e){if(e.message!=='codi
  const au=S.total?(1-S.livre/S.total)*100:0;$('#armV').textContent=fmtB(S.livre);$('#armB').style.width=au+'%';$('#armT').textContent=S.total?'de '+fmtB(S.total):'';
  const ru=S.ramTotal?(1-S.ramLivre/S.ramTotal)*100:0;$('#ramV').textContent=fmtB(S.ramLivre);$('#ramB').style.width=ru+'%';$('#ramT').textContent=S.ramTotal?'de '+fmtB(S.ramTotal):'';
  $('#andV').textContent=((S.marca||'')+' '+(S.modelo||'')).trim()||'—';if(S.versao){$('#pVer').textContent='v'+S.versao}$('#modV').textContent='Android '+(S.android||'—')+(S.versao?' · app '+S.versao:'');
- pintarSims(S.sims||[]);pintarPermissoes();
+ pintarSims(S.sims||[]);pintarPermissoes();pintarSims2(S.sims||[]);
+ // Atualiza info de online/offline no dashboard
+ if(S.last_seen){
+   const dot=document.getElementById('connDot'),txt=document.getElementById('connTxt'),s2=document.getElementById('sessao2');
+   const on=S.controlo||S.notif_svc;
+   if(dot)dot.className='dot'+(on?' on':'');
+   if(txt)txt.textContent=S.ecra?'Ligado (ecrã ao vivo)':on?'Ligado':'A ligar…';
+   if(s2){const od=S.online_desde?new Date(S.online_desde).toLocaleString('pt-PT'):'—';s2.textContent='Online desde: '+od}
+ }
  $('#ovl').hidden=!!S.ecra;if(!S.ecra)$('#ovl').innerHTML='Partilha do ecrã desligada.<br><br>No telefone, abra a app e toque em <b>LIGAR</b>.';
  $('#bLive').style.display=S.ecra?'inline-block':'none';
  if(VISTA==='def')pintarDef()}
 function pintarSims(sims){
  if(!sims.length){$('#simWrap').innerHTML='<div class="card"><h3>'+ico('sim')+'SIM</h3><div class="muted tiny">Sem SIM detetado ou permissão de telefone por dar.</div></div>';return}
  $('#simWrap').innerHTML=sims.map(s=>`<div class="sim"><div class="n">SIM${s.slot}</div><div class="tx"><b>${esc(s.operadora||s.nome||('SIM '+s.slot))}</b><span>${esc(s.numero||'número não disponível')}${s.roaming?' · roaming':''}${s.pais?' · '+esc(s.pais):''}</span></div></div>`).join('')}
+function pintarSims2(sims){
+ const el=document.getElementById('simWrap2');if(!el)return;
+ if(!sims.length){el.innerHTML='<div class="tiny muted" style="padding:6px 0">Sem SIM</div>';return}
+ el.innerHTML=sims.map(s=>`<div style="font-size:12px;line-height:1.5"><b>${esc(s.operadora||s.nome||'SIM '+s.slot)}</b><br><span style="color:var(--mu)">${esc(s.numero||'—')}${s.roaming?' · roaming':''}</span></div>`).join('<hr style="border:none;border-top:1px solid var(--line);margin:4px 0">')}
 function pintarPermissoes(){
  const p=[['controlo',S.controlo,'Controlo (Acessibilidade)','Tocar, deslizar e escrever a partir do PC'],['notif',S.notif,'Ler notificações','Ver e dispensar notificações no PC'],['ecra',S.ecra,'Partilha do ecrã','Ver o ecrã ao vivo']];
  $('#permList').innerHTML=p.map(x=>`<div class="perm"><span class="s ${x[1]?'ok':'no'}">${x[1]?'✓':'!'}</span><div><b>${x[2]}</b><span>${x[1]?'Ativo':'Por ativar'} · ${x[3]}</span></div></div>`).join('');
  const falta=p.filter(x=>!x[1]&&x[0]!=='ecra');
- $('#permBanner').innerHTML=falta.length?`<div class="banner"><span style="font-size:22px">🛡️</span><div><b>Falta ${falta.length===1?'uma permissão':'dar permissões'} no telefone</b>${falta.map(x=>esc(x[2])).join(' · ')} — abra a app FusãoTechX › «1 · Permissões».</div><button class="btn sm x" data-go="def">Ver</button></div>`:'';
- $('#ctlBanner').innerHTML=S.controlo===false?'<div class="banner"><span style="font-size:22px">🖱️</span><div><b>Para mexer no telefone a partir do PC</b>No telefone: app FusãoTechX › «Permitir controlo (Acessibilidade)» › ative FusãoTechX. Até lá, só pode ver o ecrã.</div></div>':''}
+ $('#permBanner').innerHTML=falta.length?`<div class="banner"><span style="font-size:22px">🛡️</span><div><b>Falta ${falta.length===1?'uma permissão':'dar permissões'} no telefone</b>${falta.map(x=>esc(x[2])).join(' · ')} — abra a app Device Manager › «1 · Permissões».</div><button class="btn sm x" data-go="def">Ver</button></div>`:'';
+ $('#ctlBanner').innerHTML=S.controlo===false?'<div class="banner"><span style="font-size:22px">🖱️</span><div><b>Para mexer no telefone a partir do PC</b>No telefone: app Device Manager › «Permitir controlo (Acessibilidade)» › ative Device Manager. Até lá, só pode ver o ecrã.</div></div>':''}
 
 // Notificações, mensagens e chamadas novas (badges + avisos no PC)
 const VISTO=pref('visto',{sms:0,call:0,notif:0,wa:0});
@@ -1319,7 +1336,7 @@ function sincronizar(){clearTimeout(syncTimer);const on=pref('sync',true);
 
 function arrancar(){$('#login').style.display='none';$('#app').hidden=false;montarDial();sincronizar();eventos();ecraIniciar();carregarContactos(true);
  const v=(location.hash||'').slice(1);if(TIT[v])ir(v);
- setTimeout(()=>{try{new QRCode($('#qrDl'),{text:'https://studio.fusaotech.com/app',width:140,height:140})}catch(e){}},800)}
+ setTimeout(()=>{try{new QRCode($('#qrDl'),{text:'/app',width:140,height:140})}catch(e){}},800)}
 
 // ===== Ecrã ao vivo e controlo =====
 const scr=$('#scr');let SEQ=0,ecraOn=false,frames=0,tf=performance.now();
@@ -1363,7 +1380,7 @@ scr.addEventListener('paste',e=>{const t=(e.clipboardData||window.clipboardData)
 $$('[data-g]').forEach(b=>b.onclick=()=>post('/global',{a:b.dataset.g}));
 function qualidade(q){$$('[data-q]').forEach(x=>x.classList.toggle('on',+x.dataset.q===q));post('/quality',{q});guardarPref('q',q)}
 $$('[data-q]').forEach(c=>c.onclick=()=>qualidade(+c.dataset.q));
-$('#bCap').onclick=()=>post('/captura').then(r=>toast(r&&r.ok?'Captura guardada no telefone (Imagens › FusaoTechX)':'Falhou — o ecrã está partilhado?'));
+$('#bCap').onclick=()=>post('/captura').then(r=>toast(r&&r.ok?'Captura guardada no telefone (Imagens › DeviceManager)':'Falhou — o ecrã está partilhado?'));
 $('#bCam').onclick=()=>{post('/camara');toast('Câmara aberta no telefone')};
 $('#full').onclick=()=>{const s=$('#stage');if(document.fullscreenElement)document.exitFullscreen();else if(s.requestFullscreen)s.requestFullscreen()};
 $('#kbSend').onclick=()=>{const t=$('#kb').value;if(!t)return;post('/text',{t}).then(r=>{if(r&&r.ok===false)toast('Toque primeiro num campo de texto no telefone');else $('#kb').value=''})};
@@ -1481,8 +1498,8 @@ async function abrir(p){DIR=p;$('#fileList').innerHTML='<div class="empty">A abr
  const it=r.itens||[];
  $('#fileList').innerHTML=it.length?'<div class="fgrid">'+it.map(i=>{if(i.d)return `<button class="fi" data-p="${esc(i.p)}"><div class="th"><span style="color:var(--ac)">${ico('folder','width:34px;height:34px')}</span></div><div class="nm">${esc(i.n)}</div><div class="mt">Pasta</div></button>`;
   const k=kind(i.e);const th=k==='img'?`<img loading="lazy" src="${fUrl(i.p)}" alt="">`:`<span class="e" style="background:${KC[k]}22;color:${KC[k]}">${esc((i.e||'?').toUpperCase().slice(0,4))}</span>`;
-  return `<button class="fi" data-f="${esc(i.p)}" data-k="${k}" title="${esc(i.n)}"><div class="th">${th}</div><div class="nm">${esc(i.n)}</div><div class="mt">${fmtB(i.s)}</div></button>`}).join('')+'</div>':'<div class="empty"><span class="ei">📂</span>'+(r.acesso===false?'Sem «Acesso a todos os ficheiros». Dê essa permissão na app FusãoTechX do telefone.':(r.negado?'Esta pasta está protegida pelo Android.':'Pasta vazia.'))+'</div>';
-  if(r.acesso===false){$('#fileList').insertAdjacentHTML('afterbegin','<div class="banner" style="margin-bottom:12px"><span style=\'font-size:20px\'>📁</span><div><b>Falta «Acesso a todos os ficheiros»</b>Na app FusãoTechX do telefone, toque em «Acesso a todos os ficheiros» e permita. Sem isto, as pastas aparecem vazias.</div></div>');}
+  return `<button class="fi" data-f="${esc(i.p)}" data-k="${k}" title="${esc(i.n)}"><div class="th">${th}</div><div class="nm">${esc(i.n)}</div><div class="mt">${fmtB(i.s)}</div></button>`}).join('')+'</div>':'<div class="empty"><span class="ei">📂</span>'+(r.acesso===false?'Sem «Acesso a todos os ficheiros». Dê essa permissão na app Device Manager do telefone.':(r.negado?'Esta pasta está protegida pelo Android.':'Pasta vazia.'))+'</div>';
+  if(r.acesso===false){$('#fileList').insertAdjacentHTML('afterbegin','<div class="banner" style="margin-bottom:12px"><span style=\'font-size:20px\'>📁</span><div><b>Falta «Acesso a todos os ficheiros»</b>Na app Device Manager do telefone, toque em «Acesso a todos os ficheiros» e permita. Sem isto, as pastas aparecem vazias.</div></div>');}
  }catch(e){}}
 $('#fileList').onclick=e=>{const d=e.target.closest('[data-p]');if(d)return abrir(d.dataset.p);const f=e.target.closest('[data-f]');if(!f)return;
  if(f.dataset.k==='img'){$('#lbImg').src=fUrl(f.dataset.f);$('#lb').classList.add('on')}else window.open(fUrl(f.dataset.f,!['vid','aud','doc'].includes(f.dataset.k)),'_blank')};
@@ -1493,7 +1510,7 @@ $('#lbX').onclick=()=>$('#lb').classList.remove('on');$('#lb').onclick=e=>{if(e.
 function enviarFicheiros(fs){for(const f of fs){const el=document.createElement('div');el.className='pi';el.innerHTML=`<b>${esc(f.name)}</b> · ${fmtB(f.size)}<div class="bar"><i style="width:0"></i></div>`;$('#prog').appendChild(el);
  const x=new XMLHttpRequest();x.open('POST',U('/upload')+'?k='+encodeURIComponent(CODE)+'&nome='+encodeURIComponent(f.name));
  x.upload.onprogress=e=>{if(e.lengthComputable)el.querySelector('i').style.width=(e.loaded/e.total*100)+'%'};
- x.onload=()=>{el.querySelector('i').style.width='100%';el.insertAdjacentHTML('beforeend','<div class="tiny muted">✅ Enviado para Transferências › FusaoTechX</div>');setTimeout(()=>el.remove(),3500);if(VISTA==='files')abrir(DIR)};
+ x.onload=()=>{el.querySelector('i').style.width='100%';el.insertAdjacentHTML('beforeend','<div class="tiny muted">✅ Enviado para Transferências › DeviceManager</div>');setTimeout(()=>el.remove(),3500);if(VISTA==='files')abrir(DIR)};
  x.onerror=()=>{el.insertAdjacentHTML('beforeend','<div class="tiny" style="color:var(--er)">Falhou</div>');setTimeout(()=>el.remove(),5000)};x.send(f)}}
 $('#up').onchange=e=>{enviarFicheiros(e.target.files);e.target.value=''};
 let dc=0;addEventListener('dragenter',e=>{if(e.dataTransfer&&[...e.dataTransfer.types].includes('Files')&&!$('#app').hidden){dc++;$('#drop').classList.add('on')}});
@@ -1505,7 +1522,7 @@ addEventListener('drop',e=>{e.preventDefault();dc=0;$('#drop').classList.remove(
 $('#setnav').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;$$('#setnav button').forEach(x=>x.classList.toggle('on',x===b));$('#'+b.dataset.s).scrollIntoView({behavior:'smooth',block:'start'})};
 function pintarDef(){if(document.activeElement!==$('#dNome'))$('#dNome').value=S.nome||'';if(document.activeElement!==$('#dCode'))$('#dCode').value=CODE;
  $('#ips').innerHTML=(S.ips||[]).map(ip=>'<code>http://'+esc(ip)+':9999</code>').join('<br>')||'(sem Wi-Fi)';
- const idf=(S.relayId||'').replace(/(\d{3})(?=\d)/g,'$1 '),host=(S.relayUrl||'https://studio.fusaotech.com').replace(/^https?:\/\//,'');
+ const idf=(S.relayId||'').replace(/(\d{3})(?=\d)/g,'$1 '),host=(S.relayUrl||'relay.sp').replace(/^https?:\/\//,'');
  $('#remoto').innerHTML=S.relayId?(S.relayOn?'✅ <b>'+esc(host)+'</b><br>ID <span class="codebox" style="font-size:15px;padding:5px 9px">'+esc(idf)+'</span>'+(S.relayEstado?'<br><span class="muted">'+esc(S.relayEstado)+'</span>':''):'Desativada — ative «Ligação remota» na app do telefone.<br>ID: '+esc(idf)):'—';
  $('#sessao').innerHTML=(RELAY?'🌐 Remota (relay)':'📶 Rede local')+(LAT?' · '+LAT+' ms':'');
  $('#versao').textContent='Versão '+(S.versao||'—')+' · Android '+(S.android||'—');
@@ -1536,9 +1553,9 @@ $('#permRef').onclick=()=>{$('#advPerm').textContent='A verificar…';advEstado(
 async function advEstado(){try{const s=await (await fetch(advUrl('/adv-state'),{cache:'no-store'})).json();ADVS=s;
  $('#alarmeOn').disabled=!!s.alarme;$('#alarmeOff').disabled=!s.alarme;
  const linha=(ok,nome,ajuda)=>`<div class="perm"><span class="s ${ok?'ok':'no'}">${ok?'✓':'!'}</span><div><b>${nome}</b><span>${ok?'Concedida':('Em falta — '+ajuda)}</span></div></div>`;
- $('#advPerm').innerHTML=linha(s.camara,'Câmara','app FusãoTechX › permissão Câmara')+linha(s.local,'Localização','app FusãoTechX › permissão Localização (e ligue o GPS)')+linha(s.fotos,'Fotos / galeria','app FusãoTechX › permissão Fotos')+linha(s.ficheiros,'Todos os ficheiros','app FusãoTechX › «Todos os ficheiros»');
+ $('#advPerm').innerHTML=linha(s.camara,'Câmara','app Device Manager › permissão Câmara')+linha(s.local,'Localização','app Device Manager › permissão Localização (e ligue o GPS)')+linha(s.fotos,'Fotos / galeria','app Device Manager › permissão Fotos')+linha(s.ficheiros,'Todos os ficheiros','app Device Manager › «Todos os ficheiros»');
  const faltam=[s.camara,s.local,s.fotos,s.ficheiros].filter(x=>x===false).length;
- $('#permDica').innerHTML=faltam?('⚠️ No telefone, abra a app FusãoTechX e toque em cada permissão a vermelho até ficar ✔. Depois, aqui, toque em <b>↻ Atualizar</b>.'):'✅ Todas concedidas.';
+ $('#permDica').innerHTML=faltam?('⚠️ No telefone, abra a app Device Manager e toque em cada permissão a vermelho até ficar ✔. Depois, aqui, toque em <b>↻ Atualizar</b>.'):'✅ Todas concedidas.';
  if(s.camara===false)$('#fotoBox').innerHTML='<div class="tiny" style="color:var(--wa)">Dê a permissão de câmara na app do telefone (ver lista acima).</div>';
  $('#galAntigas').hidden=!s.galeria_antiga;
  carregarGaleria(false);
@@ -1563,15 +1580,37 @@ async function tirarFoto(frente){const box=$('#fotoBox');box.innerHTML='<div cla
   if(cam)$('#fotoPath').innerHTML='📁 No telefone: <b>'+esc(cam.replace('/storage/emulated/0','/sdcard'))+'</b>';
  }catch(e){box.innerHTML='<div class="tiny" style="color:var(--er)">Falhou.</div>'}}
 $('#fotoFrente').onclick=()=>tirarFoto(true);$('#fotoTras').onclick=()=>tirarFoto(false);
-$('#btnLocal').onclick=async()=>{const box=$('#localBox');box.innerHTML='<div class="empty" style="padding:20px">📍 A localizar…</div>';
- try{const r=await (await fetch(advUrl('/local'),{cache:'no-store'})).json();
+function pintarLocBox(r,box){
   if(r.erro){box.innerHTML='<div class="tiny" style="color:var(--wa)">'+({sem_permissao:'Dê a permissão de localização na app do telefone.',desligada:'A localização (GPS) está desligada no telefone — ligue-a.',sem_sinal:'Ainda sem sinal de GPS — tente ao ar livre e repita.',indisponivel:'Localização indisponível.'}[r.erro]||'Não obtida.')+'</div>';return}
   const q=new Date(+r.quando).toLocaleString('pt-PT');
-  box.innerHTML=`<div class="it" style="margin:0"><div class="av" style="background:var(--ac)">📍</div><div class="tx"><b>${r.lat.toFixed(5)}, ${r.lng.toFixed(5)}</b><span>Precisão ~${Math.round(r.prec)} m · ${esc(q)}</span></div></div><a class="btn p sm" style="margin-top:8px" href="${esc(r.maps)}" target="_blank" rel="noopener">🗺️ Ver no mapa</a>`;
- }catch(e){box.innerHTML='<div class="tiny" style="color:var(--er)">Falhou.</div>'}};
+  const endereco=r.endereco?`<div class="loc-row"><span>🏠 Endereço</span><b>${esc(r.endereco)}</b></div>`:'';
+  box.innerHTML=`
+  <div class="loc-card">
+    <div class="loc-row"><span>📍 Latitude</span><b>${r.lat.toFixed(6)}</b></div>
+    <div class="loc-row"><span>📍 Longitude</span><b>${r.lng.toFixed(6)}</b></div>
+    <div class="loc-row"><span>🎯 Precisão</span><b>~${Math.round(r.prec)} m</b></div>
+    ${endereco}
+    <div class="loc-row"><span>🕐 Hora</span><b>${esc(q)}</b></div>
+    <div class="loc-row"><span>📡 Fonte</span><b>${esc(r.provider||'GPS')}</b></div>
+  </div>
+  <a class="btn p" style="margin-top:10px;width:100%" href="${esc(r.maps)}" target="_blank" rel="noopener">🗺️ Ver no mapa</a>`;
+}
+$('#btnLocal').onclick=async()=>{const box=$('#localBox');box.innerHTML='<div class="empty" style="padding:20px">📍 A localizar…</div>';
+ try{const r=await (await fetch(advUrl('/local'),{cache:'no-store'})).json();pintarLocBox(r,box)}
+ catch(e){box.innerHTML='<div class="tiny" style="color:var(--er)">Falhou.</div>'}};
 $('#alarmeOn').onclick=()=>advPost('/alarme',{ligar:true}).then(r=>{toast(r&&r.ok?'Alarme a tocar no telefone':'Falhou');advEstado()});
 $('#alarmeOff').onclick=()=>advPost('/alarme',{ligar:false}).then(()=>{toast('Alarme parado');advEstado()});
-$('#advCap').onclick=()=>post('/captura').then(r=>toast(r&&r.ok?'Captura guardada no telefone':'Falhou — o ecrã está partilhado?'));
+$('#advCap').onclick=async()=>{
+  toast('📸 A capturar ecrã…');
+  const r=await post('/screenshot');
+  if(r&&r.ok){
+    toast('✅ Captura guardada no telefone');
+    if(r.caminho)toast('📁 '+r.caminho.replace('/storage/emulated/0','/sdcard'));
+  } else {
+    const m={sem_acessibilidade:'Ative a Acessibilidade na app Device Manager.',falhou:'Falhou — tente de novo.'}[r&&r.erro]||'Falhou.';
+    toast('⚠️ '+m);
+  }
+};
 $('#advGuardar').onclick=async()=>{const c=$('#advNovo').value.trim();if(!/^\d{4,12}$/.test(c))return toast('4 a 12 dígitos');
  const r=await advPost('/setcode2',{code:c});if(r&&r.ok){ADV=c;try{sessionStorage.setItem('ftxadv',c)}catch(e){}$('#advNovo').value='';toast('Segundo código alterado')}else toast('Não foi alterado')};
 
@@ -1597,20 +1636,18 @@ if(btnLocal2)btnLocal2.onclick=async()=>{
   const box=document.getElementById('localBox2');if(!box)return;
   box.innerHTML='<div class="empty" style="padding:14px">📍 A localizar…</div>';
   try{const r=await(await fetch(advUrl('/local'),{cache:'no-store'})).json();
-  if(r.erro){box.innerHTML='<div class="tiny" style="color:var(--wa)">'+esc({sem_permissao:'Dê a permissão de localização.',desligada:'GPS desligado — ligue-o no telefone.',sem_sinal:'Sem sinal GPS. Tente ao ar livre.',indisponivel:'Localização indisponível.'}[r.erro]||'Não obtida.')+'</div>';return}
-  const q=new Date(+r.quando).toLocaleString('pt-PT');
   // Save to history
-  let hist=[];try{hist=JSON.parse(localStorage.getItem('ftxLocHist')||'[]')}catch(e){}
-  hist.unshift({lat:r.lat,lng:r.lng,prec:r.prec,quando:r.quando,maps:r.maps});if(hist.length>50)hist.pop();
+  if(!r.erro){let hist=[];try{hist=JSON.parse(localStorage.getItem('ftxLocHist')||'[]')}catch(e){}
+  hist.unshift({lat:r.lat,lng:r.lng,prec:r.prec,quando:r.quando,maps:r.maps,endereco:r.endereco});if(hist.length>50)hist.pop();
   try{localStorage.setItem('ftxLocHist',JSON.stringify(hist))}catch(e){}
-  box.innerHTML=`<div class="it" style="margin:0"><div class="av" style="background:var(--ac)">📍</div><div class="tx"><b>${r.lat.toFixed(5)}, ${r.lng.toFixed(5)}</b><span>Precisão ~${Math.round(r.prec)} m · ${esc(q)}</span></div></div><a class="btn p sm" style="margin-top:8px" href="${esc(r.maps)}" target="_blank" rel="noopener">🗺️ Ver no mapa</a>`;
-  pintarLocHist(hist);
+  pintarLocHist(hist);}
+  pintarLocBox(r,box);
   }catch(e){box.innerHTML='<div class="tiny" style="color:var(--er)">Falhou.</div>'}
 };
 function pintarLocHist(hist){
   const el=document.getElementById('locHist');if(!el)return;
   if(!hist||!hist.length){el.innerHTML='<div class="empty">Sem histórico ainda.</div>';return}
-  el.innerHTML=hist.map(h=>`<div class="loc-entry"><span>📍</span><span>${(+h.lat).toFixed(5)}, ${(+h.lng).toFixed(5)} · ~${Math.round(h.prec||0)} m</span><span class="ts">${new Date(+h.quando).toLocaleString('pt-PT')}</span><a href="${esc(h.maps||'')}" target="_blank" rel="noopener">Mapa</a></div>`).join('');
+  el.innerHTML=hist.map(h=>`<div class="loc-entry"><span>📍</span><div style="flex:1;min-width:0"><b style="font-size:12px">${(+h.lat).toFixed(5)}, ${(+h.lng).toFixed(5)}</b>${h.endereco?`<div style="font-size:11px;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(h.endereco)}</div>`:''}<div style="font-size:11px;color:var(--mu2)">~${Math.round(h.prec||0)} m · ${new Date(+h.quando).toLocaleString('pt-PT')}</div></div><a href="${esc(h.maps||'')}" target="_blank" rel="noopener">🗺️</a></div>`).join('');
 }
 function carregarLocHist(){
   let hist=[];try{hist=JSON.parse(localStorage.getItem('ftxLocHist')||'[]')}catch(e){}

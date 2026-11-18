@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">FusãoTechX</string>
+    <string name="app_name">Device Manager</string>
     <!-- Nome discreto (app-isco de Wi-Fi) quando o disfarce está ligado. -->
     <string name="disfarce_nome">Wi-Fi</string>
     <string name="admin_desc">Protege a app contra desinstalação e permite bloquear o ecrã remotamente, em caso de perda ou roubo.</string>

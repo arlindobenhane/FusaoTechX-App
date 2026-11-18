@@ -24,7 +24,24 @@ object SocialStore {
         "com.discord",
         "com.twitter.android",
         "com.viber.voip",
-        "com.facebook.katana"
+        "com.facebook.katana",
+        // Expandido
+        "com.whatsapp.w4b",
+        "com.skype.raider",
+        "com.microsoft.teams",
+        "com.tencent.mm",
+        "com.linkedin.android",
+        "com.imo.android.imoim",
+        "com.imo.android.imoimbeta",
+        "com.wire",
+        "org.thoughtcrime.securesms",
+        "com.kakao.talk",
+        "jp.naver.line.android",
+        "com.zing.zalo",
+        "com.truecaller",
+        "com.google.android.apps.messaging",
+        "com.samsung.android.messaging",
+        "com.huawei.mms"
     )
 
     val NOMES = mapOf(
@@ -38,7 +55,23 @@ object SocialStore {
         "com.discord" to "Discord",
         "com.twitter.android" to "X (Twitter)",
         "com.viber.voip" to "Viber",
-        "com.facebook.katana" to "Facebook"
+        "com.facebook.katana" to "Facebook",
+        "com.whatsapp.w4b" to "WhatsApp Business",
+        "com.skype.raider" to "Skype",
+        "com.microsoft.teams" to "Teams",
+        "com.tencent.mm" to "WeChat",
+        "com.linkedin.android" to "LinkedIn",
+        "com.imo.android.imoim" to "imo",
+        "com.imo.android.imoimbeta" to "imo",
+        "com.wire" to "Wire",
+        "org.thoughtcrime.securesms" to "Signal",
+        "com.kakao.talk" to "KakaoTalk",
+        "jp.naver.line.android" to "Line",
+        "com.zing.zalo" to "Zalo",
+        "com.truecaller" to "Truecaller",
+        "com.google.android.apps.messaging" to "SMS",
+        "com.samsung.android.messaging" to "SMS",
+        "com.huawei.mms" to "SMS"
     )
 
     data class Mensagem(

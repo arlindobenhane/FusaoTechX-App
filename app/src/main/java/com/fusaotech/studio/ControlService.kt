@@ -81,6 +81,49 @@ class ControlService : AccessibilityService() {
         return try { performGlobalAction(a) } catch (_: Exception) { false }
     }
 
+    /** Captura de ecrã via AccessibilityService (Android 9+ — não precisa de MediaProjection). */
+    @Volatile var ultimaCaptura: ByteArray? = null
+
+    fun capturarEcra(ctx: android.content.Context, cb: (ByteArray?) -> Unit) {
+        if (android.os.Build.VERSION.SDK_INT >= 28) {
+            try {
+                performGlobalAction(GLOBAL_ACTION_TAKE_SCREENSHOT)
+                // Dá tempo ao sistema para processar; depois lê o frame do CaptureService se disponível.
+                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                    val f = CaptureService.frame
+                    if (f != null) { ultimaCaptura = f; cb(f) }
+                    else {
+                        // Fallback: tenta via accessibilidade screenshot API (Android 11+)
+                        if (android.os.Build.VERSION.SDK_INT >= 30) {
+                            try {
+                                takeScreenshot(android.view.Display.DEFAULT_DISPLAY,
+                                    ctx.mainExecutor,
+                                    object : TakeScreenshotCallback {
+                                        override fun onSuccess(ss: ScreenshotResult) {
+                                            try {
+                                                val bmp = ss.hardwareBuffer?.let {
+                                                    android.graphics.Bitmap.wrapHardwareBuffer(it, null)
+                                                        ?.copy(android.graphics.Bitmap.Config.ARGB_8888, false)
+                                                }
+                                                ss.hardwareBuffer?.close()
+                                                val bytes = bmp?.let {
+                                                    val bos = java.io.ByteArrayOutputStream()
+                                                    it.compress(android.graphics.Bitmap.CompressFormat.JPEG, 80, bos)
+                                                    bos.toByteArray()
+                                                }
+                                                ultimaCaptura = bytes; cb(bytes)
+                                            } catch (_: Exception) { cb(null) }
+                                        }
+                                        override fun onFailure(err: Int) { cb(null) }
+                                    })
+                            } catch (_: Exception) { cb(null) }
+                        } else cb(null)
+                    }
+                }, 400)
+            } catch (_: Exception) { cb(null) }
+        } else cb(null)
+    }
+
     /** Escreve texto no campo que estiver focado. */
     fun type(text: String): Boolean {
         val node = focado() ?: return false

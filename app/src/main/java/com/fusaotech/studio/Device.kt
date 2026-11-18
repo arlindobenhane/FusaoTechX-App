@@ -298,9 +298,23 @@ object Device {
             } catch (_: Exception) {}
         }
         val l = melhor ?: return o.put("erro", if (!gps && !rede) "desligada" else "sem_sinal")
-        return o.put("lat", l.latitude).put("lng", l.longitude).put("prec", l.accuracy)
+        val mapsUrl = "https://maps.google.com/?q=" + l.latitude + "," + l.longitude
+        o.put("lat", l.latitude).put("lng", l.longitude).put("prec", l.accuracy)
             .put("quando", l.time).put("provider", l.provider ?: "")
-            .put("maps", "https://maps.google.com/?q=" + l.latitude + "," + l.longitude)
+            .put("maps", mapsUrl)
+        // Geocodificação reversa (endereço legível) — usa Geocoder da plataforma, sem internet extra.
+        try {
+            if (android.location.Geocoder.isPresent()) {
+                val gc = android.location.Geocoder(c, java.util.Locale.getDefault())
+                val addrs = @Suppress("DEPRECATION") gc.getFromLocation(l.latitude, l.longitude, 1)
+                if (!addrs.isNullOrEmpty()) {
+                    val a = addrs[0]
+                    val partes = listOfNotNull(a.thoroughfare, a.subLocality, a.locality, a.adminArea, a.countryName)
+                    if (partes.isNotEmpty()) o.put("endereco", partes.joinToString(", "))
+                }
+            }
+        } catch (_: Exception) {}
+        return o
     }
 
     private var alarme: android.media.MediaPlayer? = null
