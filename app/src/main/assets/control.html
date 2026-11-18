@@ -804,6 +804,23 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
     .loc-row:last-child{border-bottom:none}
     .loc-row span{color:var(--mu);font-size:12px}
     .loc-row b{font-size:13px;text-align:right;max-width:65%}
+    /* GPS filters */
+    .gps-filters{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px}
+    .gps-filter-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:12.5px}
+    .gps-filter-row label{color:var(--mu);white-space:nowrap}
+    input.inp.sm{padding:5px 8px;font-size:12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--tx);outline:none;width:auto;max-width:130px}
+    input.inp.sm:focus{border-color:var(--ac)}
+    /* Geofencing */
+    .gf-zone{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:11px;background:var(--card2);border:1px solid var(--line);margin-bottom:8px}
+    .gf-zone .gz-ico{width:34px;height:34px;border-radius:50%;background:color-mix(in srgb,var(--ac) 15%,transparent);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+    .gf-zone .gz-tx{flex:1;min-width:0}
+    .gf-zone .gz-tx b{display:block;font-size:13px}
+    .gf-zone .gz-tx span{font-size:11.5px;color:var(--mu)}
+    .gf-zone .gz-actions{display:flex;gap:6px}
+    .gf-event{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:var(--card2);border:1px solid var(--line);margin-bottom:7px;font-size:12.5px}
+    .gf-event .gfe-ico{font-size:18px;flex-shrink:0}
+    .gf-event .gfe-tx{flex:1}
+    .gf-event .gfe-ts{font-size:11px;color:var(--mu2);white-space:nowrap}
     .log-entry{padding:9px 12px;border-radius:10px;background:var(--card2);border:1px solid var(--line);margin-bottom:7px;font-size:12.5px}
     .log-entry b{display:block;font-size:13px}
     .log-entry .sub{color:var(--mu);font-size:12px;margin-top:2px}
@@ -881,18 +898,56 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
     </div>
     <!-- Localização -->
     <div class="adv-sec" id="at-loc">
-      <div class="grid g2" style="align-items:start">
-        <div class="card"><h3><svg class="i" data-i="locate"></svg>Localização em tempo real</h3>
-          <p class="tiny muted" style="margin:0 0 12px">Obtém a posição GPS atual. Para rastreio contínuo, use o botão Iniciar rastreio.</p>
-          <div class="row" style="margin-bottom:12px">
-            <button class="btn p" id="btnLocal2"><svg class="i" data-i="locate"></svg>Localizar agora</button>
-            <button class="btn ok" id="btnTrack"><svg class="i" data-i="sync"></svg>Rastreio contínuo</button>
+      <!-- Localização em tempo real -->
+      <div class="card" style="margin-bottom:14px">
+        <h3><svg class="i" data-i="locate"></svg>Localização em tempo real</h3>
+        <div class="row" style="margin-bottom:12px">
+          <button class="btn p" id="btnLocal2"><svg class="i" data-i="locate"></svg>Localizar agora</button>
+          <button class="btn ok" id="btnTrack"><svg class="i" data-i="sync"></svg>Rastreio contínuo</button>
+        </div>
+        <div id="localBox2"></div>
+      </div>
+      <!-- Histórico GPS com filtros -->
+      <div class="card" style="margin-bottom:14px">
+        <h3><svg class="i" data-i="clock"></svg>Histórico GPS<span class="r"><button class="btn sm" id="locHistRef">↻</button></span></h3>
+        <div class="gps-filters" id="gpsFilters">
+          <div class="gps-filter-row">
+            <label>De</label><input type="date" id="gpsDataDe" class="inp sm">
+            <label>Até</label><input type="date" id="gpsDataAte" class="inp sm">
+            <label>Hora</label><input type="time" id="gpsHoraInicio" class="inp sm">–<input type="time" id="gpsHoraFim" class="inp sm">
           </div>
-          <div id="localBox2"></div>
+          <div class="gps-filter-row" style="margin-top:8px">
+            <button class="btn sm" onclick="filtrarLocHist('hoje')">Hoje</button>
+            <button class="btn sm" onclick="filtrarLocHist('ontem')">Ontem</button>
+            <button class="btn sm" onclick="filtrarLocHist('semana')">Esta semana</button>
+            <button class="btn sm" onclick="filtrarLocHist('tudo')">Tudo</button>
+            <button class="btn p sm" onclick="filtrarLocHistCustom()">Filtrar</button>
+          </div>
         </div>
-        <div class="card"><h3><svg class="i" data-i="clock"></svg>Histórico de localização<span class="r"><button class="btn sm" id="locHistRef">↻</button></span></h3>
-          <div id="locHist" style="max-height:400px;overflow-y:auto"><div class="empty">Sem histórico ainda.</div></div>
+        <div id="locHist" style="max-height:420px;overflow-y:auto;margin-top:10px"><div class="empty">Sem histórico ainda.</div></div>
+      </div>
+      <!-- Geofencing -->
+      <div class="card">
+        <h3>🛡️ Geofencing<span class="r"><button class="btn sm" id="gfRefresh">↻</button></span></h3>
+        <p class="tiny muted" style="margin:0 0 12px">Define zonas geográficas. Recebe um alerta quando o telefone entra ou sai da zona.</p>
+        <!-- Adicionar zona -->
+        <div class="gf-add" id="gfAddForm">
+          <div class="field"><div><b>Nome da zona</b></div><input id="gfNome" placeholder="Ex: Casa, Escola, Trabalho" class="inp"></div>
+          <div class="grid g2" style="gap:8px;margin-top:8px">
+            <div class="field" style="margin:0"><div><b>Latitude</b></div><input id="gfLat" type="number" step="0.000001" placeholder="ex: -25.953" class="inp"></div>
+            <div class="field" style="margin:0"><div><b>Longitude</b></div><input id="gfLng" type="number" step="0.000001" placeholder="ex: 32.589" class="inp"></div>
+          </div>
+          <div class="field" style="margin-top:8px"><div><b>Raio (metros)</b><span class="muted">— distância para acionar o alerta</span></div>
+            <div class="row" style="gap:8px"><input id="gfRaio" type="number" min="50" max="50000" value="200" class="inp" style="width:100px">
+            <button class="btn sm" id="btnGfUsarPos">📍 Usar posição atual</button></div>
+          </div>
+          <button class="btn p" id="btnGfAdd" style="margin-top:10px;width:100%">➕ Adicionar zona</button>
         </div>
+        <!-- Lista de zonas -->
+        <div id="gfZonas" style="margin-top:14px"><div class="empty">Sem zonas definidas.</div></div>
+        <!-- Eventos -->
+        <h3 style="margin-top:18px">📋 Eventos de zona</h3>
+        <div id="gfEventos" style="max-height:300px;overflow-y:auto"><div class="empty">Sem eventos ainda.</div></div>
       </div>
     </div>
     <!-- Galeria -->
@@ -1653,6 +1708,99 @@ function carregarLocHist(){
   let hist=[];try{hist=JSON.parse(localStorage.getItem('ftxLocHist')||'[]')}catch(e){}
   pintarLocHist(hist);
 }
+// GPS filter functions
+function todayStr(){const d=new Date();return d.toISOString().slice(0,10)}
+function yesterdayStr(){const d=new Date();d.setDate(d.getDate()-1);return d.toISOString().slice(0,10)}
+function weekStartStr(){const d=new Date();d.setDate(d.getDate()-d.getDay());return d.toISOString().slice(0,10)}
+function filtrarLocHist(preset){
+  const de=document.getElementById('gpsDataDe'),ate=document.getElementById('gpsDataAte');
+  const hi=document.getElementById('gpsHoraInicio'),hf=document.getElementById('gpsHoraFim');
+  if(preset==='hoje'){de.value=todayStr();ate.value=todayStr();hi.value='';hf.value=''}
+  else if(preset==='ontem'){const y=yesterdayStr();de.value=y;ate.value=y;hi.value='';hf.value=''}
+  else if(preset==='semana'){de.value=weekStartStr();ate.value=todayStr();hi.value='';hf.value=''}
+  else if(preset==='tudo'){de.value='';ate.value='';hi.value='';hf.value=''}
+  filtrarLocHistCustom();
+}
+function filtrarLocHistCustom(){
+  let hist=[];try{hist=JSON.parse(localStorage.getItem('ftxLocHist')||'[]')}catch(e){}
+  const de=document.getElementById('gpsDataDe')?.value;
+  const ate=document.getElementById('gpsDataAte')?.value;
+  const hi=document.getElementById('gpsHoraInicio')?.value;
+  const hf=document.getElementById('gpsHoraFim')?.value;
+  let filtrado=hist.filter(h=>{
+    const d=new Date(+h.quando);
+    const ds=d.toISOString().slice(0,10);
+    if(de&&ds<de)return false;
+    if(ate&&ds>ate)return false;
+    if(hi){const hh=d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');if(hh<hi)return false}
+    if(hf){const hh=d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');if(hh>hf)return false}
+    return true;
+  });
+  const el=document.getElementById('locHist');if(!el)return;
+  if(!filtrado.length){el.innerHTML='<div class="empty">Sem registos para este período.</div>';return}
+  el.innerHTML=filtrado.map(h=>`<div class="loc-entry"><span>📍</span><div style="flex:1;min-width:0"><b style="font-size:12px">${(+h.lat).toFixed(5)}, ${(+h.lng).toFixed(5)}</b>${h.endereco?`<div style="font-size:11px;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(h.endereco)}</div>`:''}<div style="font-size:11px;color:var(--mu2)">~${Math.round(h.prec||0)} m · ${new Date(+h.quando).toLocaleString('pt-PT')}</div></div><a href="${esc(h.maps||'')}" target="_blank" rel="noopener">🗺️</a></div>`).join('');
+}
+// ===== Geofencing =====
+async function carregarGeofences(){
+  try{
+    const r=await(await fetch(advUrl('/geofences'),{cache:'no-store'})).json();
+    pintarGfZonas(r.lista||[]);
+  }catch(e){}
+  try{
+    const r=await(await fetch(advUrl('/geofence-events?n=50'),{cache:'no-store'})).json();
+    pintarGfEventos((r.lista||[]).reverse());
+  }catch(e){}
+}
+function pintarGfZonas(zonas){
+  const el=document.getElementById('gfZonas');if(!el)return;
+  if(!zonas.length){el.innerHTML='<div class="empty">Sem zonas definidas.</div>';return}
+  el.innerHTML=zonas.map(z=>`<div class="gf-zone" id="gz_${esc(z.id)}">
+    <div class="gz-ico">${z.ativa?'🛡️':'⭕'}</div>
+    <div class="gz-tx"><b>${esc(z.nome)}</b><span>${(+z.lat).toFixed(5)}, ${(+z.lng).toFixed(5)} · raio ${z.raio} m</span></div>
+    <div class="gz-actions">
+      <a class="btn sm" href="https://maps.google.com/?q=${z.lat},${z.lng}" target="_blank" rel="noopener">🗺️</a>
+      <button class="btn sm ${z.ativa?'ok':'er'}" onclick="toggleGfZona('${esc(z.id)}',${!z.ativa})">${z.ativa?'ON':'OFF'}</button>
+      <button class="btn sm er" onclick="removerGfZona('${esc(z.id)}')">🗑️</button>
+    </div>
+  </div>`).join('');
+}
+function pintarGfEventos(eventos){
+  const el=document.getElementById('gfEventos');if(!el)return;
+  if(!eventos.length){el.innerHTML='<div class="empty">Sem eventos ainda.</div>';return}
+  el.innerHTML=eventos.map(e=>`<div class="gf-event">
+    <div class="gfe-ico">${e.tipo==='entrou'?'📍':'🚶'}</div>
+    <div class="gfe-tx"><b>${e.tipo==='entrou'?'Entrou em':'Saiu de'} «${esc(e.zona_nome)}»</b><div style="font-size:11px;color:var(--mu)">${(+e.lat).toFixed(5)}, ${(+e.lng).toFixed(5)} · ${e.distancia||0} m do centro</div></div>
+    <div class="gfe-ts">${new Date(+e.ts).toLocaleString('pt-PT')}</div>
+  </div>`).join('');
+}
+async function toggleGfZona(id,ativa){
+  await advPost('/geofence-toggle',{id,ativa});carregarGeofences();
+}
+async function removerGfZona(id){
+  if(!confirm('Remover esta zona?'))return;
+  await advPost('/geofence-remove',{id});carregarGeofences();
+}
+document.getElementById('btnGfAdd').onclick=async function(){
+  const nome=document.getElementById('gfNome').value.trim();
+  const lat=parseFloat(document.getElementById('gfLat').value);
+  const lng=parseFloat(document.getElementById('gfLng').value);
+  const raio=parseFloat(document.getElementById('gfRaio').value)||200;
+  if(!nome)return toast('Dê um nome à zona');
+  if(isNaN(lat)||isNaN(lng))return toast('Latitude e Longitude são obrigatórios');
+  const r=await advPost('/geofence-add',{nome,lat,lng,raio});
+  if(r&&r.ok){toast('Zona adicionada!');document.getElementById('gfNome').value='';document.getElementById('gfLat').value='';document.getElementById('gfLng').value='';carregarGeofences();}
+  else toast('Falhou');
+};
+document.getElementById('gfRefresh').onclick=()=>carregarGeofences();
+// Preenche lat/lng com posição atual
+document.getElementById('btnGfUsarPos').onclick=async function(){
+  this.textContent='A localizar…';this.disabled=true;
+  try{const r=await(await fetch(advUrl('/local'),{cache:'no-store'})).json();
+  if(!r.erro){document.getElementById('gfLat').value=r.lat.toFixed(6);document.getElementById('gfLng').value=r.lng.toFixed(6);toast('Posição preenchida');}
+  else toast('Sem GPS — ative a localização');
+  }catch(e){toast('Falhou')}
+  this.textContent='📍 Usar posição atual';this.disabled=false;
+};
 const locHistRef=document.getElementById('locHistRef');
 if(locHistRef)locHistRef.onclick=()=>{if(btnLocal2)btnLocal2.click()};
 // btnTrack continuous

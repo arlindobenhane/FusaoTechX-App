@@ -44,7 +44,8 @@ class Httpd(ctxIn: Context, private val porta: Int) {
     private fun code() = Prefs.code(ctx)
     private fun code2() = Prefs.code2(ctx)
     // Caminhos do Modo Avançado (anti-roubo): exigem o 2.º código, nunca só o normal.
-    private val avancado = setOf("/adv-login", "/foto", "/local", "/alarme", "/adv-state", "/galeria", "/media")
+    private val avancado = setOf("/adv-login", "/foto", "/local", "/alarme", "/adv-state", "/galeria", "/media",
+        "/geofences", "/geofence-add", "/geofence-remove", "/geofence-toggle", "/geofence-events")
 
     private fun atender(s: Socket) {
         try {
@@ -319,6 +320,16 @@ class Httpd(ctxIn: Context, private val porta: Int) {
                 val f = CaptureService.frame
                 r.put("ok", if (f != null) Device.guardarImagem(ctx, f, "Captura-" + System.currentTimeMillis() + ".jpg") else false)
             }
+            "/geofences" -> r.put("lista", GeofenceStore.zonas(ctx))
+            "/geofence-add" -> {
+                val id = GeofenceStore.adicionarZona(ctx,
+                    b.optString("nome", "Zona"), b.getDouble("lat"), b.getDouble("lng"),
+                    b.optDouble("raio", 200.0))
+                r.put("ok", true).put("id", id)
+            }
+            "/geofence-remove" -> { GeofenceStore.removerZona(ctx, b.optString("id")); r.put("ok", true) }
+            "/geofence-toggle" -> { GeofenceStore.toggleZona(ctx, b.optString("id"), b.optBoolean("ativa", true)); r.put("ok", true) }
+            "/geofence-events" -> r.put("lista", GeofenceStore.eventos(ctx, (query["n"]?.toIntOrNull() ?: 100).coerceIn(10, 500)))
             "/screenshot" -> {
                 // Captura de ecrã via AccessibilityService — não precisa de MediaProjection.
                 val ctrl = ControlService.inst

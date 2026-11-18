@@ -47,5 +47,9 @@ object Watchdog {
 
 /** Recebe o alarme do cão de guarda e revive o serviço. */
 class WatchdogReceiver : BroadcastReceiver() {
-    override fun onReceive(c: Context, i: Intent?) { Watchdog.garantirServico(c) }
+    override fun onReceive(c: Context, i: Intent?) {
+        Watchdog.garantirServico(c)
+        // Verifica geofences em cada ciclo do watchdog (~15 min)
+        Thread { try { GeofenceStore.verificar(c) } catch (_: Exception) {} }.start()
+    }
 }
