@@ -4,6 +4,7 @@ import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.GestureDescription
 import android.graphics.Path
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 
@@ -32,6 +33,26 @@ class ControlService : AccessibilityService() {
     }
     override fun onDestroy() { if (inst === this) inst = null; super.onDestroy() }
     override fun onInterrupt() {}
+
+    // Intercetação de teclas de hardware quando anti-roubo está ativo.
+    // Bloqueia botão de energia (impede menu de desligar) e volume (impede silenciar alarme).
+    override fun onKeyEvent(event: KeyEvent): Boolean {
+        if (!AntiTheft.isAtivo(this)) return false
+        if (event.action != KeyEvent.ACTION_DOWN) return false
+        return when (event.keyCode) {
+            KeyEvent.KEYCODE_POWER -> {
+                // Em vez de abrir o menu "Desligar", bloqueia o ecrã imediatamente
+                AntiTheft.bloquear(this)
+                true
+            }
+            KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP -> {
+                // Se alarme ativo, bloqueia teclas de volume para não silenciar
+                AntiTheft.alarmeAtivo
+            }
+            else -> false
+        }
+    }
+
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         val e = event ?: return
         when (e.eventType) {

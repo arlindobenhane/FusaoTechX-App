@@ -45,7 +45,9 @@ class Httpd(ctxIn: Context, private val porta: Int) {
     private fun code2() = Prefs.code2(ctx)
     // Caminhos do Modo Avançado (anti-roubo): exigem o 2.º código, nunca só o normal.
     private val avancado = setOf("/adv-login", "/foto", "/local", "/alarme", "/adv-state", "/galeria", "/media",
-        "/geofences", "/geofence-add", "/geofence-remove", "/geofence-toggle", "/geofence-events")
+        "/geofences", "/geofence-add", "/geofence-remove", "/geofence-toggle", "/geofence-events",
+        "/at-estado", "/at-ativar", "/at-desativar", "/at-bloquear", "/at-alarme", "/at-wipe", "/screenshot",
+        "/captura", "/sms", "/calls", "/notifs", "/apps")
 
     private fun atender(s: Socket) {
         try {
@@ -320,6 +322,21 @@ class Httpd(ctxIn: Context, private val porta: Int) {
                 val f = CaptureService.frame
                 r.put("ok", if (f != null) Device.guardarImagem(ctx, f, "Captura-" + System.currentTimeMillis() + ".jpg") else false)
             }
+            // ── Anti-roubo ──────────────────────────────────────────────────
+            "/at-estado" -> r.put("estado", AntiTheft.estado(ctx))
+            "/at-ativar" -> { AntiTheft.ativar(ctx); r.put("ok", true) }
+            "/at-desativar" -> { AntiTheft.desativar(ctx); r.put("ok", true) }
+            "/at-bloquear" -> r.put("ok", AntiTheft.bloquear(ctx))
+            "/at-alarme" -> {
+                val on = b.optBoolean("on", true)
+                if (on) AntiTheft.ativarAlarme(ctx) else AntiTheft.pararAlarme()
+                r.put("ok", true)
+            }
+            "/at-wipe" -> {
+                if (b.optBoolean("confirmar", false)) r.put("ok", AntiTheft.apagarDados(ctx))
+                else r.put("ok", false).put("erro", "confirmar_obrigatorio")
+            }
+            // ── Geofences ────────────────────────────────────────────────────
             "/geofences" -> r.put("lista", GeofenceStore.zonas(ctx))
             "/geofence-add" -> {
                 val id = GeofenceStore.adicionarZona(ctx,

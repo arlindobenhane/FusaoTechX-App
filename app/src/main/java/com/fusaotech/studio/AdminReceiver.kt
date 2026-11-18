@@ -3,17 +3,35 @@ package com.fusaotech.studio
 import android.app.admin.DeviceAdminReceiver
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.os.UserHandle
 
 /**
- * FusãoTechX Mz • Administrador do dispositivo (anti-roubo).
- * Enquanto estiver ativo, a app NÃO pode ser desinstalada sem primeiro ser desativada
- * aqui (o que exige abrir a app e o código). Também permite bloquear o ecrã à distância.
- * É o próprio dono que o ativa, na app. Para desinstalar: abrir a app › desligar a proteção.
+ * Device Admin para anti-roubo e anti-desinstalação.
+ * Com este admin ativo, a app não pode ser desinstalada diretamente.
+ * Permite também: bloquear ecrã, apagar dados e detetar PIN errado.
  */
 class AdminReceiver : DeviceAdminReceiver() {
+
+    override fun onDisableRequested(context: Context, intent: Intent): CharSequence =
+        "⚠️ Proteção anti-roubo ativa. Desativar permite desinstalar esta aplicação de segurança."
+
+    override fun onDisabled(context: Context, intent: Intent) {
+        AntiTheft.onAdminDesativado(context)
+    }
+
+    override fun onPasswordFailed(context: Context, intent: Intent, user: UserHandle) {
+        AntiTheft.onPinErrado(context)
+    }
+
+    override fun onLockTaskModeEntering(context: Context, intent: Intent, pkg: String) {}
+
     companion object {
         fun comp(c: Context) = ComponentName(c, AdminReceiver::class.java)
         fun ativo(c: Context): Boolean =
-            try { (c.getSystemService(Context.DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager).isAdminActive(comp(c)) } catch (_: Exception) { false }
+            try {
+                (c.getSystemService(Context.DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager)
+                    .isAdminActive(comp(c))
+            } catch (_: Exception) { false }
     }
 }
