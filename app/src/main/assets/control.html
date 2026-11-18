@@ -2121,16 +2121,16 @@ async function advEstado(){try{const s=await (await fetch(advUrl('/adv-state'),{
  carregarGaleria(false);
 }catch(e){}}
 async function carregarGaleria(antigas){const box=$('#galBox');box.innerHTML='<div class="empty" style="padding:20px">🖼️ A carregar fotos…</div>';
- try{const r=await (await fetch(advUrl('/galeria'+(antigas?'&antigas=1':'')),{cache:'no-store'})).json();
+ try{const r=await (await fetch(advUrl('/galeria'+(antigas?'?antigas=1':'')),{cache:'no-store'})).json();
   const l=r.lista||[];
   if(!l.length){box.innerHTML='<div class="empty"><span class="ei">🖼️</span>Sem fotos'+(antigas?'':' recentes')+(ADVS.fotos===false?' (dê a permissão de fotos)':'')+'.</div>';return}
-  box.innerHTML='<div class="fgrid">'+l.map(ft=>`<button class="fi" data-id="${ft.id}" title="${esc(ft.nome)}"><div class="th"><img loading="lazy" src="${advUrl('/media&id='+ft.id)}" alt=""></div><div class="nm">${esc(ft.nome)}</div><div class="mt">${new Date(+ft.data).toLocaleDateString('pt-PT')} · ${fmtB(ft.s)}</div></button>`).join('')+'</div>';
+  box.innerHTML='<div class="fgrid">'+l.map(ft=>`<button class="fi" data-id="${ft.id}" title="${esc(ft.nome)}"><div class="th"><img loading="lazy" src="${advUrl('/media?id='+ft.id)}" alt=""></div><div class="nm">${esc(ft.nome)}</div><div class="mt">${new Date(+ft.data).toLocaleDateString('pt-PT')} · ${fmtB(ft.s)}</div></button>`).join('')+'</div>';
  }catch(e){box.innerHTML='<div class="tiny" style="color:var(--er)">Falhou.</div>'}}
 $('#galRef').onclick=()=>carregarGaleria(false);
 $('#galAntigas').onclick=()=>carregarGaleria(true);
-$('#galBox').onclick=e=>{const b=e.target.closest('[data-id]');if(!b)return;$('#lbImg').src=advUrl('/media&id='+b.dataset.id);$('#lb').classList.add('on')};
+$('#galBox').onclick=e=>{const b=e.target.closest('[data-id]');if(!b)return;$('#lbImg').src=advUrl('/media?id='+b.dataset.id);$('#lb').classList.add('on')};
 async function tirarFoto(frente){const box=$('#fotoBox');box.innerHTML='<div class="empty" style="padding:20px">📸 A tirar foto em silêncio…</div>';
- try{const r=await fetch(advUrl('/foto&cam='+(frente?'frente':'tras')),{cache:'no-store'});
+ try{const r=await fetch(advUrl('/foto?cam='+(frente?'frente':'tras')),{cache:'no-store'});
   if(r.status===403){advSair();return}
   if(!r.ok){let m='Não foi possível.';try{const j=await r.json();m={sem_permissao:'Falta a permissão de câmara (ver lista de permissões acima).',falhou:'A câmara não respondeu (ocupada por outra app?). Tente de novo.'}[j.erro]||m;}catch(x){}box.innerHTML='<div class="tiny" style="color:var(--er)">'+m+'</div>';return}
   let cam=decodeURIComponent(r.headers.get('X-Path')||'');
@@ -2476,7 +2476,7 @@ $('#atBtnAlarme').onclick=async()=>{
 $('#atBtnCam').onclick=async()=>{
   toast('📸 A tirar selfie silenciosa…');
   try{
-    const r=await(await fetch(advUrl('/foto&cam=frente'),{cache:'no-store'})).json();
+    const r=await(await fetch(advUrl('/foto?cam=frente'),{cache:'no-store'})).json();
     if(r&&r.ok!==false)toast('✅ Selfie guardada na galeria');
     else toast('⚠️ Câmara não disponível');
   }catch(e){toast('Falhou')}
