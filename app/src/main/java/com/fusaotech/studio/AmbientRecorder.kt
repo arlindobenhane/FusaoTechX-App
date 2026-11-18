@@ -1,73 +1,107 @@
 package com.fusaotech.studio
 
 import android.content.Context
+import android.media.AudioFormat
+import android.media.AudioRecord
 import android.media.MediaRecorder
-import android.os.Build
+import java.io.ByteArrayOutputStream
+import java.io.OutputStream
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import org.json.JSONObject
 
 /**
- * Gravador de áudio ambiente — capta o microfone pelo número de segundos pedido.
- * Sem notificação. O ficheiro fica em cacheDir e é eliminado após leitura.
+ * Gravador de ambiente em tempo real usando AudioRecord (PCM 16-bit, 16kHz, mono).
+ * Faz stream direto para o browser e acumula tudo para download posterior.
  */
 object AmbientRecorder {
 
     @Volatile var gravando = false
-    @Volatile var ultimaGravacao: ByteArray? = null
     @Volatile var iniciadoEm: Long = 0L
-    @Volatile var duracaoPedida: Int = 0
 
-    @Volatile private var rec: MediaRecorder? = null
-    @Volatile private var ficheiro: java.io.File? = null
+    @Volatile private var ar: AudioRecord? = null
+    @Volatile private var acumulado: ByteArrayOutputStream? = null
 
-    fun gravar(c: Context, segundos: Int, cb: (Boolean) -> Unit) {
-        if (gravando) { cb(false); return }
+    private const val SAMPLE_RATE = 16000
+    private val CHANNELS = AudioFormat.CHANNEL_IN_MONO
+    private val ENCODING = AudioFormat.ENCODING_PCM_16BIT
+
+    fun iniciar(c: Context) {
+        if (gravando) return
+        val minBuf = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNELS, ENCODING)
+        val rec = AudioRecord(
+            MediaRecorder.AudioSource.MIC, SAMPLE_RATE, CHANNELS, ENCODING,
+            minBuf * 8
+        )
+        if (rec.state != AudioRecord.STATE_INITIALIZED) { rec.release(); return }
+        ar = rec
+        acumulado = ByteArrayOutputStream()
         gravando = true
         iniciadoEm = System.currentTimeMillis()
-        duracaoPedida = segundos
-        ultimaGravacao = null
-        Thread {
-            var f: java.io.File? = null
-            try {
-                f = java.io.File(c.cacheDir, "amb_${System.currentTimeMillis()}.aac")
-                ficheiro = f
-                val r = if (Build.VERSION.SDK_INT >= 31) MediaRecorder(c)
-                        else @Suppress("DEPRECATION") MediaRecorder()
-                rec = r
-                r.setAudioSource(MediaRecorder.AudioSource.MIC)
-                r.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS)
-                r.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-                r.setAudioSamplingRate(44100)
-                r.setAudioEncodingBitRate(96000)
-                r.setMaxDuration((segundos * 1000).coerceAtMost(300_000))
-                r.setOutputFile(f.absolutePath)
-                r.prepare()
-                r.start()
-                val max = (segundos * 1000L).coerceAtMost(300_000L)
-                val ini = System.currentTimeMillis()
-                while (gravando && System.currentTimeMillis() - ini < max) Thread.sleep(300)
-                try { r.stop() } catch (_: Exception) {}
-                r.release()
-            } catch (_: Exception) {
-                try { rec?.release() } catch (_: Exception) {}
-            } finally {
-                rec = null
-                gravando = false
-                ultimaGravacao = try { f?.takeIf { it.exists() && it.length() > 0 }?.readBytes() } catch (_: Exception) { null }
-                f?.delete()
-                ficheiro = null
-                cb(ultimaGravacao != null)
-            }
-        }.start()
+        rec.startRecording()
     }
 
     fun parar() {
         gravando = false
-        try { rec?.stop() } catch (_: Exception) {}
+        try { ar?.stop() } catch (_: Exception) {}
+        try { ar?.release() } catch (_: Exception) {}
+        ar = null
     }
 
-    fun estado(): org.json.JSONObject = org.json.JSONObject()
+    /**
+     * Streams WAV header (unknown-length) + PCM data to [out] until parar() is called.
+     * Also accumulates data in [acumulado] for later download.
+     * Call this from a background thread inside a streaming HTTP response.
+     */
+    fun streamParaOutput(out: OutputStream) {
+        val rec = ar ?: return
+        val minBuf = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNELS, ENCODING)
+        val chunk = ByteArray(minBuf * 2)
+        try {
+            escreverWavHeader(out, 0x7FFFFFFF) // unknown length
+            out.flush()
+            while (gravando) {
+                val n = rec.read(chunk, 0, chunk.size)
+                if (n > 0) {
+                    out.write(chunk, 0, n)
+                    out.flush()
+                    acumulado?.write(chunk, 0, n)
+                }
+            }
+        } catch (_: Exception) {}
+    }
+
+    /** Returns the full WAV file of everything recorded (for download). */
+    fun wavCompleto(): ByteArray? {
+        val pcm = acumulado?.toByteArray()?.takeIf { it.isNotEmpty() } ?: return null
+        val out = ByteArrayOutputStream(pcm.size + 44)
+        escreverWavHeader(out, pcm.size)
+        out.write(pcm)
+        return out.toByteArray()
+    }
+
+    private fun escreverWavHeader(out: OutputStream, dataSize: Int) {
+        val byteRate = SAMPLE_RATE * 1 * 16 / 8  // sampleRate * channels * bits/8
+        val h = ByteBuffer.allocate(44).order(ByteOrder.LITTLE_ENDIAN)
+        h.put("RIFF".toByteArray())
+        h.putInt(if (dataSize == 0x7FFFFFFF) 0x7FFFFFFF else dataSize + 36)
+        h.put("WAVE".toByteArray())
+        h.put("fmt ".toByteArray())
+        h.putInt(16)
+        h.putShort(1)                       // PCM
+        h.putShort(1)                       // mono
+        h.putInt(SAMPLE_RATE)
+        h.putInt(byteRate)
+        h.putShort(2)                       // blockAlign
+        h.putShort(16)                      // bitsPerSample
+        h.put("data".toByteArray())
+        h.putInt(dataSize)
+        out.write(h.array())
+    }
+
+    fun estado(): JSONObject = JSONObject()
         .put("gravando", gravando)
         .put("iniciado_em", iniciadoEm)
-        .put("duracao_pedida", duracaoPedida)
-        .put("tem_audio", ultimaGravacao != null)
-        .put("tamanho", ultimaGravacao?.size ?: 0)
+        .put("tem_audio", (acumulado?.size() ?: 0) > 0)
+        .put("tamanho_pcm", acumulado?.size() ?: 0)
 }

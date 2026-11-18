@@ -1317,34 +1317,27 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
         .amb-hero.gravando{border-color:#e94560;background:color-mix(in srgb,#e94560 6%,var(--card))}
         .amb-btn-big{width:80px;height:80px;border-radius:50%;border:none;cursor:pointer;font-size:32px;display:grid;place-items:center;transition:.15s;background:var(--card2);border:2px solid var(--line)}
         .amb-btn-big:hover{transform:scale(1.06)}.amb-btn-big.gravando{background:#e94560;border-color:#e94560;animation:pulse 1.2s infinite}
-        .amb-wave{display:flex;align-items:flex-end;gap:3px;height:30px;justify-content:center}
-        .amb-wave span{width:4px;border-radius:2px;background:var(--ac);animation:wave .8s ease-in-out infinite}
-        .amb-wave span:nth-child(1){animation-delay:0s;height:8px}.amb-wave span:nth-child(2){animation-delay:.12s;height:18px}.amb-wave span:nth-child(3){animation-delay:.24s;height:28px}.amb-wave span:nth-child(4){animation-delay:.36s;height:18px}.amb-wave span:nth-child(5){animation-delay:.48s;height:8px}
-        @keyframes wave{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1)}}
+        #ambCanvas{display:none;border-radius:10px;width:100%;max-width:360px;height:60px;background:var(--card2)}
+        .amb-hero.gravando #ambCanvas{display:block}
         .amb-dl{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;background:var(--ok);color:#fff;font-weight:700;font-size:13px;cursor:pointer;border:none;text-decoration:none;margin-top:8px}
+        .amb-time{font-size:28px;font-weight:800;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+        .amb-volume{width:100%;max-width:280px;height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:4px}
+        .amb-volume-fill{height:100%;background:#e94560;border-radius:3px;transition:width .1s linear;width:0%}
       </style>
       <div class="amb-hero" id="ambHero">
         <button class="amb-btn-big" id="ambBtn" onclick="ambToggle()">🎙️</button>
-        <div id="ambWave" style="display:none" class="amb-wave"><span></span><span></span><span></span><span></span><span></span></div>
+        <canvas id="ambCanvas" width="720" height="120"></canvas>
         <div>
-          <b id="ambStatus" style="font-size:15px">Pronto para gravar</b>
-          <div class="tiny muted" id="ambSub" style="margin-top:4px">Capta o microfone silenciosamente</div>
+          <b id="ambStatus" style="font-size:15px">Pronto para escuta</b>
+          <div class="tiny muted" id="ambSub" style="margin-top:4px">Escuta em tempo real · clica para iniciar</div>
         </div>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center">
-          <label class="tiny muted">Duração:</label>
-          <select id="ambSeg" style="padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--card2);font-size:13px">
-            <option value="15">15 s</option><option value="30" selected>30 s</option><option value="60">1 min</option>
-            <option value="120">2 min</option><option value="300">5 min</option>
-          </select>
+        <div class="amb-volume" id="ambVolBar" style="display:none">
+          <div class="amb-volume-fill" id="ambVolFill"></div>
         </div>
+        <div class="amb-time" id="ambTime" style="display:none">0:00</div>
         <div id="ambDownload" style="display:none">
-          <a id="ambDlLink" class="amb-dl" href="#" download="ambiente.aac">⬇️ Descarregar gravação</a>
+          <a id="ambDlLink" class="amb-dl" href="#" download="ambiente.wav">⬇️ Descarregar gravação</a>
         </div>
-      </div>
-      <div class="card" id="ambTimer" style="display:none;text-align:center;padding:16px">
-        <div class="tiny muted">A gravar...</div>
-        <div style="font-size:28px;font-weight:800;letter-spacing:-.5px;margin:8px 0" id="ambCountdown">—</div>
-        <button class="btn er sm" onclick="ambParar()">⏹ Parar agora</button>
       </div>
     </div>
 
@@ -2486,64 +2479,158 @@ document.addEventListener('click',e=>{
 });
 
 // ══════════════════════════════════════════════════════════════════════════
-// ÁUDIO AMBIENTE
+// ÁUDIO AMBIENTE — streaming em tempo real via Web Audio API
 // ══════════════════════════════════════════════════════════════════════════
-let ambTimer=null;
+const AMB={ctx:null,processor:null,pcmBuf:[],reader:null,ativo:false,ini:0,clockId:null,headerDone:false};
+const AMB_SR=16000; // deve coincidir com AmbientRecorder.SAMPLE_RATE
+
 async function ambCarregar(){
+  // apenas sincroniza estado visual sem iniciar stream
   try{
     const r=await advPost('/ambiente-estado',{});
     const s=r.estado||r;
-    ambPintar(s);
+    if(!s.gravando && AMB.ativo) ambPararStream();
+    if(s.gravando && !AMB.ativo) ambIniciarStream();
   }catch(_){}
 }
-function ambPintar(s){
-  const btn=$('#ambBtn'),hero=$('#ambHero'),wave=$('#ambWave'),status=$('#ambStatus'),sub=$('#ambSub'),timer=$('#ambTimer'),dl=$('#ambDownload');
-  if(!btn)return;
-  if(s.gravando){
-    btn.textContent='⏹';btn.classList.add('gravando');
-    hero.classList.add('gravando');wave.style.display='flex';
-    status.textContent='A gravar...';
-    sub.textContent='Dura '+s.duracao_pedida+'s — iniciado '+horaWa(s.iniciado_em);
-    timer.style.display='block';dl.style.display='none';
-    ambContagem(s.iniciado_em,s.duracao_pedida);
-  } else {
-    btn.textContent='🎙️';btn.classList.remove('gravando');
-    hero.classList.remove('gravando');wave.style.display='none';
-    clearInterval(ambTimer);ambTimer=null;
-    timer.style.display='none';
-    if(s.tem_audio){
-      status.textContent='Gravação pronta ('+Math.round(s.tamanho/1024)+' KB)';
-      sub.textContent='Clica para descarregar';
-      dl.style.display='block';
-      $('#ambDlLink').href=HOST+'/audio?k='+KEY+'&a2='+KEY2;
-    } else {
-      status.textContent='Pronto para gravar';
-      sub.textContent='Capta o microfone silenciosamente';
-      dl.style.display='none';
-    }
-  }
-}
-function ambContagem(ini,dur){
-  clearInterval(ambTimer);
-  const cd=$('#ambCountdown');if(!cd)return;
-  ambTimer=setInterval(()=>{
-    const resto=Math.max(0,dur-(Date.now()-ini)/1000);
-    cd.textContent=Math.ceil(resto)+'s';
-    if(resto<=0){clearInterval(ambTimer);ambTimer=null;setTimeout(ambCarregar,1500);}
-  },500);
-}
+
 async function ambToggle(){
+  if(AMB.ativo){ await ambPararStream(); }
+  else { await ambIniciarStream(); }
+}
+
+async function ambIniciarStream(){
+  const r=await advPost('/ambiente',{});
+  if(!r||!r.ok){ toast('❌ '+(r&&r.erro||'Erro ao iniciar')); return; }
+  toast('🎙️ A ouvir em tempo real...');
+  AMB.ativo=true; AMB.ini=Date.now(); AMB.pcmBuf=[]; AMB.headerDone=false;
+
+  // UI: gravando
+  const btn=$('#ambBtn'),hero=$('#ambHero'),st=$('#ambStatus'),sub=$('#ambSub');
+  const dl=$('#ambDownload'),vb=$('#ambVolBar'),time=$('#ambTime');
+  if(btn){btn.textContent='⏹';btn.classList.add('gravando');}
+  if(hero) hero.classList.add('gravando');
+  if(st) st.textContent='A ouvir em tempo real...';
+  if(sub) sub.textContent='Clica ⏹ para parar e descarregar';
+  if(dl) dl.style.display='none';
+  if(vb) vb.style.display='block';
+  if(time) time.style.display='block';
+
+  // Web Audio context
+  AMB.ctx=new (window.AudioContext||window.webkitAudioContext)({sampleRate:AMB_SR});
+  const bufSize=4096;
+  AMB.processor=AMB.ctx.createScriptProcessor(bufSize,1,1);
+  AMB.processor.connect(AMB.ctx.destination);
+  AMB.processor.onaudioprocess=e=>{
+    const out=e.outputBuffer.getChannelData(0);
+    for(let i=0;i<bufSize;i++) out[i]=AMB.pcmBuf.length?AMB.pcmBuf.shift():0;
+  };
+
+  // Canvas waveform
+  const canvas=$('#ambCanvas');
+  let canvasRaf=null;
+  function drawWave(){
+    if(!AMB.ativo){cancelAnimationFrame(canvasRaf);return;}
+    canvasRaf=requestAnimationFrame(drawWave);
+    if(!canvas)return;
+    const ctx2=canvas.getContext('2d');
+    const w=canvas.width,h=canvas.height;
+    ctx2.clearRect(0,0,w,h);
+    ctx2.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--card2')||'#1a2332';
+    ctx2.fillRect(0,0,w,h);
+    const slice=AMB.pcmBuf.length?AMB.pcmBuf:new Array(w).fill(0);
+    const step=Math.max(1,Math.floor(slice.length/w));
+    ctx2.beginPath();ctx2.strokeStyle='#e94560';ctx2.lineWidth=2;
+    for(let x=0;x<w;x++){
+      const v=slice[Math.min(x*step,slice.length-1)]||0;
+      const y=h/2-(v*(h/2-4));
+      x===0?ctx2.moveTo(x,y):ctx2.lineTo(x,y);
+    }
+    ctx2.stroke();
+  }
+  drawWave();
+
+  // Clock
+  AMB.clockId=setInterval(()=>{
+    const el=$('#ambTime');if(!el)return;
+    const s=Math.floor((Date.now()-AMB.ini)/1000);
+    el.textContent=Math.floor(s/60)+':'+(s%60).toString().padStart(2,'0');
+  },500);
+
+  // Fetch stream
+  try{
+    const url=HOST+'/audio-stream?k='+encodeURIComponent(KEY)+'&a2='+encodeURIComponent(KEY2);
+    const resp=await fetch(url);
+    if(!resp.ok||!resp.body){toast('❌ Stream não disponível');ambPararStream();return;}
+    AMB.reader=resp.body.getReader();
+    let leftover=new Uint8Array(0);
+    while(AMB.ativo){
+      const {done,value}=await AMB.reader.read();
+      if(done) break;
+      let chunk=value;
+      // skip WAV header (44 bytes) on first chunk
+      if(!AMB.headerDone){
+        if(chunk.length<=44){AMB.headerDone=true;continue;}
+        chunk=chunk.slice(44);AMB.headerDone=true;
+      }
+      // handle leftover odd byte from previous chunk
+      if(leftover.length>0){
+        const merged=new Uint8Array(leftover.length+chunk.length);
+        merged.set(leftover);merged.set(chunk,leftover.length);
+        chunk=merged;leftover=new Uint8Array(0);
+      }
+      if(chunk.length%2!==0){leftover=chunk.slice(chunk.length-1);chunk=chunk.slice(0,chunk.length-1);}
+      // Int16 PCM → Float32
+      const int16=new Int16Array(chunk.buffer,chunk.byteOffset,chunk.byteLength/2);
+      let peak=0;
+      for(let i=0;i<int16.length;i++){
+        const f=int16[i]/32768;
+        AMB.pcmBuf.push(f);
+        if(Math.abs(f)>peak) peak=Math.abs(f);
+      }
+      // keep buffer bounded (last ~4s)
+      const max=AMB_SR*4;if(AMB.pcmBuf.length>max) AMB.pcmBuf.splice(0,AMB.pcmBuf.length-max);
+      // volume bar
+      const vf=$('#ambVolFill');if(vf) vf.style.width=Math.min(100,peak*300)+'%';
+    }
+  }catch(_){}
+  if(AMB.ativo) ambPararStream();
+}
+
+async function ambPararStream(){
+  AMB.ativo=false;
+  try{AMB.reader&&AMB.reader.cancel();}catch(_){}
+  try{AMB.processor&&AMB.processor.disconnect();}catch(_){}
+  try{AMB.ctx&&await AMB.ctx.close();}catch(_){}
+  clearInterval(AMB.clockId);
+  AMB.ctx=null;AMB.processor=null;AMB.reader=null;
+
+  await advPost('/ambiente-parar',{});
+
+  const btn=$('#ambBtn'),hero=$('#ambHero'),st=$('#ambStatus'),sub=$('#ambSub');
+  const dl=$('#ambDownload'),vb=$('#ambVolBar'),time=$('#ambTime');
+  if(btn){btn.textContent='🎙️';btn.classList.remove('gravando');}
+  if(hero) hero.classList.remove('gravando');
+  if(vb) vb.style.display='none';
+  if(time) time.style.display='none';
+
+  // Check if we have audio to download
   const s=await advPost('/ambiente-estado',{});
-  if((s.estado||s).gravando){await ambParar();}else{await ambGravar();}
-}
-async function ambGravar(){
-  const seg=parseInt($('#ambSeg').value)||30;
-  const r=await advPost('/ambiente',{segundos:seg});
-  if(r&&r.ok){toast('🎙️ A gravar '+seg+'s...');ambCarregar();}
-  else toast((r&&r.erro)||'Erro ao iniciar gravação');
-}
-async function ambParar(){
-  await advPost('/ambiente-parar',{});toast('⏹ Gravação parada');setTimeout(ambCarregar,800);
+  const es=(s&&s.estado)||s;
+  if(es&&es.tem_audio){
+    if(st) st.textContent='Gravação pronta ('+Math.round((es.tamanho_pcm||0)/1024)+' KB PCM)';
+    if(sub) sub.textContent='Descarrega o ficheiro WAV abaixo';
+    if(dl){
+      dl.style.display='block';
+      const link=$('#ambDlLink');
+      if(link) link.href=HOST+'/audio-dl?k='+encodeURIComponent(KEY)+'&a2='+encodeURIComponent(KEY2);
+    }
+  } else {
+    if(st) st.textContent='Pronto para escuta';
+    if(sub) sub.textContent='Escuta em tempo real · clica para iniciar';
+    if(dl) dl.style.display='none';
+  }
+  toast('⏹ Parado');
 }
 
 // ══════════════════════════════════════════════════════════════════════════
