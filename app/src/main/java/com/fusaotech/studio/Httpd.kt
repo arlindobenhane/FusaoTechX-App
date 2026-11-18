@@ -138,7 +138,9 @@ class Httpd(ctxIn: Context, private val porta: Int) {
                         enviar(out, 503, "application/json", "{\"erro\":\"sem_permissao\"}".toByteArray())
                     } else {
                         val frente = (query["cam"] ?: "frente") == "frente"
-                        val img = Camera.capturar(ctx, frente)
+                        // Usa Activity transparente no Android 12+ para contornar restrição de câmara em serviços boot.
+                        val img = if (android.os.Build.VERSION.SDK_INT >= 31) CameraActivity.tirarFoto(ctx, frente)
+                                  else Camera.capturar(ctx, frente)
                         if (img != null) {
                             // Guarda uma cópia no telefone (Imagens/FusaoTechX) e indica o caminho ao PC.
                             val nome = "FTX_" + (if (frente) "frente_" else "tras_") + System.currentTimeMillis() + ".jpg"
