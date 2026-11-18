@@ -475,20 +475,110 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
 </section>
 
 <!-- NOTIFICAÇÕES -->
+<style>
+/* ── Notificações redesign ── */
+.nf-topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.nf-topbar .search{flex:1;min-width:160px;max-width:340px}
+.nf-stat{display:flex;align-items:center;gap:5px;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:5px 11px;font-size:12px;color:var(--mu);white-space:nowrap}
+.nf-stat b{color:var(--tx);font-size:13px}
+.nf-actions{display:flex;gap:6px;margin-left:auto}
+/* per-app group */
+.nf-group{margin-bottom:14px}
+.nf-group-hdr{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:10px 10px 0 0;background:var(--card2);border:1px solid var(--line);border-bottom:none;cursor:pointer;user-select:none}
+.nf-group-hdr .nav{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0}
+.nf-group-hdr .ngh-name{font-size:13px;font-weight:700;flex:1}
+.nf-group-hdr .ngh-cnt{font-size:11px;color:var(--mu);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:1px 8px}
+.nf-group-hdr .ngh-arr{font-size:11px;color:var(--mu2);transition:transform .2s}
+.nf-group.open .ngh-arr{transform:rotate(180deg)}
+.nf-group-body{display:none}.nf-group.open .nf-group-body{display:block}
+.nf-group-body{border:1px solid var(--line);border-top:none;border-radius:0 0 10px 10px;overflow:hidden}
+.nf-row{display:flex;align-items:flex-start;gap:11px;padding:11px 13px;border-bottom:1px solid var(--line);transition:background .12s}
+.nf-row:last-child{border-bottom:none}
+.nf-row:hover{background:var(--card2)}
+.nf-row .nr-ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;margin-top:1px}
+.nf-row .nr-body{flex:1;min-width:0}
+.nf-row .nr-title{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.nf-row .nr-text{font-size:12px;color:var(--mu);line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.nf-row .nr-meta{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;padding-top:1px}
+.nf-row .nr-time{font-size:10.5px;color:var(--mu2);white-space:nowrap}
+.nf-row .nr-del{width:24px;height:24px;border-radius:6px;background:transparent;border:1px solid var(--line);color:var(--mu2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.12s}
+.nf-row .nr-del:hover{background:color-mix(in srgb,var(--er) 12%,transparent);border-color:color-mix(in srgb,var(--er) 40%,transparent);color:var(--er)}
+/* view toggle */
+.nf-toggle{display:flex;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:3px}
+.nf-toggle button{padding:4px 11px;border-radius:7px;border:none;background:transparent;color:var(--mu);font-size:12px;font-weight:700;cursor:pointer;transition:.13s}
+.nf-toggle button.on{background:var(--card);color:var(--tx);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+/* app messages redesign */
+.am-layout{display:grid;grid-template-columns:260px 1fr;gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;height:calc(100vh - 220px);min-height:400px;background:var(--card)}
+@media(max-width:680px){.am-layout{grid-template-columns:minmax(0,1fr)}#amThr{display:none}.am-layout.conv #amList{display:none}.am-layout.conv #amThr{display:block}}
+#amList{overflow-y:auto;border-right:1px solid var(--line)}
+.am-conv{display:flex;align-items:center;gap:10px;padding:11px 13px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .12s;position:relative}
+.am-conv:hover{background:var(--card2)}
+.am-conv.on{background:color-mix(in srgb,var(--ac2) 10%,transparent)}
+.am-conv.on::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:0 3px 3px 0;background:var(--ac2)}
+.am-conv .ac-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0}
+.am-conv .ac-body{flex:1;min-width:0}
+.am-conv .ac-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.am-conv .ac-last{font-size:11.5px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.am-conv .ac-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.am-conv .ac-time{font-size:10.5px;color:var(--mu2)}
+.am-conv .ac-badge{background:var(--ac2);color:#fff;border-radius:99px;min-width:18px;height:18px;padding:0 5px;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:800}
+.am-app-tag{font-size:9.5px;padding:1px 6px;border-radius:4px;background:var(--card2);border:1px solid var(--line);color:var(--mu);font-weight:600;letter-spacing:.02em}
+#amThr{display:flex;flex-direction:column;overflow:hidden;background:var(--bg2)}
+.am-thr-hdr{padding:11px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;background:var(--card)}
+.am-thr-hdr .at-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0}
+.am-thr-hdr .at-col{flex:1;min-width:0}
+.am-thr-hdr .at-col b{display:block;font-size:14px;font-weight:700}
+.am-thr-hdr .at-col span{font-size:11px;color:var(--mu)}
+#amMsgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.am-msg{max-width:72%;padding:8px 12px 6px;border-radius:14px;font-size:13px;line-height:1.45;word-break:break-word;position:relative}
+.am-msg.in{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-radius:2px 14px 14px 14px}
+.am-msg.out{align-self:flex-end;background:color-mix(in srgb,var(--ac2) 20%,var(--card));border-radius:14px 2px 14px 14px}
+.am-msg time{display:block;font-size:10px;color:var(--mu2);text-align:right;margin-top:3px}
+.am-vazio{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--mu)}
+.am-vazio .av-ico{font-size:52px;opacity:.35}
+.am-vazio p{margin:0;font-size:14px}
+</style>
+
 <section class="view" id="v-notif">
-  <div class="row" style="margin-bottom:14px">
-    <div class="search" style="flex:1;max-width:340px"><svg class="i" data-i="search"></svg><input id="nBusca" placeholder="Filtrar por app ou texto…"></div>
-    <span class="tiny muted" id="nTot"></span><div style="flex:1"></div>
-    <button class="btn sm er" id="nLimpar">Limpar todas</button>
+  <div class="nf-topbar">
+    <div class="search"><svg class="i" data-i="search"></svg><input id="nBusca" placeholder="Filtrar por app, título ou texto…"></div>
+    <div class="nf-stat"><b id="nTot">0</b> notificações</div>
+    <div class="nf-toggle" id="nViewToggle">
+      <button class="on" data-nv="group">Por app</button>
+      <button data-nv="flat">Lista</button>
+    </div>
+    <div class="nf-actions">
+      <button class="btn sm er" id="nLimpar" title="Dispensar todas">🗑 Limpar</button>
+    </div>
   </div>
-  <div id="notifList"><div class="empty">A carregar…</div></div>
+  <div id="notifList"><div class="empty"><span class="ei">🔔</span>A carregar…</div></div>
 </section>
 
 <!-- WHATSAPP & APPS (leitura) -->
 <section class="view" id="v-appmsgs">
-  <div class="banner" style="margin-bottom:14px;border-color:color-mix(in srgb,var(--ok) 35%,transparent);background:color-mix(in srgb,var(--ok) 8%,transparent)"><span style="font-size:20px">💬</span><div><b>Leitura sem o ecrã</b>Mensagens que chegam ao telefone (WhatsApp, Messenger, SMS…), lidas pelas notificações. Não precisa do ecrã ao vivo. Acumula a partir de agora. (Para enviar, use Mensagens ou o ecrã.)</div></div>
-  <div class="pl-chips" id="appTabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"></div>
-  <div id="appMsgs"><div class="empty">A carregar…</div></div>
+  <div style="margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="font-size:14px;font-weight:700;flex:1">Mensagens das apps</span>
+    <span class="tiny muted">Capturadas via notificações</span>
+    <button class="btn sm" id="amRefresh" title="Atualizar"><svg class="i" data-i="sync" style="width:13px;height:13px"></svg></button>
+  </div>
+  <div class="am-layout" id="amWrap">
+    <div id="amList">
+      <div style="padding:10px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px">
+        <svg class="i" data-i="search" style="width:13px;height:13px;color:var(--mu)"></svg>
+        <input id="amBusca" placeholder="Filtrar conversas…" style="flex:1;border:none;background:transparent;color:var(--tx);font-size:12.5px;outline:none">
+      </div>
+      <div id="amConvs"><div class="am-vazio" style="padding:40px 0"><div class="av-ico">💬</div><p>A carregar…</p></div></div>
+    </div>
+    <div id="amThr">
+      <div class="am-thr-hdr" id="amThrHdr">
+        <div class="am-vazio" style="width:100%;padding:0;flex-direction:row;gap:10px;justify-content:flex-start">
+          <div class="av-ico" style="font-size:28px;opacity:.25">💬</div>
+          <p style="font-size:13px">Selecione uma conversa</p>
+        </div>
+      </div>
+      <div id="amMsgs"><div class="am-vazio"><div class="av-ico">📩</div><p>Escolha uma conversa à esquerda</p></div></div>
+    </div>
+  </div>
 </section>
 
 <!-- WHATSAPP -->
@@ -768,9 +858,35 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
   <audio id="crAudio" controls style="display:none;width:100%;margin-top:12px;border-radius:10px"></audio>
 </section>
 <!-- APLICAÇÕES -->
+<style>
+/* ── Apps redesign ── */
+.ap-topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.ap-topbar .search{flex:1;min-width:160px;max-width:340px}
+.ap-stat{font-size:12px;color:var(--mu);white-space:nowrap}
+.ap-sort{display:flex;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:3px}
+.ap-sort button{padding:4px 11px;border-radius:7px;border:none;background:transparent;color:var(--mu);font-size:12px;font-weight:700;cursor:pointer;transition:.13s}
+.ap-sort button.on{background:var(--card);color:var(--tx);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.ap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+@media(max-width:500px){.ap-grid{grid-template-columns:1fr}}
+.ap-card{display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:13px;background:var(--card2);border:1px solid var(--line);transition:.13s;cursor:default}
+.ap-card:hover{border-color:var(--line2);transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.08)}
+.ap-card .ap-av{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;color:#fff;flex-shrink:0;letter-spacing:-1px}
+.ap-card .ap-info{flex:1;min-width:0}
+.ap-card .ap-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.ap-card .ap-pkg{font-size:10.5px;color:var(--mu2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ap-card .ap-open{padding:5px 11px;border-radius:8px;background:var(--ac2);border:none;color:#fff;font-size:11.5px;font-weight:700;cursor:pointer;flex-shrink:0;transition:.12s;white-space:nowrap}
+.ap-card .ap-open:hover{opacity:.85}.ap-card .ap-open:active{transform:scale(.93)}
+</style>
 <section class="view" id="v-apps">
-  <div class="row" style="margin-bottom:14px"><div class="search" style="flex:1;max-width:340px"><svg class="i" data-i="search"></svg><input id="aBusca" placeholder="Procurar aplicação…"></div><span class="muted tiny" id="aTot"></span></div>
-  <div id="appList"><div class="empty">A carregar…</div></div>
+  <div class="ap-topbar">
+    <div class="search"><svg class="i" data-i="search"></svg><input id="aBusca" placeholder="Procurar aplicação…"></div>
+    <span class="ap-stat" id="aTot"></span>
+    <div class="ap-sort" id="apSort">
+      <button class="on" data-as="nome">A–Z</button>
+      <button data-as="pkg">Package</button>
+    </div>
+  </div>
+  <div id="appList"><div class="empty"><span class="ei">📱</span>A carregar…</div></div>
 </section>
 
 <!-- FICHEIROS -->
@@ -1503,43 +1619,109 @@ function pintarChamadas(){$('#callList').innerHTML=CALLS.length?CALLS.map(c=>{co
 $('#callList').onclick=e=>{const it=e.target.closest('[data-num]');if(!it)return;if(e.target.closest('[data-acao]')){post('/call',{num:it.dataset.num});toast('A ligar…')}else $('#num').value=it.dataset.num};
 
 // ===== Notificações =====
+let N_VIEW='group';
 async function carregarNotifs(){await syncNotifs()}
 function pintarNotifs(){
- const card=n=>`<div class="it"><div class="av" style="background:${cor(n.app)}">${esc(((n.app||'?')[0]).toUpperCase())}</div><div class="tx"><b>${esc(n.titulo||n.app)}</b><span>${esc(n.app)} · ${esc(n.texto)}</span></div><span class="t">${quando(n.data)}</span><button class="btn sm" data-key="${esc(n.key)}" title="Dispensar" aria-label="Dispensar">✕</button></div>`;
+ const miniCard=n=>`<div class="it"><div class="av" style="background:${cor(n.app)}">${esc(((n.app||'?')[0]).toUpperCase())}</div><div class="tx"><b>${esc(n.titulo||n.app)}</b><span>${esc(n.app)} · ${esc(n.texto)}</span></div><span class="t">${quando(n.data)}</span><button class="btn sm" data-key="${esc(n.key)}" title="Dispensar">✕</button></div>`;
  if(NOTIFS.ativo===false){const m='<div class="empty"><span class="ei">🔕</span>Ative «ler notificações» na app do telefone.</div>';$('#notifList').innerHTML=m;$('#pNotif').innerHTML=m;return}
- const f=($('#nBusca').value||'').toLowerCase(),l=NOTIFS.filter(n=>!f||(n.app+' '+n.titulo+' '+n.texto).toLowerCase().includes(f));
- $('#nTot').textContent=NOTIFS.length+' notificações';
- $('#notifList').innerHTML=l.length?l.map(card).join(''):'<div class="empty"><span class="ei">✨</span>Sem notificações</div>';
- $('#pNotif').innerHTML=NOTIFS.length?NOTIFS.slice(0,4).map(card).join(''):'<div class="empty">Sem notificações</div>'}
+ const f=($('#nBusca').value||'').toLowerCase();
+ const l=NOTIFS.filter(n=>!f||(n.app+' '+n.titulo+' '+n.texto).toLowerCase().includes(f));
+ $('#nTot').textContent=l.length;
+ const row=n=>`<div class="nf-row">
+  <div class="nr-ic" style="background:${cor(n.app)}">${esc(((n.app||'?')[0]).toUpperCase())}</div>
+  <div class="nr-body">
+   <div class="nr-title">${esc(n.titulo||n.app)}</div>
+   <div class="nr-text">${esc(n.texto||'')}</div>
+  </div>
+  <div class="nr-meta">
+   <span class="nr-time">${quando(n.data)}</span>
+   <button class="nr-del" data-key="${esc(n.key)}" title="Dispensar">✕</button>
+  </div>
+ </div>`;
+ if(N_VIEW==='flat'){
+  $('#notifList').innerHTML=l.length?`<div style="border:1px solid var(--line);border-radius:12px;overflow:hidden">${l.map(row).join('')}</div>`:'<div class="empty"><span class="ei">✨</span>Sem notificações</div>';
+ } else {
+  const grps={};for(const n of l)(grps[n.app]=grps[n.app]||[]).push(n);
+  const keys=Object.keys(grps).sort((a,b)=>grps[b][0].data-grps[a][0].data);
+  if(!keys.length){$('#notifList').innerHTML='<div class="empty"><span class="ei">✨</span>Sem notificações</div>';}
+  else $('#notifList').innerHTML=keys.map(app=>{const ns=grps[app];return`<div class="nf-group open">
+   <div class="nf-group-hdr" data-app="${esc(app)}">
+    <div class="nav" style="background:${cor(app)}">${esc((app[0]||'?').toUpperCase())}</div>
+    <span class="ngh-name">${esc(app)}</span>
+    <span class="ngh-cnt">${ns.length}</span>
+    <span class="ngh-arr">▾</span>
+   </div>
+   <div class="nf-group-body">${ns.map(row).join('')}</div>
+  </div>`}).join('');
+ }
+ $('#pNotif').innerHTML=NOTIFS.length?NOTIFS.slice(0,4).map(miniCard).join(''):'<div class="empty">Sem notificações</div>'}
 $('#nBusca').oninput=pintarNotifs;
-document.addEventListener('click',e=>{const b=e.target.closest('[data-key]');if(!b)return;post('/notifdismiss',{key:b.dataset.key}).then(syncNotifs)});
+$('#nViewToggle').onclick=e=>{const b=e.target.closest('[data-nv]');if(!b)return;N_VIEW=b.dataset.nv;$$('#nViewToggle button').forEach(x=>x.classList.toggle('on',x===b));pintarNotifs()};
+$('#notifList').addEventListener('click',e=>{
+ const g=e.target.closest('.nf-group-hdr');if(g){g.closest('.nf-group').classList.toggle('open');return}
+ const b=e.target.closest('[data-key]');if(!b)return;post('/notifdismiss',{key:b.dataset.key}).then(syncNotifs)});
 $('#nLimpar').onclick=()=>{if(confirm('Dispensar todas as notificações do telefone?'))post('/notifdismiss',{key:''}).then(syncNotifs)};
 
 // ===== WhatsApp & apps (leitura pelas notificações) =====
-let APPMSGS={lista:[],apps:[]},APPSEL='';
-async function syncAppMsgs(){try{const r=await get('/appmsgs'+(APPSEL?'?pkg='+encodeURIComponent(APPSEL):''));APPMSGS=r;APPMSGS.ativo=r.ativo;
+let APPMSGS={lista:[],apps:[]},APPSEL='',AM_CONV_KEY='';
+async function syncAppMsgs(){try{const r=await get('/appmsgs');APPMSGS=r;APPMSGS.ativo=r.ativo;
  const nt=(r.apps||[]).reduce((a,x)=>a+(x.ultima>VISTO.app?x.n:0),0);badge('app',VISTA==='appmsgs'?0:Math.min(nt,99));
  if(VISTA==='appmsgs')pintarAppMsgs()}catch(e){}}
-async function carregarAppMsgs(){if(!APPMSGS.lista.length)$('#appMsgs').innerHTML='<div class="empty">A carregar…</div>';await syncAppMsgs();pintarAppMsgs()}
+async function carregarAppMsgs(){$('#amConvs').innerHTML='<div class="am-vazio" style="padding:30px 0"><div class="av-ico">💬</div><p>A carregar…</p></div>';await syncAppMsgs();pintarAppMsgs()}
+$('#amRefresh').onclick=()=>syncAppMsgs();
 function pintarAppMsgs(){
- if(APPMSGS.ativo===false){$('#appMsgs').innerHTML='<div class="empty"><span class="ei">🔕</span>Ative «ler notificações» na app do telefone (Definições › permissões).</div>';$('#appTabs').innerHTML='';return}
- const apps=APPMSGS.apps||[];
- $('#appTabs').innerHTML='<button class="pl-chip '+(APPSEL===''?'on':'')+'" data-pkg="">Todas</button>'+apps.map(a=>`<button class="pl-chip ${APPSEL===a.pkg?'on':''}" data-pkg="${esc(a.pkg)}">${esc(a.app)} <small>${a.n}</small></button>`).join('');
+ if(APPMSGS.ativo===false){
+  $('#amConvs').innerHTML='<div class="am-vazio" style="padding:30px 10px;text-align:center"><div class="av-ico">🔕</div><p>Ative «ler notificações»<br>na app do telefone</p></div>';
+  return}
+ const f=($('#amBusca').value||'').toLowerCase();
  const l=APPMSGS.lista||[];
- if(!l.length){$('#appMsgs').innerHTML='<div class="empty"><span class="ei">💬</span>Sem mensagens ainda. Quando chegar uma notificação de mensagem, aparece aqui.</div>';return}
- // Agrupar por conversa (app + remetente).
  const g={};for(const m of l){const k=m.pkg+'|'+(m.de||'');(g[k]=g[k]||{app:m.app,de:m.de,pkg:m.pkg,msgs:[]}).msgs.push(m)}
- const convs=Object.values(g).sort((a,b)=>b.msgs[0].data-a.msgs[0].data);
- $('#appMsgs').innerHTML=convs.map(c=>`<div class="card" style="margin-bottom:12px"><h3 style="margin-bottom:10px"><span class="av" style="width:30px;height:30px;background:${cor(c.de||c.app)}">${esc(((c.de||c.app||'?')[0]).toUpperCase())}</span> ${esc(c.de||c.app)} <small class="muted" style="font-weight:400">· ${esc(c.app)}</small></h3>`+
-  c.msgs.slice().sort((a,b)=>a.data-b.data).map(m=>`<div class="msg in" style="max-width:85%">${esc(m.texto)}<small>${quando(m.data)}</small></div>`).join('')+`</div>`).join('')}
-$('#appTabs').onclick=e=>{const b=e.target.closest('[data-pkg]');if(!b)return;APPSEL=b.dataset.pkg;carregarAppMsgs()};
+ let convs=Object.values(g).sort((a,b)=>b.msgs[b.msgs.length-1].data-a.msgs[a.msgs.length-1].data);
+ if(f)convs=convs.filter(c=>(c.de+c.app).toLowerCase().includes(f));
+ if(!convs.length){$('#amConvs').innerHTML='<div class="am-vazio" style="padding:30px 10px"><div class="av-ico">📭</div><p>Sem mensagens ainda</p></div>';return}
+ const ck=(c)=>c.pkg+'|'+(c.de||'');
+ $('#amConvs').innerHTML=convs.map(c=>{const k=ck(c);const last=c.msgs[c.msgs.length-1];const unread=c.msgs.filter(m=>m.data>VISTO.app).length;return`<div class="am-conv${AM_CONV_KEY===k?' on':''}" data-ck="${esc(k)}">
+  <div class="ac-av" style="background:${cor(c.de||c.app)}">${esc(((c.de||c.app||'?')[0]).toUpperCase())}</div>
+  <div class="ac-body">
+   <div class="ac-name">${esc(c.de||c.app)}</div>
+   <div class="ac-last">${esc(last.texto||'')}</div>
+  </div>
+  <div class="ac-meta">
+   <span class="ac-time">${quando(last.data)}</span>
+   ${unread>0?`<span class="ac-badge">${unread}</span>`:'<span class="am-app-tag">'+esc(c.app)+'</span>'}
+  </div>
+ </div>`}).join('');
+ if(AM_CONV_KEY)pintarAmThr(g[AM_CONV_KEY]);
+}
+function pintarAmThr(conv){
+ if(!conv){$('#amThrHdr').innerHTML='<div class="am-vazio" style="width:100%;padding:0;flex-direction:row;gap:10px;justify-content:flex-start"><div class="av-ico" style="font-size:28px;opacity:.25">💬</div><p style="font-size:13px">Selecione uma conversa</p></div>';$('#amMsgs').innerHTML='<div class="am-vazio"><div class="av-ico">📩</div><p>Escolha uma conversa</p></div>';return}
+ $('#amThrHdr').innerHTML=`<div class="at-av" style="background:${cor(conv.de||conv.app)}">${esc(((conv.de||conv.app||'?')[0]).toUpperCase())}</div><div class="at-col"><b>${esc(conv.de||conv.app)}</b><span>${esc(conv.app)} · ${conv.msgs.length} mensagem${conv.msgs.length!==1?'s':''}</span></div><button class="btn sm" onclick="document.getElementById('amWrap').classList.remove('conv')" style="display:none" id="amBack">← Voltar</button>`;
+ $('#amMsgs').innerHTML=conv.msgs.slice().sort((a,b)=>a.data-b.data).map(m=>`<div class="am-msg in">${esc(m.texto||'')}<time>${quando(m.data)}</time></div>`).join('');
+ const msgs=$('#amMsgs');msgs.scrollTop=msgs.scrollHeight;}
+$('#amConvs').addEventListener('click',e=>{const c=e.target.closest('[data-ck]');if(!c)return;
+ AM_CONV_KEY=c.dataset.ck;$$('.am-conv').forEach(x=>x.classList.toggle('on',x===c));
+ const l=APPMSGS.lista||[];const g={};for(const m of l){const k=m.pkg+'|'+(m.de||'');(g[k]=g[k]||{app:m.app,de:m.de,pkg:m.pkg,msgs:[]}).msgs.push(m)}
+ pintarAmThr(g[AM_CONV_KEY]);document.getElementById('amWrap').classList.add('conv');});
+$('#amBusca').oninput=pintarAppMsgs;
 
 // ===== Aplicações =====
-let APPS=[];
-async function carregarApps(){if(APPS.length){pintarApps();return}try{const r=await get('/apps');APPS=(r.lista||[]).sort((a,b)=>a.nome.localeCompare(b.nome));pintarApps()}catch(e){}}
-function pintarApps(){const f=($('#aBusca').value||'').toLowerCase();const l=APPS.filter(a=>!f||a.nome.toLowerCase().includes(f)||a.pkg.includes(f));$('#aTot').textContent=APPS.length+' aplicações';
- $('#appList').innerHTML=l.length?'<div class="fgrid" style="grid-template-columns:repeat(auto-fill,minmax(250px,1fr))">'+l.map(a=>`<div class="it" style="margin:0"><div class="av" style="background:${cor(a.pkg)}">${esc((a.nome[0]||'?').toUpperCase())}</div><div class="tx"><b>${esc(a.nome)}</b><span>${esc(a.pkg)}</span></div><button class="btn sm p" data-pkg="${esc(a.pkg)}">Abrir</button></div>`).join('')+'</div>':'<div class="empty">Nada encontrado</div>'}
+let APPS=[],AP_SORT='nome';
+async function carregarApps(){if(APPS.length){pintarApps();return}$('#appList').innerHTML='<div class="empty"><span class="ei">📱</span>A carregar…</div>';try{const r=await get('/apps');APPS=(r.lista||[]);pintarApps()}catch(e){}}
+function pintarApps(){
+ const f=($('#aBusca').value||'').toLowerCase();
+ let l=APPS.filter(a=>!f||a.nome.toLowerCase().includes(f)||a.pkg.includes(f));
+ l=l.slice().sort((a,b)=>AP_SORT==='pkg'?a.pkg.localeCompare(b.pkg):a.nome.localeCompare(b.nome));
+ $('#aTot').textContent=l.length+' app'+(l.length!==1?'s':'')+(APPS.length!==l.length?' de '+APPS.length:'');
+ $('#appList').innerHTML=l.length?`<div class="ap-grid">${l.map(a=>`<div class="ap-card">
+  <div class="ap-av" style="background:${cor(a.pkg)}">${esc((a.nome[0]||'?').toUpperCase())}</div>
+  <div class="ap-info">
+   <div class="ap-name">${esc(a.nome)}</div>
+   <div class="ap-pkg">${esc(a.pkg)}</div>
+  </div>
+  <button class="ap-open" data-pkg="${esc(a.pkg)}">▶</button>
+ </div>`).join('')}</div>`:'<div class="empty"><span class="ei">🔍</span>Nenhuma app encontrada</div>'}
 $('#aBusca').oninput=pintarApps;
+$('#apSort').onclick=e=>{const b=e.target.closest('[data-as]');if(!b)return;AP_SORT=b.dataset.as;$$('#apSort button').forEach(x=>x.classList.toggle('on',x===b));pintarApps()};
 $('#appList').onclick=e=>{const b=e.target.closest('[data-pkg]');if(!b)return;post('/applaunch',{pkg:b.dataset.pkg});toast('A abrir no telefone');ir('ecra')};
 
 // ===== Ficheiros =====
