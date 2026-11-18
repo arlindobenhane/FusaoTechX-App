@@ -214,7 +214,7 @@ object WhatsAppStore {
             "sticker" -> setOf("webp","png")
             else      -> setOf("pdf","doc","docx","xls","xlsx","ppt","pptx","txt","zip")
         }
-        val janela = 30_000L  // 30 segundos de margem
+        val janela = 300_000L  // 5 minutos de margem (WhatsApp pode demorar a guardar)
         var melhor: java.io.File? = null
         var menorDelta = Long.MAX_VALUE
         for (raiz in raizes) {
@@ -301,13 +301,25 @@ object WhatsAppStore {
         return arr
     }
 
-    /** Mensagens de uma conversa específica (mais antigas primeiro). */
-    fun mensagensConversa(chave: String, limite: Int = 100): JSONArray {
+    /** Mensagens de uma conversa específica (mais antigas primeiro).
+     *  Se ctx fornecido, tenta encontrar media em falta (re-busca lazy). */
+    fun mensagensConversa(chave: String, limite: Int = 100, ctx: Context? = null): JSONArray {
         val arr = JSONArray()
         val fila = conversas[chave] ?: return arr
+        val semMedia = setOf("texto", "chamada", "localizacao")
         synchronized(fila) {
             fila.takeLast(limite.coerceIn(1, MAX_POR_CONVERSA)).forEach { m ->
-                arr.put(mensagemParaJson(m))
+                var msg = m
+                if (ctx != null && m.mediaPath == null && m.tipo !in semMedia) {
+                    val novo = procurarMedia(m.pacote, m.tipo, m.id)
+                    if (novo != null) {
+                        msg = m.copy(mediaPath = novo)
+                        val idx = fila.indexOfFirst { it.id == m.id && it.chave == m.chave }
+                        if (idx >= 0) fila[idx] = msg
+                        guardar(ctx)
+                    }
+                }
+                arr.put(mensagemParaJson(msg))
             }
         }
         return arr

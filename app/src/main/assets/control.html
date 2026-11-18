@@ -1621,10 +1621,17 @@ async function carregarWa(){
   }catch(e){document.getElementById('waStatus').textContent='Erro ao carregar'}
 }
 
+const WA_OCULTAR_NOMES=['atualizações recentes','atualizações recentes','recent updates','ofertas relâmpago','flash sales'];
 function wafiltrarLista(){
-  if(WA_FILTRO==='messenger') return WA_CONVS.filter(c=>c.pacote==='com.whatsapp');
-  if(WA_FILTRO==='business')  return WA_CONVS.filter(c=>c.pacote==='com.whatsapp.w4b');
-  return WA_CONVS;
+  let lista=WA_CONVS.filter(c=>{
+    const ch=c.chave||'',nm=(c.conversa||'').toLowerCase().trim();
+    if(ch.includes('_atualiza__es_recentes')||ch.includes('_recent_updates')) return false;
+    if(WA_OCULTAR_NOMES.includes(nm)) return false;
+    return true;
+  });
+  if(WA_FILTRO==='messenger') return lista.filter(c=>c.pacote==='com.whatsapp');
+  if(WA_FILTRO==='business')  return lista.filter(c=>c.pacote==='com.whatsapp.w4b');
+  return lista;
 }
 
 function pintarWaConvs(){
