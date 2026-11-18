@@ -638,7 +638,7 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
 <!-- WHATSAPP -->
 <section class="view" id="v-wa">
   <style>
-    /* ── WhatsApp panel ── */
+    /* ── WhatsApp panel — estilo consistente com o resto do painel ── */
     .wa-icon path{fill:currentColor}
     /* header */
     .wa-hdr{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--line)}
@@ -648,16 +648,15 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
     .wa-hdr h2{margin:0;font-size:17px;font-weight:800}
     .wa-hdr .muted{font-size:11.5px;color:var(--mu)}
     /* permissão */
-    .wa-perm{display:flex;align-items:center;gap:12px;background:color-mix(in srgb,#25d366 10%,transparent);border:1px solid color-mix(in srgb,#25d366 30%,transparent);border-radius:12px;padding:13px 16px;margin-bottom:14px}
+    .wa-perm{display:flex;align-items:center;gap:12px;background:color-mix(in srgb,var(--ac2) 10%,transparent);border:1px solid color-mix(in srgb,var(--ac2) 30%,transparent);border-radius:12px;padding:13px 16px;margin-bottom:14px}
     .wa-perm span{font-size:24px}
     .wa-perm b{display:block;margin-bottom:2px;font-size:13.5px}
     .wa-perm .muted{font-size:12px;color:var(--mu)}
-    /* filtros */
+    /* filtros — igual ao design das tabs do app */
     .wa-filters{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
     .wa-filters .wf{padding:5px 12px;border-radius:99px;font-size:12.5px;font-weight:700;border:1px solid var(--line);color:var(--mu);cursor:pointer;transition:.13s;background:transparent}
     .wa-filters .wf:hover{border-color:var(--line2);color:var(--tx)}
-    .wa-filters .wf.on{background:color-mix(in srgb,#25d366 15%,transparent);border-color:color-mix(in srgb,#25d366 50%,transparent);color:#1aad53}
-    html[data-theme=claro] .wa-filters .wf.on{color:#0d7a3a}
+    .wa-filters .wf.on{background:color-mix(in srgb,var(--ac2) 15%,transparent);border-color:color-mix(in srgb,var(--ac2) 50%,transparent);color:var(--ac2)}
     .wa-exp-all{margin-left:auto;display:flex;gap:6px}
     /* layout principal */
     #waWrap{display:grid;grid-template-columns:290px 1fr;gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;height:calc(100vh - 230px);min-height:420px;background:var(--card)}
@@ -670,24 +669,24 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
     #waConvs{flex:1;overflow-y:auto}
     .wa-conv{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;border-bottom:1px solid var(--line);transition:background .12s;position:relative}
     .wa-conv:hover{background:var(--card2)}
-    .wa-conv.on{background:color-mix(in srgb,#25d366 10%,transparent)}
-    .wa-conv.on::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:0 3px 3px 0;background:#25d366}
+    .wa-conv.on{background:color-mix(in srgb,var(--ac2) 10%,transparent)}
+    .wa-conv.on::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:0 3px 3px 0;background:var(--ac2)}
     .wa-conv .av{width:38px;height:38px;border-radius:50%;background:var(--ac2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;flex-shrink:0}
-    .wa-conv .av.grp{background:linear-gradient(135deg,#25d366,#128c7e)}
+    .wa-conv .av.grp{background:linear-gradient(135deg,var(--ac2),var(--ac))}
     .wa-conv .av.biz{background:linear-gradient(135deg,#1a4a3c,#25d366)}
     .wa-conv .col{flex:1;min-width:0}
     .wa-conv .col b{display:flex;align-items:center;gap:5px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .wa-conv .col span{display:block;font-size:11.5px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
     .wa-conv .meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
     .wa-conv .meta time{font-size:10.5px;color:var(--mu2)}
-    .wa-conv .meta .nb{background:#25d366;color:#fff;border-radius:99px;min-width:18px;height:18px;padding:0 5px;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:800}
-    .wa-biz-badge{font-size:9px;font-weight:800;padding:1px 5px;border-radius:4px;background:color-mix(in srgb,#25d366 20%,transparent);color:#1aad53;border:1px solid color-mix(in srgb,#25d366 35%,transparent);letter-spacing:.03em;flex-shrink:0}
+    .wa-conv .meta .nb{background:var(--ac2);color:#fff;border-radius:99px;min-width:18px;height:18px;padding:0 5px;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:800}
+    .wa-biz-badge{font-size:9px;font-weight:800;padding:1px 5px;border-radius:4px;background:color-mix(in srgb,#25d366 15%,transparent);color:#1aad53;border:1px solid color-mix(in srgb,#25d366 30%,transparent);letter-spacing:.03em;flex-shrink:0}
     html[data-theme=claro] .wa-biz-badge{color:#0d7a3a}
     /* painel de thread */
     #waThr{display:flex;flex-direction:column;overflow:hidden;background:var(--bg2)}
     .wa-thrhd{padding:11px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;background:var(--card)}
     .wa-thrhd .av{width:36px;height:36px;border-radius:50%;background:var(--ac2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;flex-shrink:0}
-    .wa-thrhd .av.grp{background:linear-gradient(135deg,#25d366,#128c7e)}
+    .wa-thrhd .av.grp{background:linear-gradient(135deg,var(--ac2),var(--ac))}
     .wa-thrhd .av.biz{background:linear-gradient(135deg,#1a4a3c,#25d366)}
     .wa-thrhd .col{flex:1;min-width:0}
     .wa-thrhd .col b{display:block;font-size:14px;font-weight:700}
@@ -701,16 +700,16 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
     .wa-msg{max-width:70%;display:flex;flex-direction:column;gap:1px}
     .wa-msg.eu{align-self:flex-end;align-items:flex-end}
     .wa-msg.eles{align-self:flex-start;align-items:flex-start}
-    .wa-msg .rem{font-size:10.5px;font-weight:700;color:#25d366;margin-bottom:1px;padding:0 2px}
+    .wa-msg .rem{font-size:10.5px;font-weight:700;color:var(--ac2);margin-bottom:1px;padding:0 2px}
     .wa-msg .bub{padding:7px 11px 5px;border-radius:14px;line-height:1.45;word-break:break-word;position:relative}
-    .wa-msg.eu .bub{background:color-mix(in srgb,#25d366 25%,var(--card));border-radius:14px 2px 14px 14px}
+    .wa-msg.eu .bub{background:color-mix(in srgb,var(--ac2) 20%,var(--card));border-radius:14px 2px 14px 14px}
     .wa-msg.eles .bub{background:var(--card);border-radius:2px 14px 14px 14px;border:1px solid var(--line)}
     html[data-theme=claro] .wa-msg.eles .bub{background:#fff}
     .wa-msg .txt{font-size:13.5px;color:var(--tx)}
     .wa-msg .media-ic{font-size:16px;margin-right:4px;vertical-align:middle}
     .wa-msg .media-lbl{font-size:12.5px;color:var(--mu);font-style:italic}
     .wa-msg time{font-size:10px;color:var(--mu2);display:block;text-align:right;margin-top:3px;padding:0 2px}
-    .wa-msg.eu time{color:color-mix(in srgb,#25d366 70%,var(--mu))}
+    .wa-msg.eu time{color:color-mix(in srgb,var(--ac2) 70%,var(--mu))}
     .wa-media-img{max-width:100%;max-height:260px;border-radius:10px;display:block;cursor:zoom-in;margin-bottom:4px}
     .wa-media-video{max-width:100%;max-height:260px;border-radius:10px;display:block;margin-bottom:4px;background:#000}
     .wa-media-audio{width:100%;min-width:180px;margin-bottom:4px;border-radius:8px}
@@ -723,8 +722,8 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
     /* caixa de resposta */
     .wa-reply{padding:10px 12px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:flex-end;background:var(--card)}
     .wa-reply textarea{flex:1;border:1px solid var(--line);border-radius:22px;padding:9px 14px;font-size:13.5px;resize:none;background:var(--in);color:var(--tx);outline:none;max-height:120px;min-height:38px;line-height:1.4;transition:border-color .15s}
-    .wa-reply textarea:focus{border-color:#25d366}
-    .wa-reply .btn-send{width:38px;height:38px;border-radius:50%;background:#25d366;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s,transform .1s}
+    .wa-reply textarea:focus{border-color:var(--ac2)}
+    .wa-reply .btn-send{width:38px;height:38px;border-radius:50%;background:var(--ac2);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s,transform .1s}
     .wa-reply .btn-send:hover{opacity:.85}.wa-reply .btn-send:active{transform:scale(.92)}
     .wa-reply .btn-send svg{width:18px;height:18px;fill:#fff}
     .wa-noreply{padding:9px 14px;border-top:1px solid var(--line);text-align:center;font-size:12px;color:var(--mu);background:var(--card)}
@@ -2563,6 +2562,8 @@ async function ambParar(){
   const au=document.getElementById('ambAudio');
   if(au){au.pause();au.src='';}
   await advPost('/ambiente-parar',{});
+  // Small delay so the phone finishes flushing audio before we check state
+  await new Promise(r=>setTimeout(r,400));
   const s=await advPost('/ambiente-estado',{});
   ambPararUI((s&&(s.estado||s).tem_audio));
   toast('⏹ Parado');

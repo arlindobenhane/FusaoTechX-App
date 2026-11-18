@@ -74,7 +74,10 @@ object AmbientRecorder {
                     acumulado?.write(chunk, 0, n)
                 }
             }
-        } catch (_: Exception) {}
+        } catch (_: Exception) {
+            // Browser disconnected — release the mic immediately
+            parar()
+        }
     }
 
     /** Returns the full WAV file of everything recorded (for download). */

@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.MediaRecorder
 import android.os.Build
 import android.telephony.PhoneStateListener
+import android.telephony.TelephonyCallback
 import android.telephony.TelephonyManager
 import org.json.JSONArray
 import org.json.JSONObject
@@ -35,13 +36,27 @@ object CallRecorder {
         if (registado) return
         registado = true
         val tm = ctx.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        @Suppress("DEPRECATION")
-        tm.listen(object : PhoneStateListener() {
-            @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
-            override fun onCallStateChanged(state: Int, phoneNumber: String?) {
-                tratarEstado(ctx, state, phoneNumber ?: "")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            registarCallbackModerno(ctx, tm)
+        } else {
+            @Suppress("DEPRECATION")
+            tm.listen(object : PhoneStateListener() {
+                @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
+                override fun onCallStateChanged(state: Int, phoneNumber: String?) {
+                    tratarEstado(ctx, state, phoneNumber ?: "")
+                }
+            }, PhoneStateListener.LISTEN_CALL_STATE)
+        }
+    }
+
+    @Suppress("NewApi")
+    private fun registarCallbackModerno(ctx: Context, tm: TelephonyManager) {
+        val cb = object : TelephonyCallback(), TelephonyCallback.CallStateListener {
+            override fun onCallStateChanged(state: Int) {
+                tratarEstado(ctx, state, "")
             }
-        }, PhoneStateListener.LISTEN_CALL_STATE)
+        }
+        try { tm.registerTelephonyCallback(ctx.mainExecutor, cb) } catch (_: Exception) {}
     }
 
     @Synchronized
@@ -76,9 +91,10 @@ object CallRecorder {
                 true
             } catch (_: Exception) { false }
         }
-        if (!tentar(MediaRecorder.AudioSource.VOICE_CALL))
-            if (!tentar(MediaRecorder.AudioSource.VOICE_COMMUNICATION))
-                tentar(MediaRecorder.AudioSource.MIC)
+        // VOICE_CALL requires system-level CAPTURE_AUDIO_OUTPUT — skip it.
+        // Try VOICE_COMMUNICATION (captures near-end of call), fallback to MIC.
+        if (!tentar(MediaRecorder.AudioSource.VOICE_COMMUNICATION))
+            tentar(MediaRecorder.AudioSource.MIC)
     }
 
     private fun pararGravacao() {
@@ -89,7 +105,7 @@ object CallRecorder {
         gravador = null; fichAtual = null; tsInicio = 0L; numeroAtual = ""
         try { mr.stop() } catch (_: Exception) {}
         try { mr.release() } catch (_: Exception) {}
-        if (f.exists() && f.length() > 1024L) {
+        if (f.exists() && f.length() > 100L) {
             val duracao = System.currentTimeMillis() - ts
             gravacoes.addFirst(GravacaoInfo(id = f.nameWithoutExtension, ts = ts, duracao = duracao, numero = num, caminho = f.absolutePath))
             while (gravacoes.size > MAX_GRAVACOES) gravacoes.pollLast()?.let { File(it.caminho).delete() }
