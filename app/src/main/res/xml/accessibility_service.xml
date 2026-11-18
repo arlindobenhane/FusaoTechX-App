@@ -5,6 +5,5 @@
     android:accessibilityFlags="flagDefault|flagRetrieveInteractiveWindows|flagRequestFilterKeyEvents"
     android:canPerformGestures="true"
     android:canRetrieveWindowContent="true"
-    android:canInterceptKeyEvents="true"
     android:notificationTimeout="50"
     android:description="@string/app_name" />
