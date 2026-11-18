@@ -1210,6 +1210,20 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
         <h3>📸 Fotos de tentativas de PIN errado <span class="r"><small id="atPinCount" class="muted tiny"></small></span></h3>
         <div id="atSelfies"><div class="tiny muted">Sem fotos ainda. Quando alguém introduzir o PIN errado com o anti-roubo ativo, aparece aqui.</div></div>
       </div>
+
+      <!-- Stealth / Visibilidade do ícone -->
+      <div class="card" style="margin-top:16px">
+        <h3>👁 Stealth — Visibilidade da App</h3>
+        <p class="tiny muted" style="margin:0 0 12px">Quando o ícone está escondido, a app desaparece da gaveta de aplicações. Continua a funcionar em segundo plano. Para abri-la de novo, usa o atalho secreto.</p>
+        <div id="atIconeCard" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;background:var(--bg2,#f5f5f5);margin-bottom:10px">
+          <span id="atIconeDot" style="width:10px;height:10px;border-radius:50%;background:#888;flex-shrink:0"></span>
+          <span id="atIconeLabel" class="tiny">A verificar...</span>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" id="btnEsconderIcone" onclick="iconeAcao(false)">🫥 Esconder ícone</button>
+          <button class="btn" id="btnMostrarIcone" onclick="iconeAcao(true)">👁 Mostrar ícone</button>
+        </div>
+      </div>
     </div>
 
     </div><!-- /at-antiroubo -->
@@ -2305,8 +2319,29 @@ $('#atWipeConfirm').onclick=async()=>{
 // Auto-load when tab opens
 document.addEventListener('click',e=>{
   const t=e.target.closest('[data-at="at-antiroubo"]');
-  if(t)atCarregar();
+  if(t){ atCarregar(); iconeCarregar(); }
 });
+
+// ── Stealth: ícone launcher ───────────────────────────────────────────────
+async function iconeCarregar(){
+  try{
+    const r=await advPost('/icone-estado',{});
+    const v=r&&r.visivel;
+    const dot=$('#atIconeDot');
+    const lbl=$('#atIconeLabel');
+    if(!dot)return;
+    dot.style.background=v?'#4caf50':'#888';
+    lbl.textContent=v?'Ícone visível na gaveta de apps':'Ícone escondido — app invisível no launcher';
+  }catch(_){}
+}
+async function iconeAcao(mostrar){
+  const ep=mostrar?'/icone-mostrar':'/icone-esconder';
+  const r=await advPost(ep,{});
+  if(r&&r.ok){
+    toast(mostrar?'👁 Ícone visível':'🫥 Ícone escondido');
+    iconeCarregar();
+  }
+}
 
 // ===== Dashboard — atividade recente e contadores =====
 async function atualizarAtividade(){

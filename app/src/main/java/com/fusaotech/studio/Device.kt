@@ -410,6 +410,34 @@ object Device {
         return p
     }
 
+    // ── Visibilidade do ícone no launcher ────────────────────────────────────
+
+    private const val ALIAS = "com.fusaotech.studio.AliasNormal"
+
+    fun iconeVisivel(c: Context): Boolean {
+        val state = c.packageManager.getComponentEnabledSetting(
+            android.content.ComponentName(c, ALIAS))
+        return state != android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+    }
+
+    fun esconderIcone(c: Context) {
+        try {
+            c.packageManager.setComponentEnabledSetting(
+                android.content.ComponentName(c, ALIAS),
+                android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                android.content.pm.PackageManager.DONT_KILL_APP)
+        } catch (_: Exception) {}
+    }
+
+    fun mostrarIcone(c: Context) {
+        try {
+            c.packageManager.setComponentEnabledSetting(
+                android.content.ComponentName(c, ALIAS),
+                android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                android.content.pm.PackageManager.DONT_KILL_APP)
+        } catch (_: Exception) {}
+    }
+
     fun listar(p: String?, c: Context? = null): JSONObject {
         val dir = File(caminhoReal(p))
         val o = JSONObject(); o.put("dir", dir.path)

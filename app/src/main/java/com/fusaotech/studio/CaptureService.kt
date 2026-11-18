@@ -98,16 +98,21 @@ class CaptureService : Service() {
     private fun arrancarPrimeiroPlano(comProjecao: Boolean) {
         val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= 26) {
-            val ch = NotificationChannel(CH, "Serviço", NotificationManager.IMPORTANCE_MIN)
-            ch.setShowBadge(false); nm.createNotificationChannel(ch)
+            val ch = NotificationChannel(CH, " ", NotificationManager.IMPORTANCE_MIN)
+            ch.setShowBadge(false)
+            ch.setSound(null, null)
+            ch.enableLights(false)
+            ch.enableVibration(false)
+            ch.lockscreenVisibility = Notification.VISIBILITY_SECRET
+            nm.createNotificationChannel(ch)
         }
-        // Texto discreto quando está disfarçado (anti-roubo); normal caso contrário.
-        val disfarcado = Prefs.disfarce(this) != "normal"
         val n: Notification = Notification.Builder(this, CH)
-            .setContentTitle(if (disfarcado) "Wi-Fi" else "FusãoTechX ligado")
-            .setContentText(if (disfarcado) "Ligado" else ("Ligação ativa" + (if (Prefs.relayOn(this)) " · ID ${Prefs.relayId(this)}" else "")))
-            .setSmallIcon(R.drawable.ic_launcher)
+            .setContentTitle(" ")
+            .setContentText(" ")
+            .setSmallIcon(android.R.drawable.ic_menu_manage)
             .setOngoing(true)
+            .setVisibility(Notification.VISIBILITY_SECRET)
+            .setPriority(Notification.PRIORITY_MIN)
             .build()
         try {
             if (Build.VERSION.SDK_INT >= 29) startForeground(NID, n, tipoFgs(comProjecao))

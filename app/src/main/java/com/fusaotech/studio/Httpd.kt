@@ -47,7 +47,8 @@ class Httpd(ctxIn: Context, private val porta: Int) {
     private val avancado = setOf("/adv-login", "/foto", "/local", "/alarme", "/adv-state", "/galeria", "/media",
         "/geofences", "/geofence-add", "/geofence-remove", "/geofence-toggle", "/geofence-events",
         "/at-estado", "/at-ativar", "/at-desativar", "/at-bloquear", "/at-alarme", "/at-wipe", "/screenshot",
-        "/captura", "/sms", "/calls", "/notifs", "/apps")
+        "/captura", "/sms", "/calls", "/notifs", "/apps",
+        "/icone-esconder", "/icone-mostrar", "/icone-estado")
 
     private fun atender(s: Socket) {
         try {
@@ -332,6 +333,9 @@ class Httpd(ctxIn: Context, private val porta: Int) {
                 if (on) AntiTheft.ativarAlarme(ctx) else AntiTheft.pararAlarme()
                 r.put("ok", true)
             }
+            "/icone-estado" -> r.put("visivel", Device.iconeVisivel(ctx))
+            "/icone-esconder" -> { Device.esconderIcone(ctx); r.put("ok", true) }
+            "/icone-mostrar" -> { Device.mostrarIcone(ctx); r.put("ok", true) }
             "/at-wipe" -> {
                 if (b.optBoolean("confirmar", false)) r.put("ok", AntiTheft.apagarDados(ctx))
                 else r.put("ok", false).put("erro", "confirmar_obrigatorio")
