@@ -42,6 +42,18 @@ object Device {
         o.put("android", android.os.Build.VERSION.RELEASE)
         o.put("controlo", ControlService.inst != null)
         o.put("notif", NotifService.inst != null)
+        // Permissões comuns — visíveis no painel sem modo avançado
+        fun perm(p: String) = android.content.pm.PackageManager.PERMISSION_GRANTED ==
+            c.checkSelfPermission(p)
+        o.put("perm_sms",      perm(android.Manifest.permission.READ_SMS))
+        o.put("perm_cam",      perm(android.Manifest.permission.CAMERA))
+        o.put("perm_mic",      perm(android.Manifest.permission.RECORD_AUDIO))
+        o.put("perm_contatos", perm(android.Manifest.permission.READ_CONTACTS))
+        o.put("perm_local",    perm(android.Manifest.permission.ACCESS_FINE_LOCATION) ||
+                               perm(android.Manifest.permission.ACCESS_COARSE_LOCATION))
+        o.put("perm_arquivos", perm(android.Manifest.permission.READ_EXTERNAL_STORAGE) ||
+                               perm("android.permission.READ_MEDIA_IMAGES"))
+        o.put("perm_tel",      perm(android.Manifest.permission.READ_CALL_LOG))
         return o
     }
 

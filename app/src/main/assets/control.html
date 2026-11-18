@@ -1440,7 +1440,7 @@ button.it:hover,.it.ck:hover{border-color:var(--line2);cursor:pointer}
       <div class="card" id="sApa"><h3>🎨 Aparência</h3>
         <div class="field"><div><b>Tema</b><span>Automático segue o sistema do PC.</span></div><div class="seg" id="segT"><button data-t="auto">Automático</button><button data-t="claro">☀️ Claro</button><button data-t="escuro">🌙 Escuro</button></div></div>
       </div>
-      <div class="card" id="sPer"><h3>🛡️ Permissões no telefone</h3><div id="permList"></div>
+      <div class="card" id="sPer"><h3>🛡️ Permissões no telefone<span class="r"><button class="btn sm" id="permRefresh">↻ Atualizar</button></span></h3><div id="permList"></div>
         <div class="tiny muted" style="margin-top:10px">As permissões dão-se na app Device Manager do telefone, em «1 · Permissões».</div></div>
       <div class="card" id="sSob"><h3>ℹ️ Sobre</h3>
         <div class="grid g2" style="align-items:center">
@@ -1573,11 +1573,23 @@ function pintarSims2(sims){
  if(!sims.length){el.innerHTML='<div class="tiny muted" style="padding:6px 0">Sem SIM</div>';return}
  el.innerHTML=sims.map(s=>`<div style="font-size:12px;line-height:1.5"><b>${esc(s.operadora||s.nome||'SIM '+s.slot)}</b><br><span style="color:var(--mu)">${esc(s.numero||'—')}${s.roaming?' · roaming':''}</span></div>`).join('<hr style="border:none;border-top:1px solid var(--line);margin:4px 0">')}
 function pintarPermissoes(){
- const p=[['controlo',S.controlo,'Controlo (Acessibilidade)','Tocar, deslizar e escrever a partir do PC'],['notif',S.notif,'Ler notificações','Ver e dispensar notificações no PC'],['ecra',S.ecra,'Partilha do ecrã','Ver o ecrã ao vivo']];
- $('#permList').innerHTML=p.map(x=>`<div class="perm"><span class="s ${x[1]?'ok':'no'}">${x[1]?'✓':'!'}</span><div><b>${x[2]}</b><span>${x[1]?'Ativo':'Por ativar'} · ${x[3]}</span></div></div>`).join('');
- const falta=p.filter(x=>!x[1]&&x[0]!=='ecra');
+ const p=[
+   ['controlo',  S.controlo,       'Controlo (Acessibilidade)', 'Para mexer no telefone a partir do PC'],
+   ['notif',     S.notif,          'Ler notificações',           'Ver e dispensar notificações'],
+   ['ecra',      S.ecra,           'Partilha do ecrã',           'Ver o ecrã ao vivo'],
+   ['sms',       S.perm_sms,       'SMS (leitura)',               'Ler mensagens SMS recebidas'],
+   ['tel',       S.perm_tel,       'Registo de chamadas',         'Ver chamadas recebidas e efectuadas'],
+   ['cam',       S.perm_cam,       'Câmara',                     'Tirar fotos remotamente'],
+   ['mic',       S.perm_mic,       'Microfone',                  'Capturar áudio do ambiente'],
+   ['contatos',  S.perm_contatos,  'Contactos',                  'Ver nomes associados a números'],
+   ['local',     S.perm_local,     'Localização',                'Ver a posição GPS do telefone'],
+   ['arquivos',  S.perm_arquivos,  'Fotos / ficheiros',          'Aceder à galeria e media WA'],
+ ];
+ const lRow=x=>{const v=x[1];const st=v===true?'ok':v===false?'no':'dk';const lbl=v===true?'Concedida':v===false?('Por dar — '+x[3]):'A verificar…';return`<div class="perm"><span class="s ${st}">${v===true?'✓':v===false?'!':'?'}</span><div><b>${x[2]}</b><span>${lbl}</span></div></div>`;};
+ $('#permList').innerHTML=p.map(lRow).join('');
+ const falta=p.filter(x=>x[1]===false&&x[0]!=='ecra'&&x[0]!=='cam'&&x[0]!=='mic'&&x[0]!=='local');
  $('#permBanner').innerHTML=falta.length?`<div class="banner"><span style="font-size:22px">🛡️</span><div><b>Falta ${falta.length===1?'uma permissão':'dar permissões'} no telefone</b>${falta.map(x=>esc(x[2])).join(' · ')} — abra a app Device Manager › «1 · Permissões».</div><button class="btn sm x" data-go="def">Ver</button></div>`:'';
- $('#ctlBanner').innerHTML=S.controlo===false?'<div class="banner"><span style="font-size:22px">🖱️</span><div><b>Para mexer no telefone a partir do PC</b>No telefone: app Device Manager › «Permitir controlo (Acessibilidade)» › ative Device Manager. Até lá, só pode ver o ecrã.</div></div>':''}
+ $('#ctlBanner').innerHTML=S.controlo===false?'<div class="banner"><span style="font-size:22px">🖱️</span><div><b>Para mexer no telefone a partir do PC</b>No telefone: app Device Manager › «Permitir controlo (Acessibilidade)» › ative Device Manager. Até lá, só pode ver o ecrã.</div></div>':'';}
 
 // Notificações, mensagens e chamadas novas (badges + avisos no PC)
 const VISTO=pref('visto',{sms:0,call:0,notif:0,wa:0});
@@ -2067,6 +2079,7 @@ addEventListener('drop',e=>{e.preventDefault();dc=0;$('#drop').classList.remove(
 
 // ===== Definições =====
 $('#setnav').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;$$('#setnav button').forEach(x=>x.classList.toggle('on',x===b));$('#'+b.dataset.s).scrollIntoView({behavior:'smooth',block:'start'})};
+document.getElementById('permRefresh').onclick=async()=>{await estado();pintarPermissoes()};
 function pintarDef(){if(document.activeElement!==$('#dNome'))$('#dNome').value=S.nome||'';if(document.activeElement!==$('#dCode'))$('#dCode').value=CODE;
  $('#ips').innerHTML=(S.ips||[]).map(ip=>'<code>http://'+esc(ip)+':9999</code>').join('<br>')||'(sem Wi-Fi)';
  const idf=(S.relayId||'').replace(/(\d{3})(?=\d)/g,'$1 '),host=(S.relayUrl||'relay.sp').replace(/^https?:\/\//,'');
