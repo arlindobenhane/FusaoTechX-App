@@ -104,7 +104,7 @@ object GeofenceStore {
                         .put("zona_nome", z.optString("nome"))
                         .put("tipo", tipo)
                         .put("lat", lat).put("lng", lng)
-                        .put("distancia", kotlin.math.roundToInt(dist))
+                        .put("distancia", dist.toLong())
                         .put("ts", ts))
                     // SEM notificação no telefone — evento fica só no log para o admin ler.
                 }
